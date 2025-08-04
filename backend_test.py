@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime, timedelta
 
 # Configuration
-BASE_URL = "https://f463abed-ae3e-464b-a6d7-5662f9927a39.preview.emergentagent.com"
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 class SparkMVPTester:
