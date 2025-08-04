@@ -1,45 +1,58 @@
 'use client'
 
-import { useEffect } from "react";
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/components/AuthProvider'
+import { useRouter } from 'next/navigation'
+import Navigation from '@/components/Navigation'
+import Hero from '@/components/homepage/Hero'
+import WhySpark from '@/components/homepage/WhySpark'
+import HowItWorks from '@/components/homepage/HowItWorks'
+import Benefits from '@/components/homepage/Benefits'
+import Stats from '@/components/homepage/Stats'
+import Testimonials from '@/components/homepage/Testimonials'
+import FAQ from '@/components/homepage/FAQ'
+import JoinBeta from '@/components/homepage/JoinBeta'
+import Footer from '@/components/Footer'
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await fetch('/api/');
-      const data = await response.json();
-      console.log(data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+export default function HomePage() {
+  const { user, profile, loading } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
-    helloWorldApi();
-  }, []);
+    if (!loading && user && profile) {
+      // Redirect authenticated users to their dashboard
+      if (profile.role === 'creator') {
+        router.push('/creator/dashboard')
+      } else if (profile.role === 'brand') {
+        router.push('/brand/dashboard')
+      } else if (profile.role === 'admin') {
+        router.push('/admin/panel')
+      }
+    }
+  }, [user, profile, loading, router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" alt="Emergent" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <main>
+        <Hero />
+        <WhySpark />
+        <HowItWorks />
+        <Benefits />
+        <Stats />
+        <Testimonials />
+        <FAQ />
+        <JoinBeta />
+      </main>
+      <Footer />
     </div>
-  );
-};
-
-function App() {
-  return (
-    <div className="App">
-      <Home />
-    </div>
-  );
+  )
 }
-
-export default App;

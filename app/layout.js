@@ -1,15 +1,29 @@
+import { Inter, Montserrat } from 'next/font/google'
 import './globals.css'
+import { AuthProvider } from '@/components/AuthProvider'
+
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter'
+})
+
+const montserrat = Montserrat({ 
+  subsets: ['latin'],
+  variable: '--font-montserrat'
+})
 
 export const metadata = {
-  title: 'Next.js MongoDB Template',
-  description: 'A simple template with App Router, MongoDB, and shadcn/ui',
+  title: 'Spark - KOL & Creator Marketplace',
+  description: 'Connect brands with creators through our innovative marketplace platform.',
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
-        {children}
+      <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased`}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )
