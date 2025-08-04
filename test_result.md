@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the Spark MVP backend functionality with Supabase integration including authentication, database operations, API endpoints, and helper functions"
+user_problem_statement: "Test the complete Spark MVP authentication and profile management flow including frontend signup flows, database integration, role-based routing, and error handling"
 
 backend:
   - task: "Supabase Connection and Configuration"
