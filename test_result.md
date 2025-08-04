@@ -245,7 +245,7 @@ frontend:
     implemented: true
     working: false
     file: "/app/app/auth/signup/page.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -255,6 +255,9 @@ frontend:
         - working: false
           agent: "testing"
           comment: "❌ CRITICAL ISSUE - Creator signup form works correctly (role pre-selection, form validation), but profile creation fails with 'Account created but profile setup failed. Please contact support.' Console shows 401 errors from Supabase profiles table. Authentication user creation succeeds but profile database insertion fails due to RLS policy or permission issues."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ISSUE PERSISTS - After main agent attempted database fixes, comprehensive testing confirms Creator signup still fails. Supabase auth succeeds (200 response) but profile creation fails with HTTP 401 and RLS policy error: 'new row violates row-level security policy for table profiles' (code: 42501). Fixed redirect from /creator/onboarding to /creator/dashboard. ROOT CAUSE: Supabase RLS policies blocking profile INSERT operations."
 
   - task: "Brand Signup Flow"
     implemented: true
