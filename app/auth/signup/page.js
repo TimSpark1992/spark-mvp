@@ -98,9 +98,9 @@ export default function SignupPage() {
 
     // Redirect based on role
     if (formData.role === 'creator') {
-      router.push('/creator/onboarding')
+      router.push('/creator/dashboard')
     } else if (formData.role === 'brand') {
-      router.push('/brand/onboarding')
+      router.push('/brand/dashboard')
     } else {
       router.push('/')
     }
