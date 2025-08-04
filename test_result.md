@@ -225,14 +225,164 @@ backend:
           agent: "testing"
           comment: "✅ PASS - MongoDB template routes working correctly with CORS, error handling, and basic CRUD operations. Not part of main Spark MVP but functional"
 
+frontend:
+  - task: "Homepage Hero Section with Role Selection"
+    implemented: true
+    working: "NA"
+    file: "/app/components/homepage/Hero.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Hero section with 'I'm a Creator' and 'I'm a Brand' buttons that link to signup with role parameters. Needs testing for proper navigation."
+
+  - task: "Creator Signup Flow"
+    implemented: true
+    working: "NA"
+    file: "/app/app/auth/signup/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Complete signup form with role selection, email, password, full name. Includes role parameter from URL, form validation, and profile creation. Needs comprehensive testing."
+
+  - task: "Brand Signup Flow"
+    implemented: true
+    working: "NA"
+    file: "/app/app/auth/signup/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Same signup component handles both creator and brand roles via URL parameter. Needs testing for brand-specific flow and redirect to brand dashboard."
+
+  - task: "Authentication State Management"
+    implemented: true
+    working: "NA"
+    file: "/app/components/AuthProvider.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "AuthProvider manages user state, profile data, and auth session. Includes role-based properties (isCreator, isBrand). Needs testing for state persistence and updates."
+
+  - task: "Role-Based Dashboard Routing"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Homepage redirects authenticated users to appropriate dashboards based on role. Creator → /creator/dashboard, Brand → /brand/dashboard. Needs testing."
+
+  - task: "Creator Dashboard"
+    implemented: true
+    working: "NA"
+    file: "/app/app/creator/dashboard/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Creator dashboard with profile completion tracking, campaign feed, application stats. Protected route with role verification. Needs testing for data loading and display."
+
+  - task: "Brand Dashboard"
+    implemented: true
+    working: "NA"
+    file: "/app/app/brand/dashboard/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Brand dashboard with campaign management, stats, quick actions. Protected route with role verification. Needs testing for data loading and display."
+
+  - task: "Protected Route Component"
+    implemented: true
+    working: "NA"
+    file: "/app/components/ProtectedRoute.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "ProtectedRoute component enforces authentication and role-based access. Redirects unauthorized users and wrong roles. Needs testing for access control."
+
+  - task: "Profile Database Integration"
+    implemented: true
+    working: "NA"
+    file: "/app/lib/supabase.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Profile creation during signup, profile fetching in AuthProvider. createProfile, getProfile functions integrated. Needs testing for database operations."
+
+  - task: "Login Page and Authentication"
+    implemented: true
+    working: "NA"
+    file: "/app/app/auth/login/page.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Login page with email/password and Google OAuth. Redirects to appropriate dashboard after login. Needs testing for authentication flow."
+
+  - task: "Auth Callback Handling"
+    implemented: true
+    working: "NA"
+    file: "/app/app/auth/callback/page.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "OAuth callback handler that checks for existing profile and redirects based on role. Needs testing for OAuth flow completion."
+
+  - task: "Error Handling and Validation"
+    implemented: true
+    working: "NA"
+    file: "/app/app/auth/signup/page.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Form validation for password mismatch, required fields, role selection. Error display with Alert components. Needs testing for error scenarios."
+
 metadata:
   created_by: "testing_agent"
-  version: "1.0"
-  test_sequence: 1
-  run_ui: false
+  version: "1.1"
+  test_sequence: 2
+  run_ui: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Creator Signup Flow"
+    - "Brand Signup Flow"
+    - "Role-Based Dashboard Routing"
+    - "Authentication State Management"
+    - "Profile Database Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -242,3 +392,5 @@ agent_communication:
       message: "Initial assessment complete. Found comprehensive Supabase integration with auth, database operations, and file storage. MongoDB routes appear to be template code. Starting systematic testing of Supabase functionality."
     - agent: "testing"
       message: "✅ COMPREHENSIVE TESTING COMPLETE - All Supabase MVP backend functionality tested and working correctly. Database connection successful, all helper functions implemented and integrated with frontend pages. Authentication flow, profile management, campaign operations, and application management all functional. RLS policies configured, storage functions available. No critical issues found."
+    - agent: "testing"
+      message: "🔄 FRONTEND TESTING INITIATED - Added comprehensive frontend testing tasks for Spark MVP authentication and profile management flows. Ready to test complete user journeys for both creator and brand roles, including signup, authentication, dashboard access, and database integration."
