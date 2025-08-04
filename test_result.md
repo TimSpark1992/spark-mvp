@@ -266,7 +266,7 @@ frontend:
     implemented: true
     working: false
     file: "/app/app/auth/signup/page.js"
-    stuck_count: 2
+    stuck_count: 3
     priority: "high"
     needs_retesting: false
     status_history:
@@ -279,6 +279,9 @@ frontend:
         - working: false
           agent: "testing"
           comment: "❌ CRITICAL ISSUE PERSISTS - After main agent attempted database fixes, comprehensive testing confirms Brand signup still fails. Identical issue to Creator signup: Supabase auth succeeds but profile creation fails with HTTP 401 and RLS policy error: 'new row violates row-level security policy for table profiles' (code: 42501). Fixed redirect from /brand/onboarding to /brand/dashboard. ROOT CAUSE: Supabase RLS policies blocking profile INSERT operations."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ISSUE STILL UNRESOLVED - Comprehensive end-to-end testing with unique credentials (brand.final.20250804_195853@sparktest.com) confirms Brand signup STILL FAILS. Identical errors persist: HTTP 401 from Supabase, PostgreSQL error 42501 'new row violates row-level security policy for table profiles'. Authentication succeeds but profile creation fails. User remains on signup page with error message. RLS policies require immediate reconfiguration."
 
   - task: "Authentication State Management"
     implemented: true
