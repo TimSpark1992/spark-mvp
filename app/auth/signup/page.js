@@ -76,8 +76,11 @@ export default function SignupPage() {
       return
     }
 
-    // Create profile in database
+    // Create profile in database after user is authenticated
     if (data.user) {
+      // Wait a moment for auth state to update
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
       const { error: profileError } = await createProfile({
         id: data.user.id,
         email: formData.email,
@@ -86,7 +89,8 @@ export default function SignupPage() {
       })
 
       if (profileError) {
-        setError('Account created but profile setup failed. Please contact support.')
+        console.error('Profile creation error:', profileError)
+        setError(`Profile setup failed: ${profileError.message || 'Unknown error'}. Please try again.`)
         setLoading(false)
         return
       }
