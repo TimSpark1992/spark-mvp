@@ -110,13 +110,15 @@ export default function SignupPage() {
       }
     }
 
-    // Redirect based on role
+    // Redirect based on role - direct navigation without intermediate redirects
+    setLoading(false) // Set loading to false before redirect
+    
     if (formData.role === 'creator') {
-      router.push('/creator/dashboard')
+      router.replace('/creator/dashboard') // Use replace to avoid back navigation to signup
     } else if (formData.role === 'brand') {
-      router.push('/brand/dashboard')
+      router.replace('/brand/dashboard') // Use replace to avoid back navigation to signup
     } else {
-      router.push('/')
+      router.replace('/') // Fallback to homepage
     }
   }
 
