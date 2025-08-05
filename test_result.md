@@ -579,7 +579,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "XSS Protection Integration"
+    - "XSS Protection Integration - Signup Form"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
