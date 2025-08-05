@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { createCampaign } from '@/lib/supabase'
+import { sanitizeFieldValue } from '@/lib/xss-protection'
 import { ArrowLeft, Save, Eye } from 'lucide-react'
 import Link from 'next/link'
 
