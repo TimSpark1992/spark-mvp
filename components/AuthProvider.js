@@ -48,6 +48,8 @@ export function AuthProvider({ children }) {
           const { data: profile, error } = await getProfile(session.user.id)
           if (profile) {
             setProfile(profile)
+          } else if (error) {
+            console.warn('Profile retrieval error during auth state change (non-blocking):', error)
           }
         } else {
           setUser(null)
