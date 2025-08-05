@@ -567,7 +567,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Production Readiness and Security Validation"
+    - "XSS Protection Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
