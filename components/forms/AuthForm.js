@@ -44,11 +44,13 @@ export function SignUpForm({ preselectedRole = '' }) {
   }
 
   const validateForm = () => {
-    const validation = validateInput(signUpSchema, formData)
+    const validation = validateInputEnhanced(enhancedSignUpSchema, formData)
     if (!validation.success) {
       // Extract field-specific errors
       const fieldErrors = {}
-      if (validation.error) {
+      if (validation.field) {
+        fieldErrors[validation.field] = validation.error
+      } else {
         fieldErrors.general = validation.error
       }
       setErrors(fieldErrors)
