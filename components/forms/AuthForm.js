@@ -260,7 +260,9 @@ export function SignInForm() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    // Apply XSS sanitization to all form inputs
+    const sanitizedValue = sanitizeFieldValue(name, value)
+    setFormData(prev => ({ ...prev, [name]: sanitizedValue }))
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
