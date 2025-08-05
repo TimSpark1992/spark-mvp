@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { signUp, signInWithGoogle, createProfile, supabase } from '@/lib/supabase'
+import { sanitizeFieldValue } from '@/lib/xss-protection'
 import { Zap, Mail, Eye, EyeOff, Users, Briefcase } from 'lucide-react'
 
 export default function SignupPage() {
