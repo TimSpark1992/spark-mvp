@@ -38,7 +38,9 @@ export default function SignupPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    // Apply XSS sanitization to all signup form inputs
+    const sanitizedValue = sanitizeFieldValue(name, value)
+    setFormData(prev => ({ ...prev, [name]: sanitizedValue }))
   }
 
   const handleRoleChange = (value) => {
