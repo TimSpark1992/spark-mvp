@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { signUp, signInWithGoogle, createProfile } from '@/lib/supabase'
+import { signUp, signInWithGoogle, createProfile, supabase } from '@/lib/supabase'
 import { Zap, Mail, Eye, EyeOff, Users, Briefcase } from 'lucide-react'
 
 export default function SignupPage() {
