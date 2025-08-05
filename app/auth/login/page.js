@@ -167,3 +167,20 @@ function LoginForm() {
     </div>
   )
 }
+
+// Loading component for Suspense fallback
+function LoginPageFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+    </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginPageFallback />}>
+      <LoginForm />
+    </Suspense>
+  )
+}
