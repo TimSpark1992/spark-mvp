@@ -97,9 +97,9 @@ export default function SignupPage() {
       
       const { error: profileError } = await createProfile({
         id: data.user.id,
-        email: formData.email,
-        full_name: formData.fullName,
-        role: formData.role
+        email: sanitizeFieldValue('email', formData.email),
+        full_name: sanitizeFieldValue('full_name', formData.fullName),
+        role: sanitizeFieldValue('role', formData.role)
       })
 
       if (profileError) {
