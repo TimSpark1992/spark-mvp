@@ -108,6 +108,9 @@ export default function SignupPage() {
         setLoading(false)
         return
       }
+      
+      // Wait a moment for auth state to fully update before redirect
+      await new Promise(resolve => setTimeout(resolve, 1000))
     }
 
     // Redirect based on role - direct navigation without intermediate redirects
