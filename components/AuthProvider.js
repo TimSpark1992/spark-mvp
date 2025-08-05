@@ -29,6 +29,8 @@ export function AuthProvider({ children }) {
         getProfile(user.id).then(({ data: profile, error: profileError }) => {
           if (profile) {
             setProfile(profile)
+          } else if (profileError) {
+            console.warn('Profile retrieval error (non-blocking):', profileError)
           }
           setLoading(false)
         })
