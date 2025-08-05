@@ -22,21 +22,37 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     // Get initial user
-    getCurrentUser().then(({ user, error }) => {
+    getCurrentUser().then(async ({ user, error }) => {
       if (user) {
         setUser(user)
-        // Get user profile
-        getProfile(user.id).then(({ data: profile, error: profileError }) => {
-          if (profile) {
+        // Get user profile with retry mechanism
+        let profile = null
+        let retryCount = 0
+        const maxRetries = 3
+        
+        while (!profile && retryCount < maxRetries) {
+          const { data: profileData, error: profileError } = await getProfile(user.id)
+          
+          if (profileData) {
+            profile = profileData
             setProfile(profile)
+            break
           } else if (profileError) {
-            console.warn('Profile retrieval error (non-blocking):', profileError)
+            console.warn(`Initial profile retrieval attempt ${retryCount + 1} failed:`, profileError)
           }
-          setLoading(false)
-        })
-      } else {
-        setLoading(false)
+          
+          retryCount++
+          // Wait before retry (increasing delay)
+          if (retryCount < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount))
+          }
+        }
+        
+        if (!profile) {
+          console.warn('Initial profile retrieval failed after all retries for user:', user.id)
+        }
       }
+      setLoading(false)
     })
 
     // Listen for auth changes
