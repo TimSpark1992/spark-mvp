@@ -44,12 +44,31 @@ export function AuthProvider({ children }) {
       async (event, session) => {
         if (session?.user) {
           setUser(session.user)
-          // Get user profile
-          const { data: profile, error } = await getProfile(session.user.id)
-          if (profile) {
-            setProfile(profile)
-          } else if (error) {
-            console.warn('Profile retrieval error during auth state change (non-blocking):', error)
+          // Get user profile with retry mechanism for newly created profiles
+          let profile = null
+          let retryCount = 0
+          const maxRetries = 3
+          
+          while (!profile && retryCount < maxRetries) {
+            const { data: profileData, error } = await getProfile(session.user.id)
+            
+            if (profileData) {
+              profile = profileData
+              setProfile(profile)
+              break
+            } else if (error) {
+              console.warn(`Profile retrieval attempt ${retryCount + 1} failed:`, error)
+            }
+            
+            retryCount++
+            // Wait before retry (increasing delay)
+            if (retryCount < maxRetries) {
+              await new Promise(resolve => setTimeout(resolve, 1000 * retryCount))
+            }
+          }
+          
+          if (!profile) {
+            console.warn('Profile retrieval failed after all retries for user:', session.user.id)
           }
         } else {
           setUser(null)
