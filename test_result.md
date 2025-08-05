@@ -396,7 +396,7 @@ frontend:
 
   - task: "Profile Database Integration"
     implemented: true
-    working: false
+    working: true
     file: "/app/lib/supabase.js"
     stuck_count: 6
     priority: "high"
