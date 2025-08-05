@@ -265,10 +265,12 @@ export function SignInForm() {
   }
 
   const validateForm = () => {
-    const validation = validateInput(signInSchema, formData)
+    const validation = validateInputEnhanced(enhancedSignInSchema, formData)
     if (!validation.success) {
       const fieldErrors = {}
-      if (validation.error) {
+      if (validation.field) {
+        fieldErrors[validation.field] = validation.error
+      } else {
         fieldErrors.general = validation.error
       }
       setErrors(fieldErrors)
