@@ -34,7 +34,11 @@ export default function LoginPage() {
       return
     }
 
-    router.push(redirectTo)
+    // Set loading to false before redirect
+    setLoading(false)
+    
+    // Use router.replace for cleaner navigation
+    router.replace(redirectTo)
   }
 
   const handleGoogleSignIn = async () => {
