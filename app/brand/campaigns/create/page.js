@@ -57,11 +57,15 @@ export default function CreateCampaignPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    // Apply XSS sanitization to all campaign form inputs
+    const sanitizedValue = sanitizeFieldValue(name, value)
+    setFormData(prev => ({ ...prev, [name]: sanitizedValue }))
   }
 
   const handleSelectChange = (name, value) => {
-    setFormData(prev => ({ ...prev, [name]: value }))
+    // Apply XSS sanitization to select field values
+    const sanitizedValue = sanitizeFieldValue(name, value)
+    setFormData(prev => ({ ...prev, [name]: sanitizedValue }))
   }
 
   const handleSubmit = async (e) => {
