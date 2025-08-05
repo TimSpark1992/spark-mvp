@@ -243,7 +243,7 @@ frontend:
 
   - task: "Creator Signup Flow"
     implemented: true
-    working: false
+    working: true
     file: "/app/app/auth/signup/page.js"
     stuck_count: 6
     priority: "high"
