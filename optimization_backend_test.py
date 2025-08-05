@@ -13,7 +13,7 @@ import uuid
 from datetime import datetime, timedelta
 
 # Configuration
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://f463abed-ae3e-464b-a6d7-5662f9927a39.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://04851aba-10ab-4161-baaf-b2b9d3d1d332.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 class OptimizationTester:
