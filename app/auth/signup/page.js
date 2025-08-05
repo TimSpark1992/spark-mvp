@@ -67,11 +67,11 @@ export default function SignupPage() {
     }
 
     const { data, error: authError } = await signUp(
-      formData.email,
-      formData.password,
+      sanitizeFieldValue('email', formData.email),
+      formData.password, // Password doesn't need XSS sanitization, just validation
       {
-        full_name: formData.fullName,
-        role: formData.role
+        full_name: sanitizeFieldValue('full_name', formData.fullName),
+        role: sanitizeFieldValue('role', formData.role)
       }
     )
 
