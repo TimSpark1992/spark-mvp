@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,7 @@ import { signUp, signInWithGoogle, createProfile, supabase } from '@/lib/supabas
 import { sanitizeFieldValue } from '@/lib/xss-protection'
 import { Zap, Mail, Eye, EyeOff, Users, Briefcase } from 'lucide-react'
 
-export default function SignupPage() {
+function SignupForm() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
