@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { FormInput, FormRadioGroup } from './FormField'
 import { authSignUp, authSignIn } from '@/lib/auth'
 import { validateInputEnhanced, enhancedSignUpSchema, enhancedSignInSchema } from '@/lib/validation-enhanced'
-import { sanitizeText } from '@/lib/xss-protection'
+import { sanitizeFieldValue } from '@/lib/xss-protection'
 import { Zap, Mail, Eye, EyeOff, Users, Briefcase } from 'lucide-react'
 
 export function SignUpForm({ preselectedRole = '' }) {
