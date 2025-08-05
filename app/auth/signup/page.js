@@ -78,8 +78,17 @@ export default function SignupPage() {
 
     // Create profile in database after user is authenticated
     if (data.user) {
-      // Wait a moment for auth state to update
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Wait for auth session to be established and refresh the client session
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Refresh the session to ensure auth.uid() works in RLS policies
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
+      if (!session) {
+        setError('Authentication session not established. Please try again.')
+        setLoading(false)
+        return
+      }
       
       const { error: profileError } = await createProfile({
         id: data.user.id,
