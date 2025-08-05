@@ -44,7 +44,9 @@ export default function SignupPage() {
   }
 
   const handleRoleChange = (value) => {
-    setFormData(prev => ({ ...prev, role: value }))
+    // Apply XSS sanitization to role selection
+    const sanitizedValue = sanitizeFieldValue('role', value)
+    setFormData(prev => ({ ...prev, role: sanitizedValue }))
   }
 
   const handleSubmit = async (e) => {
