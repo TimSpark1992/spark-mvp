@@ -32,9 +32,16 @@ export default function ForgotPasswordPage() {
     try {
       console.log('🔄 Processing password reset request for:', email)
       
+      // Enhanced timeout handling for production consistency
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timed out. Please try again.')), 10000)
+      )
+      
       // MVP-Safe: No actual email sending, immediate success response
-      // Simulate processing time for better UX
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      const processPromise = new Promise(resolve => setTimeout(resolve, 1500))
+      
+      // Race between process and timeout
+      await Promise.race([processPromise, timeoutPromise])
       
       console.log('✅ Password reset request processed (MVP-safe mode)')
       setSuccess(true)
