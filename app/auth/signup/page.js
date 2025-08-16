@@ -113,13 +113,6 @@ function SignupForm() {
           window.location.href = redirectPath
         }
       }, 1500) // 1.5 second delay to show success
-        
-      } catch (redirectError) {
-        console.error('❌ Redirect error:', redirectError)
-        clearTimeout(timeoutId)
-        setError('Signup successful! Please try logging in manually or refresh the page.')
-        setLoading(false)
-      }
 
     } catch (error) {
       console.error('❌ Signup process error:', error)
