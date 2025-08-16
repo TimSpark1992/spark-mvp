@@ -249,7 +249,7 @@ function BrandDashboardContent() {
             </Link>
             
             {!profile?.onboarding_completed && (
-              <Button variant="secondary" size="sm" onClick={openOnboarding}>
+              <Button variant="secondary" size="sm" onClick={triggerOnboarding}>
                 <HelpCircle className="w-4 h-4 mr-2" />
                 Show Tutorial
               </Button>
