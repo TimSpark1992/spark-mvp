@@ -1,0 +1,12 @@
+Vercel Build Cache Fix Applied
+============================
+
+This file ensures the Vercel build cache is cleared and a fresh deployment is triggered.
+
+Changes Made:
+- Cleaned up app/landing/page.js to remove duplicate imports and content
+- Fixed 'use client' directive placement
+- Removed multiple default exports
+- File now has 289 clean lines with proper structure
+
+Timestamp: $(date)
