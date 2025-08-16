@@ -213,14 +213,32 @@ export default function CreatorProfilePage() {
     setSuccess('')
 
     try {
-      const { error: updateError } = await updateProfile(profile.id, formData)
+      console.log('🔄 Starting Creator profile save process...')
+      
+      // Enhanced timeout handling for production reliability
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Profile save request timed out. Please check your connection and try again.')), 30000)
+      )
+      
+      const updatePromise = updateProfile(profile.id, formData)
+      
+      // Race between update and timeout
+      const { error: updateError } = await Promise.race([updatePromise, timeoutPromise])
+      
       if (updateError) throw new Error(updateError.message)
 
+      console.log('✅ Creator profile update successful, refreshing profile...')
       await refreshProfile()
       setSuccess('Profile updated successfully!')
+      console.log('🎉 Creator profile save completed successfully')
+      
     } catch (error) {
-      console.error('Error updating profile:', error)
-      setError(error.message || 'Failed to update profile')
+      console.error('❌ Creator profile save failed:', error)
+      if (error.message.includes('timed out')) {
+        setError('Profile save timed out. Please check your internet connection and try again.')
+      } else {
+        setError(error.message || 'Failed to update profile')
+      }
     } finally {
       setLoading(false)
     }
