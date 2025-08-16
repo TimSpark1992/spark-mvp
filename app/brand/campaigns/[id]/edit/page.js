@@ -163,11 +163,19 @@ export default function EditCampaignPage() {
       }
 
       console.log('✅ Campaign updated successfully:', data)
+      
+      // Update campaign in cache immediately for instant UI updates
+      if (data && data.length > 0) {
+        console.log('🔄 Updating campaign cache with new data...')
+        updateCampaignInCache(campaignId, data[0])
+        console.log('✅ Campaign cache synchronized with status:', data[0].status)
+      }
+      
       setSuccess('Campaign updated successfully!')
 
-      // Redirect after a brief delay
+      // Redirect back to campaigns dashboard after a brief delay
       setTimeout(() => {
-        router.push(`/brand/campaigns/${campaignId}`)
+        router.push('/brand/campaigns')
       }, 1500)
 
     } catch (error) {
