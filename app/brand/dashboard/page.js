@@ -40,6 +40,10 @@ import Link from 'next/link'
 function BrandDashboardContent() {
   const { profile } = useAuth()
   const { triggerOnboarding } = useOnboarding()
+  
+  // Debug logging for onboarding hook
+  console.log('🔍 Dashboard: useOnboarding hook result:', { triggerOnboarding: typeof triggerOnboarding })
+  
   const [campaigns, setCampaigns] = useState(() => {
     // Initialize from cache using utility function
     return getCachedCampaigns() || []
