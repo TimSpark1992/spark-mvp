@@ -92,19 +92,33 @@ export default function AdminPanel() {
 
   const updateCampaignStatus = async (campaignId, newStatus) => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('campaigns')
-        .update({ status: newStatus })
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString() 
+        })
         .eq('id', campaignId)
+        .select()
 
-      if (!error) {
+      if (!error && data && data.length > 0) {
+        // Update local admin state
         setCampaigns(prev => 
           prev.map(campaign => 
             campaign.id === campaignId 
-              ? { ...campaign, status: newStatus }
+              ? { ...campaign, status: newStatus, updated_at: data[0].updated_at }
               : campaign
           )
         )
+        
+        // CRITICAL: Sync with platform-wide campaign cache
+        // This ensures status changes from admin panel appear everywhere
+        console.log('🔄 Admin: Syncing campaign status change to platform cache')
+        updateCampaignInCache(campaignId, { 
+          status: newStatus, 
+          updated_at: data[0].updated_at 
+        })
+        console.log('✅ Admin: Campaign cache synchronized with new status:', newStatus)
       }
     } catch (error) {
       console.error('Error updating campaign status:', error)
