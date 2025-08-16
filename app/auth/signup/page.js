@@ -56,7 +56,12 @@ function SignupForm() {
     try {
       console.log('🔄 Starting signup process for:', formData.email, 'with role:', formData.role)
       
-      const { data, error: authError } = await signUp(
+      // Enhanced timeout handling with better error messages (increased for production network conditions)
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Signup request timed out. Please check your internet connection and try again.')), 30000)
+      )
+      
+      const signupPromise = signUp(
         sanitizeFieldValue('email', formData.email),
         formData.password,
         {
@@ -64,6 +69,9 @@ function SignupForm() {
           role: sanitizeFieldValue('role', formData.role)
         }
       )
+      
+      // Race between signup and timeout
+      const { data, error: authError } = await Promise.race([signupPromise, timeoutPromise])
 
       if (authError) {
         console.error('❌ Signup error:', authError)
@@ -85,39 +93,26 @@ function SignupForm() {
       }
 
       console.log('✅ Signup successful for user:', data.user.email)
-
       console.log('🔄 Starting redirect process...')
       
-      // Set timeout to prevent infinite loading
-      const timeoutId = setTimeout(() => {
-        console.log('⚠️ Signup redirect timeout reached')
-        setError(`Account created successfully! Please click this link to go to your dashboard: ${formData.role === 'creator' ? '/creator/dashboard' : '/brand/dashboard'}`)
-        setLoading(false)
-      }, 10000) // 10 second timeout
-
-      try {
-        console.log('🔄 Redirecting immediately after successful signup...')
-        
-        // More robust redirect mechanism using Next.js router
-        const redirectPath = formData.role === 'creator' ? '/creator/dashboard' : '/brand/dashboard'
-        console.log('🔄 Redirect path:', redirectPath)
-        
-        // Use Next.js router instead of window.location for better compatibility
-        console.log('🔄 Attempting redirect with Next.js router to:', redirectPath)
-        
-        // Clear the loading state first to allow redirect
-        setLoading(false)
-        
-        // Use replace instead of push to prevent back button issues
-        router.replace(redirectPath)
-        
-        // Fallback timeout in case router navigation fails
-        setTimeout(() => {
-          if (window.location.pathname.includes('/auth/signup')) {
-            console.warn('⚠️ Router redirect may have failed, trying window.location')
-            window.location.replace(redirectPath)
-          }
-        }, 1000)
+      // Simple redirect using Next.js router
+      const redirectPath = formData.role === 'creator' ? '/creator/dashboard' : '/brand/dashboard'
+      console.log('🔄 Redirect path:', redirectPath)
+      
+      // Clear loading state and redirect
+      setLoading(false)
+      
+      setTimeout(async () => {
+        try {
+          console.log('🔄 Using router.push to redirect to:', redirectPath)
+          await router.push(redirectPath)
+          console.log('✅ Router redirect successful')
+        } catch (routerError) {
+          console.error('❌ Router redirect failed:', routerError)
+          // Fallback to window.location
+          window.location.href = redirectPath
+        }
+      }, 1500) // 1.5 second delay to show success
         
       } catch (redirectError) {
         console.error('❌ Redirect error:', redirectError)
