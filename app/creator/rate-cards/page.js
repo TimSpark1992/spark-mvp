@@ -133,23 +133,34 @@ export default function RateCardsPage() {
         rush_pct: formData.rush_pct || 0
       }
 
-      let response
+      console.log('🔄 Starting rate card save process...')
+      
+      // Enhanced timeout handling for production reliability
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Rate card save request timed out. Please check your connection and try again.')), 30000)
+      )
+      
+      let responsePromise
       if (editingCard) {
         // Update existing rate card
-        response = await fetch(`/api/rate-cards/${editingCard.id}`, {
+        responsePromise = fetch(`/api/rate-cards/${editingCard.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody)
+          body: JSON.stringify(requestBody),
+          signal: AbortSignal.timeout(25000) // 25s timeout for fetch
         })
       } else {
-        // Create new rate card
-        response = await fetch('/api/rate-cards', {
+        // Create new rate card  
+        responsePromise = fetch('/api/rate-cards', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody)
+          body: JSON.stringify(requestBody),
+          signal: AbortSignal.timeout(25000) // 25s timeout for fetch
         })
       }
-
+      
+      // Race between rate card save and timeout
+      const response = await Promise.race([responsePromise, timeoutPromise])
       const data = await response.json()
 
       if (!response.ok) {
