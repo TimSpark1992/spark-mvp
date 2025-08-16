@@ -107,6 +107,8 @@ export default function CampaignDetailsPage() {
     }
 
     try {
+      console.log('🔄 Starting campaign application process...')
+      
       const applicationData = {
         campaign_id: params.id,
         creator_id: profile.id,
@@ -116,17 +118,31 @@ export default function CampaignDetailsPage() {
         status: 'pending'
       }
 
-      const { data, error: applicationError } = await createApplication(applicationData)
+      // Enhanced timeout handling for production reliability
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Application submission timed out. Please check your connection and try again.')), 30000)
+      )
+      
+      const applicationPromise = createApplication(applicationData)
+      
+      // Race between application and timeout
+      const { data, error: applicationError } = await Promise.race([applicationPromise, timeoutPromise])
+      
       if (applicationError) throw new Error(applicationError.message)
 
+      console.log('✅ Campaign application submitted successfully')
       setHasApplied(true)
       setApplicationStatus('pending')
       setSuccess('Application submitted successfully! The brand will review your application and get back to you.')
       setApplicationForm({ message: '', portfolio_url: '', media_kit_url: '' })
 
     } catch (error) {
-      console.error('Error submitting application:', error)
-      setError(error.message || 'Failed to submit application. Please try again.')
+      console.error('❌ Campaign application failed:', error)
+      if (error.message.includes('timed out')) {
+        setError('Application submission timed out. Please check your internet connection and try again.')
+      } else {
+        setError(error.message || 'Failed to submit application. Please try again.')
+      }
     } finally {
       setApplicationLoading(false)
     }
