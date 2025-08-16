@@ -34,7 +34,7 @@ import Link from 'next/link'
 
 function CreatorDashboardContent() {
   const { profile } = useAuth()
-  const { openOnboarding } = useOnboarding()
+  const { triggerOnboarding } = useOnboarding()
   const [campaigns, setCampaigns] = useState([])
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
