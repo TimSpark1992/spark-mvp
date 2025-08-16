@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Heading, Text } from '@/components/ui/Typography'
 import { getBrandCampaigns, updateCampaign } from '@/lib/supabase'
+import { updateCampaignInCache } from '@/lib/campaign-cache'
 import { sanitizeFieldValue } from '@/lib/xss-protection'
 import { 
   ArrowLeft,
