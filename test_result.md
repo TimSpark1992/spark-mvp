@@ -374,6 +374,7 @@ backend:
 
 test_plan:
   current_focus:
+    - "Campaign Creation API Array Format Fix"
     - "Password Reset Functionality Testing"
     - "Enhanced Campaign Deletion Modal with Spark Design System"
     - "Enhanced Calendar Icon Functionality"
