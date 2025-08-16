@@ -39,7 +39,7 @@ import Link from 'next/link'
 
 function BrandDashboardContent() {
   const { profile } = useAuth()
-  const { openOnboarding } = useOnboarding()
+  const { triggerOnboarding } = useOnboarding()
   const [campaigns, setCampaigns] = useState(() => {
     // Initialize from cache using utility function
     return getCachedCampaigns() || []
