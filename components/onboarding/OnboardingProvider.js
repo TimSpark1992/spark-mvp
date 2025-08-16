@@ -49,8 +49,16 @@ export default function OnboardingProvider({ children }) {
     setOnboardingChecked(true)
   }, [profile, onboardingChecked, pathname])
 
-  const triggerOnboarding = () => setShowOnboarding(true)
-  const hideOnboarding = () => setShowOnboarding(false)
+  const triggerOnboarding = () => {
+    console.log('🎯 OnboardingProvider: triggerOnboarding called!')
+    setShowOnboarding(true)
+    console.log('🎯 OnboardingProvider: showOnboarding set to true')
+  }
+  
+  const hideOnboarding = () => {
+    console.log('🎯 OnboardingProvider: hideOnboarding called!')
+    setShowOnboarding(false)
+  }
 
   return (
     <OnboardingContext.Provider value={{ triggerOnboarding, hideOnboarding }}>
