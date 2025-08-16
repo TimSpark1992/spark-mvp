@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Brand Profile Improvements
-Testing the recent brand profile improvements as specified in the review request:
-1. Brand logo upload functionality - verify uploaded images update and display correctly
-2. First-time profile completion redirect - ensure new users are redirected to dashboard after completing profile
-3. Profile save functionality continues to work properly
-4. Test both first-time users and returning users
+Backend Testing for Campaign Creation API Fix
+==============================================
+
+This test focuses on verifying the campaign creation API fix where .single() was removed
+from the createCampaign function to ensure it returns array format instead of single object.
+
+CRITICAL FOCUS: Test that createCampaign function returns proper array format
 """
 
 import requests
 import json
 import time
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://spark-payments.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://006ef4e7-1e43-4b34-92e8-18a672524883.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(message, status="INFO"):
