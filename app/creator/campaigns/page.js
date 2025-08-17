@@ -229,25 +229,66 @@ export default function CreatorCampaignsPage() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCampaigns.map((campaign) => (
-                <Card key={campaign.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge variant="secondary" className="text-xs">
-                        {campaign.category}
-                      </Badge>
-                      <span className="text-xs text-gray-500">
-                        {new Date(campaign.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <CardTitle className="text-lg line-clamp-2">
-                      {campaign.title}
-                    </CardTitle>
-                  </CardHeader>
-                  
-                  <CardContent className="space-y-4">
-                    <p className="text-gray-600 text-sm line-clamp-3">
-                      {campaign.description}
+              {filteredCampaigns.map((campaign) => {
+                // Add comprehensive null checks
+                if (!campaign || !campaign.id) return null
+                
+                return (
+                  <Card key={campaign.id} className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="flex justify-between items-start mb-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {campaign.category || 'Uncategorized'}
+                        </Badge>
+                        <span className="text-xs text-gray-500">
+                          {campaign.created_at 
+                            ? new Date(campaign.created_at).toLocaleDateString()
+                            : 'No date'
+                          }
+                        </span>
+                      </div>
+                      <CardTitle className="text-lg line-clamp-2">
+                        {campaign.title || 'Untitled Campaign'}
+                      </CardTitle>
+                    </CardHeader>
+                    
+                    <CardContent className="space-y-4">
+                      <p className="text-gray-600 text-sm line-clamp-3">
+                        {campaign.description || 'No description available'}
+                      </p>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <DollarSign className="w-4 h-4 mr-2" />
+                          <span>{campaign.budget_range || 'Budget not specified'}</span>
+                        </div>
+                        
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Building className="w-4 h-4 mr-2" />
+                          <span>{campaign.profiles?.company_name || campaign.profiles?.full_name || 'Unknown Brand'}</span>
+                        </div>
+                        
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Calendar className="w-4 h-4 mr-2" />
+                          <span>Apply by {campaign.application_deadline 
+                            ? new Date(campaign.application_deadline).toLocaleDateString()
+                            : 'No deadline'
+                          }</span>
+                        </div>
+                      </div>
+                      
+                      <div className="pt-4">
+                        <Link href={`/creator/campaigns/${campaign.id}`}>
+                          <Button className="w-full">
+                            View Details
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              }).filter(Boolean)}
                     </p>
 
                     <div className="space-y-2">
