@@ -1,26 +1,24 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Platform-Wide Infinite Loading Fixes
-=====================================================================
+URGENT: Backend Testing for Existing User Login Issue
+====================================================
 
-Testing all timeout configurations and infinite loading prevention mechanisms
-that were systematically applied across the platform.
+CRITICAL ISSUE: User test.creator@example.com exists but login times out
+- Account exists (signup says "User already registered") 
+- Login times out with valid credentials test.creator@example.com / testpassword123
+- Need to diagnose account state and authentication flow
 
-CRITICAL FOCUS: Verify that ALL potential infinite loading issues across the platform have been resolved
+IMMEDIATE TESTING FOCUS:
+1. Check User Account State - Verify user exists and profile data
+2. Test Authentication Flow - Test Supabase signInWithPassword directly  
+3. Diagnose Login Timeout - Identify root cause of timeout issue
+4. Verify System Health - Check if issue is user-specific or system-wide
+5. Test Account Recovery - Verify if password reset would resolve issue
 
-SYSTEMATIC FIXES TO TEST:
-1. Authentication Forms: Login ✅, Signup ✅, Forgot Password ✅ - All enhanced with 30-second timeouts
-2. Profile Operations: Creator Profile Save ✅ - Enhanced with timeout protection  
-3. Rate Cards: Creation/Update ✅ - Added fetch timeout + Promise.race protection
-4. Campaign Applications: Creator applications ✅ - Enhanced with timeout handling
-5. Supabase Client: Platform-wide 25-second AbortController timeout ✅
-
-EXPECTED RESULTS:
-✅ NO infinite loading states anywhere on the platform
-✅ All operations complete within configured timeout windows
-✅ User-friendly timeout error messages
-✅ Consistent behavior across Brand, Creator, and Admin interfaces
-✅ Platform-wide protection against network-related hanging
+EXPECTED OUTCOME: 
+✅ Identify exact cause of login timeout for existing user
+✅ Provide specific recommendations to fix the account
+✅ Verify login works after fixes applied
 """
 
 import requests
