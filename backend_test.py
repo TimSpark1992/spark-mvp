@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """
-URGENT: Backend Testing for Existing User Login Issue
-====================================================
+URGENT: Backend Testing for Creator Login After Role Fix
+=======================================================
 
-CRITICAL ISSUE: User test.creator@example.com exists but login times out
-- Account exists (signup says "User already registered") 
-- Login times out with valid credentials test.creator@example.com / testpassword123
-- Need to diagnose account state and authentication flow
+CRITICAL TESTING: User test.creator@example.com after role update
+- Previous issue: User authenticated but had wrong role assignment
+- Role fix applied: User role should now be 'creator' instead of 'user'
+- Need to verify login works and creator dashboard access is granted
 
 IMMEDIATE TESTING FOCUS:
-1. Check User Account State - Verify user exists and profile data
-2. Test Authentication Flow - Test Supabase signInWithPassword directly  
-3. Diagnose Login Timeout - Identify root cause of timeout issue
-4. Verify System Health - Check if issue is user-specific or system-wide
-5. Test Account Recovery - Verify if password reset would resolve issue
+1. Test Authentication - Verify login with test.creator@example.com / testpassword123 works
+2. Test Role Access - Verify user can access /creator/dashboard without "Access Restricted" error
+3. Test Profile Data - Check that user profile shows role: 'creator' 
+4. Test Dashboard Functionality - Verify creator-specific features are accessible
 
 EXPECTED OUTCOME: 
-✅ Identify exact cause of login timeout for existing user
-✅ Provide specific recommendations to fix the account
-✅ Verify login works after fixes applied
+✅ Login succeeds without timeout
+✅ User redirected to /creator/dashboard  
+✅ No "Access Restricted" error messages
+✅ Creator dashboard loads with proper functionality
 """
 
 import requests
