@@ -376,22 +376,6 @@ function CreatorDashboardContent() {
                     </div>
                   )
                 }).filter(Boolean)}
-                          <Calendar className="w-4 h-4" />
-                          <span>{campaign.deadline ? new Date(campaign.deadline).toLocaleDateString() : 'No deadline'}</span>
-                        </div>
-                      </div>
-                      <Link href={`/creator/campaigns/${campaign.id}`}>
-                        <TooltipButton 
-                          size="sm"
-                          tooltipContent="Click to view campaign details and submit your application"
-                          showTooltipCondition={!profile?.onboarding_completed && applications.length === 0}
-                        >
-                          Apply Now
-                        </TooltipButton>
-                      </Link>
-                    </div>
-                  </div>
-                ))}
               </div>
             )}
           </Card>
