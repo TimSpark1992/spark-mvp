@@ -4,10 +4,35 @@ export async function GET(request) {
   try {
     console.log('📡 API: GET /api/campaigns called')
     
-    // Return empty campaigns array for now to test the fix
-    const campaigns = []
+    // Return sample campaigns data to test the fix
+    const campaigns = [
+      {
+        id: '1',
+        title: 'Fashion Photography Campaign',
+        description: 'Looking for fashion influencers to showcase our new summer collection',
+        category: 'Fashion & Beauty',
+        budget_range: '$2,500 - $5,000',
+        application_deadline: '2025-09-15',
+        created_at: '2025-08-15',
+        profiles: {
+          company_name: 'Sample Fashion Brand',
+        }
+      },
+      {
+        id: '2', 
+        title: 'Tech Review Campaign',
+        description: 'Need tech reviewers for our latest smartphone release',
+        category: 'Technology',
+        budget_range: '$1,000 - $2,500',
+        application_deadline: '2025-09-30',
+        created_at: '2025-08-16',
+        profiles: {
+          company_name: 'TechCorp',
+        }
+      }
+    ]
     
-    console.log('✅ API: Campaigns fetched successfully:', campaigns.length)
+    console.log('✅ API: Sample campaigns returned:', campaigns.length)
     return NextResponse.json({ campaigns })
 
   } catch (error) {
