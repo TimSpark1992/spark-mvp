@@ -55,13 +55,26 @@ export default function CreatorCampaignsPage() {
   useEffect(() => {
     const loadCampaigns = async () => {
       try {
+        console.log('🔄 Loading campaigns...')
         const { data, error } = await getCampaigns()
-        if (data) {
+        
+        if (error) {
+          console.error('❌ Error loading campaigns:', error)
+          setCampaigns([])
+          setFilteredCampaigns([])
+        } else if (data && Array.isArray(data)) {
+          console.log('✅ Campaigns loaded:', data.length)
           setCampaigns(data)
           setFilteredCampaigns(data)
+        } else {
+          console.log('⚠️ No campaigns data or invalid format')
+          setCampaigns([])
+          setFilteredCampaigns([])
         }
       } catch (error) {
-        console.error('Error loading campaigns:', error)
+        console.error('❌ Exception loading campaigns:', error)
+        setCampaigns([])
+        setFilteredCampaigns([])
       } finally {
         setLoading(false)
       }
