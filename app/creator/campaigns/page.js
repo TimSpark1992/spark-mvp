@@ -53,9 +53,11 @@ export default function CreatorCampaignsPage() {
   useEffect(() => {
     const loadCampaigns = async () => {
       try {
-        console.log('🔄 Loading campaigns via API...')
+        console.log('🔄 Loading sample campaigns for testing...')
         
-        // For now, show sample campaigns to test the UI
+        // Simulate API delay and return sample data
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
         const sampleCampaigns = [
           {
             id: '1',
@@ -92,6 +94,7 @@ export default function CreatorCampaignsPage() {
         setCampaigns([])
         setFilteredCampaigns([])
       } finally {
+        console.log('🏁 Setting loading to false')
         setLoading(false)
       }
     }
