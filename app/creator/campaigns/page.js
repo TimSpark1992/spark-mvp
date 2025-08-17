@@ -48,8 +48,7 @@ export default function CreatorCampaignsPage() {
     '$1,000 - $2,500',
     '$2,500 - $5,000',
     '$5,000 - $10,000',
-    '$10,000 - $25,000',
-    '$25,000+'
+    '$10,000+'
   ]
 
   useEffect(() => {
@@ -123,77 +122,90 @@ export default function CreatorCampaignsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
+      <ProtectedRoute allowedRoles={['creator']}>
+        <div className="min-h-screen bg-gray-50">
+          <Navigation />
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading campaigns...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ProtectedRoute>
     )
   }
 
   return (
-    <ProtectedRoute requiredRole="creator">
+    <ProtectedRoute allowedRoles={['creator']}>
       <div className="min-h-screen bg-gray-50">
         <Navigation />
         
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-montserrat font-bold text-gray-900 mb-2">
-              Available Campaigns
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Browse Campaigns</h1>
             <p className="text-gray-600">
-              Discover and apply to campaigns that match your interests and expertise.
+              Discover exciting collaboration opportunities with brands
             </p>
           </div>
 
           {/* Filters */}
-          <Card className="mb-8">
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    placeholder="Search campaigns..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Filter Campaigns</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Search campaigns..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
 
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Category Filter */}
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-                <Select value={selectedBudget} onValueChange={setSelectedBudget}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Budgets" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All Budgets</SelectItem>
-                    {budgetRanges.map((range) => (
-                      <SelectItem key={range} value={range}>
-                        {range}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Budget Filter */}
+              <Select value={selectedBudget} onValueChange={setSelectedBudget}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Budgets" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Budgets</SelectItem>
+                  {budgetRanges.map((range) => (
+                    <SelectItem key={range} value={range}>
+                      {range}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
+              {/* Clear Filters */}
+              {(searchTerm || selectedCategory || selectedBudget) && (
                 <Button variant="outline" onClick={clearFilters}>
-                  <Filter className="w-4 h-4 mr-2" />
                   Clear Filters
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
+              )}
+            </div>
+          </div>
 
           {/* Results Header */}
           <div className="flex justify-between items-center mb-6">
@@ -289,45 +301,6 @@ export default function CreatorCampaignsPage() {
                   </Card>
                 )
               }).filter(Boolean)}
-                    </p>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Building className="w-4 h-4" />
-                        <span>{campaign.profiles?.company_name || campaign.profiles?.full_name}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <DollarSign className="w-4 h-4" />
-                        <span>{campaign.budget_range}</span>
-                      </div>
-                      
-                      {campaign.deadline && (
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                          <Calendar className="w-4 h-4" />
-                          <span>Deadline: {new Date(campaign.deadline).toLocaleDateString()}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {campaign.creator_requirements && (
-                      <div className="bg-gray-50 p-3 rounded-lg">
-                        <p className="text-xs font-medium text-gray-700 mb-1">Requirements:</p>
-                        <p className="text-xs text-gray-600 line-clamp-2">
-                          {campaign.creator_requirements}
-                        </p>
-                      </div>
-                    )}
-
-                    <Link href={`/creator/campaigns/${campaign.id}`}>
-                      <Button className="w-full flex items-center justify-center gap-2">
-                        View Details
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
             </div>
           )}
         </div>
