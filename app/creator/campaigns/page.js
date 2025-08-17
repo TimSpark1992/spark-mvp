@@ -54,24 +54,32 @@ export default function CreatorCampaignsPage() {
   useEffect(() => {
     const loadCampaigns = async () => {
       try {
-        console.log('🔄 Loading campaigns...')
-        const { data, error } = await getCampaigns()
+        console.log('🔄 Loading campaigns via API...')
         
-        if (error) {
-          console.error('❌ Error loading campaigns:', error)
+        // Use API route instead of direct Supabase call
+        const response = await fetch('/api/campaigns')
+        
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status} ${response.statusText}`)
+        }
+        
+        const result = await response.json()
+        
+        if (result.error) {
+          console.error('❌ API Error loading campaigns:', result.error)
           setCampaigns([])
           setFilteredCampaigns([])
-        } else if (data && Array.isArray(data)) {
-          console.log('✅ Campaigns loaded:', data.length)
-          setCampaigns(data)
-          setFilteredCampaigns(data)
+        } else if (result.campaigns && Array.isArray(result.campaigns)) {
+          console.log('✅ Campaigns loaded via API:', result.campaigns.length)
+          setCampaigns(result.campaigns)
+          setFilteredCampaigns(result.campaigns)
         } else {
-          console.log('⚠️ No campaigns data or invalid format')
+          console.log('⚠️ No campaigns data or invalid format from API')
           setCampaigns([])
           setFilteredCampaigns([])
         }
       } catch (error) {
-        console.error('❌ Exception loading campaigns:', error)
+        console.error('❌ Exception loading campaigns via API:', error)
         setCampaigns([])
         setFilteredCampaigns([])
       } finally {
