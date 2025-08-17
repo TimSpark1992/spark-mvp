@@ -22,409 +22,693 @@ EXPECTED OUTCOME:
 """
 
 import requests
-import time
 import json
-import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+import os
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://006ef4e7-1e43-4b34-92e8-18a672524883.preview.emergentagent.com"
-TIMEOUT_LIMIT = 30  # 30 second timeout for all requests
-TEST_CREDENTIALS = {
-    "email": "prodtest1755229904@example.com",
-    "password": "testpassword123"
-}
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://006ef4e7-1e43-4b34-92e8-18a672524883.preview.emergentagent.com')
+API_BASE = f"{BASE_URL}/api"
 
-class InfiniteLoadingTester:
+# URGENT: Test credentials for the problematic user
+URGENT_USER_EMAIL = "test.creator@example.com"
+URGENT_USER_PASSWORD = "testpassword123"
+URGENT_USER_ROLE = "creator"
+
+class UrgentLoginTester:
     def __init__(self):
-        self.results = []
         self.session = requests.Session()
-        self.session.timeout = TIMEOUT_LIMIT
+        self.session.headers.update({
+            'Content-Type': 'application/json',
+            'User-Agent': 'SPARK-Urgent-Login-Tester/1.0'
+        })
+        self.results = []
         
-    def log_result(self, test_name, success, details, duration=None):
-        """Log test results with timestamp"""
+    def log_result(self, test_name, success, message, details=None):
+        """Log test results"""
         result = {
-            "test": test_name,
-            "success": success,
-            "details": details,
-            "duration": duration,
-            "timestamp": datetime.now().isoformat()
+            'test': test_name,
+            'success': success,
+            'message': message,
+            'details': details,
+            'timestamp': datetime.now().isoformat()
         }
         self.results.append(result)
         
         status = "✅ PASS" if success else "❌ FAIL"
-        duration_str = f" ({duration:.2f}s)" if duration else ""
-        print(f"{status} {test_name}{duration_str}: {details}")
+        print(f"{status} {test_name}: {message}")
+        if details:
+            print(f"   Details: {details}")
+        print()
+
+    def test_system_health_check(self):
+        """URGENT: Test basic system health before diagnosing user issue"""
+        print("🚨 URGENT SYSTEM HEALTH CHECK")
+        print("=" * 60)
         
-    def test_authentication_timeout_protection(self):
-        """Test 1: Authentication Forms Timeout Protection"""
-        print("\n🔐 TESTING AUTHENTICATION TIMEOUT PROTECTION")
-        
-        # Test Login Page Accessibility
-        start_time = time.time()
+        # Test 1: API Connectivity
         try:
-            response = self.session.get(f"{BASE_URL}/auth/login", timeout=TIMEOUT_LIMIT)
-            duration = time.time() - start_time
+            response = self.session.get(f"{API_BASE}/root", timeout=10)
             
-            if response.status_code == 200 and duration < TIMEOUT_LIMIT:
-                self.log_result("Login Page Access", True, f"Page loads in {duration:.2f}s (< {TIMEOUT_LIMIT}s timeout)", duration)
-            else:
-                self.log_result("Login Page Access", False, f"Status: {response.status_code}, Duration: {duration:.2f}s", duration)
-        except requests.exceptions.Timeout:
-            duration = time.time() - start_time
-            self.log_result("Login Page Access", False, f"Request timed out after {duration:.2f}s", duration)
-        except Exception as e:
-            duration = time.time() - start_time
-            self.log_result("Login Page Access", False, f"Error: {str(e)}", duration)
-            
-        # Test Signup Page Accessibility
-        start_time = time.time()
-        try:
-            response = self.session.get(f"{BASE_URL}/auth/signup", timeout=TIMEOUT_LIMIT)
-            duration = time.time() - start_time
-            
-            if response.status_code == 200 and duration < TIMEOUT_LIMIT:
-                self.log_result("Signup Page Access", True, f"Page loads in {duration:.2f}s (< {TIMEOUT_LIMIT}s timeout)", duration)
-            else:
-                self.log_result("Signup Page Access", False, f"Status: {response.status_code}, Duration: {duration:.2f}s", duration)
-        except requests.exceptions.Timeout:
-            duration = time.time() - start_time
-            self.log_result("Signup Page Access", False, f"Request timed out after {duration:.2f}s", duration)
-        except Exception as e:
-            duration = time.time() - start_time
-            self.log_result("Signup Page Access", False, f"Error: {str(e)}", duration)
-            
-        # Test Forgot Password Page Accessibility
-        start_time = time.time()
-        try:
-            response = self.session.get(f"{BASE_URL}/auth/forgot-password", timeout=TIMEOUT_LIMIT)
-            duration = time.time() - start_time
-            
-            if response.status_code == 200 and duration < TIMEOUT_LIMIT:
-                self.log_result("Forgot Password Page Access", True, f"Page loads in {duration:.2f}s (< {TIMEOUT_LIMIT}s timeout)", duration)
-            else:
-                self.log_result("Forgot Password Page Access", False, f"Status: {response.status_code}, Duration: {duration:.2f}s", duration)
-        except requests.exceptions.Timeout:
-            duration = time.time() - start_time
-            self.log_result("Forgot Password Page Access", False, f"Request timed out after {duration:.2f}s", duration)
-        except Exception as e:
-            duration = time.time() - start_time
-            self.log_result("Forgot Password Page Access", False, f"Error: {str(e)}", duration)
-    
-    def test_profile_operations_timeout_protection(self):
-        """Test 2: Profile Operations Timeout Protection"""
-        print("\n👤 TESTING PROFILE OPERATIONS TIMEOUT PROTECTION")
-        
-        # Test Brand Profile Page
-        start_time = time.time()
-        try:
-            response = self.session.get(f"{BASE_URL}/brand/profile", timeout=TIMEOUT_LIMIT)
-            duration = time.time() - start_time
-            
-            if response.status_code in [200, 302, 401] and duration < TIMEOUT_LIMIT:
-                self.log_result("Brand Profile Page Access", True, f"Page accessible in {duration:.2f}s (Status: {response.status_code})", duration)
-            else:
-                self.log_result("Brand Profile Page Access", False, f"Status: {response.status_code}, Duration: {duration:.2f}s", duration)
-        except requests.exceptions.Timeout:
-            duration = time.time() - start_time
-            self.log_result("Brand Profile Page Access", False, f"Request timed out after {duration:.2f}s", duration)
-        except Exception as e:
-            duration = time.time() - start_time
-            self.log_result("Brand Profile Page Access", False, f"Error: {str(e)}", duration)
-            
-        # Test Creator Profile Page
-        start_time = time.time()
-        try:
-            response = self.session.get(f"{BASE_URL}/creator/profile", timeout=TIMEOUT_LIMIT)
-            duration = time.time() - start_time
-            
-            if response.status_code in [200, 302, 401] and duration < TIMEOUT_LIMIT:
-                self.log_result("Creator Profile Page Access", True, f"Page accessible in {duration:.2f}s (Status: {response.status_code})", duration)
-            else:
-                self.log_result("Creator Profile Page Access", False, f"Status: {response.status_code}, Duration: {duration:.2f}s", duration)
-        except requests.exceptions.Timeout:
-            duration = time.time() - start_time
-            self.log_result("Creator Profile Page Access", False, f"Request timed out after {duration:.2f}s", duration)
-        except Exception as e:
-            duration = time.time() - start_time
-            self.log_result("Creator Profile Page Access", False, f"Error: {str(e)}", duration)
-    
-    def test_rate_cards_timeout_protection(self):
-        """Test 3: Rate Cards Operations Timeout Protection"""
-        print("\n💳 TESTING RATE CARDS TIMEOUT PROTECTION")
-        
-        # Test Rate Cards API Endpoint
-        start_time = time.time()
-        try:
-            response = self.session.get(f"{BASE_URL}/api/rate-cards", timeout=TIMEOUT_LIMIT)
-            duration = time.time() - start_time
-            
-            if duration < TIMEOUT_LIMIT:
-                self.log_result("Rate Cards API Timeout", True, f"API responds in {duration:.2f}s (Status: {response.status_code})", duration)
-            else:
-                self.log_result("Rate Cards API Timeout", False, f"API took {duration:.2f}s (> {TIMEOUT_LIMIT}s)", duration)
-        except requests.exceptions.Timeout:
-            duration = time.time() - start_time
-            self.log_result("Rate Cards API Timeout", False, f"API timed out after {duration:.2f}s", duration)
-        except Exception as e:
-            duration = time.time() - start_time
-            self.log_result("Rate Cards API Timeout", False, f"Error: {str(e)}", duration)
-            
-        # Test Creator Rate Cards Page
-        start_time = time.time()
-        try:
-            response = self.session.get(f"{BASE_URL}/creator/rate-cards", timeout=TIMEOUT_LIMIT)
-            duration = time.time() - start_time
-            
-            if response.status_code in [200, 302, 401] and duration < TIMEOUT_LIMIT:
-                self.log_result("Creator Rate Cards Page", True, f"Page accessible in {duration:.2f}s (Status: {response.status_code})", duration)
-            else:
-                self.log_result("Creator Rate Cards Page", False, f"Status: {response.status_code}, Duration: {duration:.2f}s", duration)
-        except requests.exceptions.Timeout:
-            duration = time.time() - start_time
-            self.log_result("Creator Rate Cards Page", False, f"Request timed out after {duration:.2f}s", duration)
-        except Exception as e:
-            duration = time.time() - start_time
-            self.log_result("Creator Rate Cards Page", False, f"Error: {str(e)}", duration)
-    
-    def test_campaign_applications_timeout_protection(self):
-        """Test 4: Campaign Applications Timeout Protection"""
-        print("\n📋 TESTING CAMPAIGN APPLICATIONS TIMEOUT PROTECTION")
-        
-        # Test Applications API Endpoint
-        start_time = time.time()
-        try:
-            response = self.session.get(f"{BASE_URL}/api/applications", timeout=TIMEOUT_LIMIT)
-            duration = time.time() - start_time
-            
-            if duration < TIMEOUT_LIMIT:
-                self.log_result("Applications API Timeout", True, f"API responds in {duration:.2f}s (Status: {response.status_code})", duration)
-            else:
-                self.log_result("Applications API Timeout", False, f"API took {duration:.2f}s (> {TIMEOUT_LIMIT}s)", duration)
-        except requests.exceptions.Timeout:
-            duration = time.time() - start_time
-            self.log_result("Applications API Timeout", False, f"API timed out after {duration:.2f}s", duration)
-        except Exception as e:
-            duration = time.time() - start_time
-            self.log_result("Applications API Timeout", False, f"Error: {str(e)}", duration)
-            
-        # Test Creator Applications Page
-        start_time = time.time()
-        try:
-            response = self.session.get(f"{BASE_URL}/creator/applications", timeout=TIMEOUT_LIMIT)
-            duration = time.time() - start_time
-            
-            if response.status_code in [200, 302, 401] and duration < TIMEOUT_LIMIT:
-                self.log_result("Creator Applications Page", True, f"Page accessible in {duration:.2f}s (Status: {response.status_code})", duration)
-            else:
-                self.log_result("Creator Applications Page", False, f"Status: {response.status_code}, Duration: {duration:.2f}s", duration)
-        except requests.exceptions.Timeout:
-            duration = time.time() - start_time
-            self.log_result("Creator Applications Page", False, f"Request timed out after {duration:.2f}s", duration)
-        except Exception as e:
-            duration = time.time() - start_time
-            self.log_result("Creator Applications Page", False, f"Error: {str(e)}", duration)
-    
-    def test_supabase_client_timeout_configuration(self):
-        """Test 5: Supabase Client Platform-Wide Timeout Configuration"""
-        print("\n🔧 TESTING SUPABASE CLIENT TIMEOUT CONFIGURATION")
-        
-        # Test multiple API endpoints that use Supabase client
-        endpoints = [
-            "/api/profiles",
-            "/api/campaigns", 
-            "/api/messages",
-            "/api/setup-database"
-        ]
-        
-        for endpoint in endpoints:
-            start_time = time.time()
-            try:
-                response = self.session.get(f"{BASE_URL}{endpoint}", timeout=TIMEOUT_LIMIT)
-                duration = time.time() - start_time
-                
-                if duration < 25:  # Supabase client has 25-second timeout
-                    self.log_result(f"Supabase Timeout - {endpoint}", True, f"Responds in {duration:.2f}s (< 25s Supabase timeout)", duration)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('message') == 'Hello World':
+                    self.log_result(
+                        "System Health - API", 
+                        True, 
+                        "Backend API is healthy and responding",
+                        f"Response time: {response.elapsed.total_seconds():.2f}s"
+                    )
                 else:
-                    self.log_result(f"Supabase Timeout - {endpoint}", False, f"Took {duration:.2f}s (> 25s Supabase timeout)", duration)
-            except requests.exceptions.Timeout:
-                duration = time.time() - start_time
-                self.log_result(f"Supabase Timeout - {endpoint}", False, f"Request timed out after {duration:.2f}s", duration)
-            except Exception as e:
-                duration = time.time() - start_time
-                self.log_result(f"Supabase Timeout - {endpoint}", False, f"Error: {str(e)}", duration)
-    
-    def test_concurrent_request_handling(self):
-        """Test 6: Concurrent Request Handling (No Infinite Loading Under Load)"""
-        print("\n⚡ TESTING CONCURRENT REQUEST HANDLING")
-        
-        def make_request(url):
-            start_time = time.time()
-            try:
-                response = requests.get(url, timeout=TIMEOUT_LIMIT)
-                duration = time.time() - start_time
-                return {
-                    "url": url,
-                    "status": response.status_code,
-                    "duration": duration,
-                    "success": duration < TIMEOUT_LIMIT
-                }
-            except Exception as e:
-                duration = time.time() - start_time
-                return {
-                    "url": url,
-                    "status": "ERROR",
-                    "duration": duration,
-                    "success": False,
-                    "error": str(e)
-                }
-        
-        # Test concurrent requests to different endpoints
-        urls = [
-            f"{BASE_URL}/auth/login",
-            f"{BASE_URL}/auth/signup", 
-            f"{BASE_URL}/brand/dashboard",
-            f"{BASE_URL}/creator/dashboard",
-            f"{BASE_URL}/api/campaigns"
-        ]
-        
-        start_time = time.time()
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            futures = [executor.submit(make_request, url) for url in urls]
-            results = [future.result() for future in as_completed(futures)]
-        
-        total_duration = time.time() - start_time
-        successful_requests = sum(1 for r in results if r["success"])
-        
-        self.log_result("Concurrent Request Handling", 
-                       successful_requests >= 3,  # At least 3/5 should succeed
-                       f"{successful_requests}/5 requests completed successfully in {total_duration:.2f}s",
-                       total_duration)
-    
-    def test_timeout_error_handling(self):
-        """Test 7: Timeout Error Handling (User-Friendly Messages)"""
-        print("\n🚨 TESTING TIMEOUT ERROR HANDLING")
-        
-        # Test pages that should have timeout protection
-        pages_with_timeout_protection = [
-            "/auth/login",
-            "/auth/signup",
-            "/brand/profile",
-            "/creator/profile"
-        ]
-        
-        for page in pages_with_timeout_protection:
-            start_time = time.time()
-            try:
-                response = self.session.get(f"{BASE_URL}{page}", timeout=TIMEOUT_LIMIT)
-                duration = time.time() - start_time
+                    self.log_result(
+                        "System Health - API", 
+                        False, 
+                        "API responding but with unexpected data",
+                        f"Got: {data}"
+                    )
+            else:
+                self.log_result(
+                    "System Health - API", 
+                    False, 
+                    f"API unhealthy - status {response.status_code}",
+                    f"Response: {response.text[:200]}"
+                )
                 
-                # Check if page contains timeout handling code
+        except Exception as e:
+            self.log_result(
+                "System Health - API", 
+                False, 
+                "API completely inaccessible",
+                f"Error: {str(e)}"
+            )
+
+        # Test 2: Frontend Health
+        try:
+            response = self.session.get(f"{BASE_URL}/auth/login", timeout=15)
+            
+            if response.status_code == 200:
+                html_content = response.text
+                
+                # Check for critical errors
+                if "SUPABASE CONFIGURATION ERROR" in html_content:
+                    self.log_result(
+                        "System Health - Frontend", 
+                        False, 
+                        "CRITICAL: Supabase configuration error detected",
+                        "Missing environment variables"
+                    )
+                elif "error" in html_content.lower() and "500" in html_content:
+                    self.log_result(
+                        "System Health - Frontend", 
+                        False, 
+                        "Frontend showing server errors",
+                        "500 error detected in HTML"
+                    )
+                else:
+                    self.log_result(
+                        "System Health - Frontend", 
+                        True, 
+                        "Frontend login page accessible and healthy",
+                        f"Response time: {response.elapsed.total_seconds():.2f}s"
+                    )
+            else:
+                self.log_result(
+                    "System Health - Frontend", 
+                    False, 
+                    f"Frontend unhealthy - status {response.status_code}",
+                    f"Login page not accessible"
+                )
+                
+        except Exception as e:
+            self.log_result(
+                "System Health - Frontend", 
+                False, 
+                "Frontend completely inaccessible",
+                f"Error: {str(e)}"
+            )
+
+    def test_user_account_existence(self):
+        """URGENT: Test if the problematic user account exists"""
+        print(f"🔍 URGENT USER ACCOUNT DIAGNOSIS: {URGENT_USER_EMAIL}")
+        print("=" * 60)
+        
+        # Test 1: Check signup page behavior (should indicate user exists)
+        try:
+            print(f"Testing signup behavior for existing user: {URGENT_USER_EMAIL}")
+            
+            # Access signup page
+            response = self.session.get(f"{BASE_URL}/auth/signup", timeout=10)
+            
+            if response.status_code == 200:
+                self.log_result(
+                    "User Existence - Signup Page Access", 
+                    True, 
+                    "Signup page accessible for testing user existence",
+                    f"Can proceed with user existence test"
+                )
+                
+                # Check if page has proper form elements for testing
+                html_content = response.text
+                has_email_field = 'type="email"' in html_content or 'name="email"' in html_content
+                has_password_field = 'type="password"' in html_content
+                
+                if has_email_field and has_password_field:
+                    self.log_result(
+                        "User Existence - Signup Form", 
+                        True, 
+                        "Signup form has required fields for testing",
+                        "Email and password fields detected"
+                    )
+                else:
+                    self.log_result(
+                        "User Existence - Signup Form", 
+                        False, 
+                        "Signup form missing required fields",
+                        f"Email field: {has_email_field}, Password field: {has_password_field}"
+                    )
+            else:
+                self.log_result(
+                    "User Existence - Signup Page Access", 
+                    False, 
+                    f"Cannot access signup page (status: {response.status_code})",
+                    "Cannot test user existence"
+                )
+                
+        except Exception as e:
+            self.log_result(
+                "User Existence - Signup Page Access", 
+                False, 
+                "Failed to access signup page",
+                f"Error: {str(e)}"
+            )
+
+        # Test 2: Check creator dashboard protection (should redirect to login)
+        try:
+            print(f"Testing creator dashboard access for authentication check...")
+            
+            response = self.session.get(f"{BASE_URL}/creator/dashboard", timeout=10, allow_redirects=True)
+            
+            # Should redirect to login if not authenticated
+            if '/auth/login' in response.url:
+                self.log_result(
+                    "User Account - Dashboard Protection", 
+                    True, 
+                    "Creator dashboard properly protected (redirects to login)",
+                    f"Redirected to: {response.url}"
+                )
+            elif response.status_code == 401:
+                self.log_result(
+                    "User Account - Dashboard Protection", 
+                    True, 
+                    "Creator dashboard properly protected (401 unauthorized)",
+                    "Authentication required as expected"
+                )
+            elif response.status_code == 200:
+                self.log_result(
+                    "User Account - Dashboard Protection", 
+                    False, 
+                    "SECURITY ISSUE: Dashboard accessible without authentication",
+                    "This indicates a serious security problem"
+                )
+            else:
+                self.log_result(
+                    "User Account - Dashboard Protection", 
+                    False, 
+                    f"Unexpected dashboard response (status: {response.status_code})",
+                    f"Expected redirect to login or 401"
+                )
+                
+        except Exception as e:
+            self.log_result(
+                "User Account - Dashboard Protection", 
+                False, 
+                "Failed to test dashboard protection",
+                f"Error: {str(e)}"
+            )
+
+    def test_login_timeout_diagnosis(self):
+        """URGENT: Diagnose the specific login timeout issue"""
+        print(f"⏱️ URGENT LOGIN TIMEOUT DIAGNOSIS: {URGENT_USER_EMAIL}")
+        print("=" * 60)
+        
+        # Test 1: Login page response time
+        try:
+            print("Testing login page response time...")
+            
+            start_time = time.time()
+            response = self.session.get(f"{BASE_URL}/auth/login", timeout=30)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                if response_time < 5.0:
+                    self.log_result(
+                        "Login Timeout - Page Load Speed", 
+                        True, 
+                        f"Login page loads quickly ({response_time:.2f}s)",
+                        "Page load speed not causing timeout"
+                    )
+                elif response_time < 15.0:
+                    self.log_result(
+                        "Login Timeout - Page Load Speed", 
+                        True, 
+                        f"Login page loads acceptably ({response_time:.2f}s)",
+                        "May contribute to timeout but not critical"
+                    )
+                else:
+                    self.log_result(
+                        "Login Timeout - Page Load Speed", 
+                        False, 
+                        f"Login page loads slowly ({response_time:.2f}s)",
+                        "Slow page load likely contributing to timeout"
+                    )
+            else:
+                self.log_result(
+                    "Login Timeout - Page Load Speed", 
+                    False, 
+                    f"Login page failed to load (status: {response.status_code})",
+                    f"Response time: {response_time:.2f}s"
+                )
+                
+        except requests.exceptions.Timeout:
+            self.log_result(
+                "Login Timeout - Page Load Speed", 
+                False, 
+                "Login page itself times out after 30s",
+                "CRITICAL: Page load timeout explains user login timeout"
+            )
+        except Exception as e:
+            self.log_result(
+                "Login Timeout - Page Load Speed", 
+                False, 
+                "Failed to test login page load speed",
+                f"Error: {str(e)}"
+            )
+
+        # Test 2: Check for timeout configurations in login page
+        try:
+            print("Checking login page for timeout configurations...")
+            
+            response = self.session.get(f"{BASE_URL}/auth/login", timeout=15)
+            
+            if response.status_code == 200:
+                html_content = response.text
+                
+                # Look for timeout-related code
+                timeout_indicators = []
+                if "30000" in html_content:  # 30 second timeout
+                    timeout_indicators.append("30-second timeout configured")
+                if "25000" in html_content:  # 25 second Supabase timeout
+                    timeout_indicators.append("25-second Supabase timeout configured")
+                if "timeout" in html_content.lower():
+                    timeout_indicators.append("Timeout handling code present")
+                if "promise.race" in html_content.lower():
+                    timeout_indicators.append("Promise.race timeout protection")
+                if "abortcontroller" in html_content.lower():
+                    timeout_indicators.append("AbortController timeout protection")
+                
+                if timeout_indicators:
+                    self.log_result(
+                        "Login Timeout - Configuration Check", 
+                        True, 
+                        "Timeout protection mechanisms found in login page",
+                        f"Found: {', '.join(timeout_indicators)}"
+                    )
+                else:
+                    self.log_result(
+                        "Login Timeout - Configuration Check", 
+                        False, 
+                        "No timeout protection mechanisms found",
+                        "Login page may lack timeout handling"
+                    )
+            else:
+                self.log_result(
+                    "Login Timeout - Configuration Check", 
+                    False, 
+                    f"Cannot check timeout configuration (status: {response.status_code})",
+                    "Unable to analyze login page code"
+                )
+                
+        except Exception as e:
+            self.log_result(
+                "Login Timeout - Configuration Check", 
+                False, 
+                "Failed to check timeout configuration",
+                f"Error: {str(e)}"
+            )
+
+    def test_supabase_connectivity(self):
+        """URGENT: Test Supabase connectivity and configuration"""
+        print("🔧 URGENT SUPABASE CONNECTIVITY TEST")
+        print("=" * 60)
+        
+        # Test 1: Check for Supabase configuration errors
+        try:
+            print("Checking for Supabase configuration errors...")
+            
+            response = self.session.get(f"{BASE_URL}/auth/login", timeout=10)
+            
+            if response.status_code == 200:
+                html_content = response.text
+                
+                # Check for specific Supabase errors
+                if "SUPABASE CONFIGURATION ERROR" in html_content:
+                    self.log_result(
+                        "Supabase - Configuration", 
+                        False, 
+                        "CRITICAL: Supabase configuration error detected",
+                        "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY"
+                    )
+                elif "Missing environment variables" in html_content:
+                    self.log_result(
+                        "Supabase - Configuration", 
+                        False, 
+                        "CRITICAL: Missing Supabase environment variables",
+                        "Check .env.local file for Supabase configuration"
+                    )
+                elif "supabase" in html_content.lower():
+                    self.log_result(
+                        "Supabase - Configuration", 
+                        True, 
+                        "Supabase configuration appears valid",
+                        "No configuration errors detected in HTML"
+                    )
+                else:
+                    self.log_result(
+                        "Supabase - Configuration", 
+                        True, 
+                        "No obvious Supabase configuration issues",
+                        "Login page loads without configuration errors"
+                    )
+            else:
+                self.log_result(
+                    "Supabase - Configuration", 
+                    False, 
+                    f"Cannot check Supabase configuration (status: {response.status_code})",
+                    "Login page not accessible"
+                )
+                
+        except Exception as e:
+            self.log_result(
+                "Supabase - Configuration", 
+                False, 
+                "Failed to check Supabase configuration",
+                f"Error: {str(e)}"
+            )
+
+        # Test 2: Test Supabase-related API endpoints
+        try:
+            print("Testing Supabase-related functionality...")
+            
+            # Test if any Supabase-related endpoints are accessible
+            supabase_endpoints = [
+                "/api/auth/callback",
+                "/api/profiles", 
+                "/api/setup-database"
+            ]
+            
+            working_endpoints = 0
+            total_endpoints = len(supabase_endpoints)
+            
+            for endpoint in supabase_endpoints:
+                try:
+                    response = self.session.get(f"{BASE_URL}{endpoint}", timeout=10)
+                    # Any response (even 404/401) is better than timeout/connection error
+                    if response.status_code in [200, 401, 404, 405, 500]:
+                        working_endpoints += 1
+                except:
+                    pass  # Endpoint not working
+            
+            if working_endpoints >= total_endpoints // 2:
+                self.log_result(
+                    "Supabase - API Endpoints", 
+                    True, 
+                    f"Supabase-related endpoints responding ({working_endpoints}/{total_endpoints})",
+                    "Supabase connectivity appears functional"
+                )
+            else:
+                self.log_result(
+                    "Supabase - API Endpoints", 
+                    False, 
+                    f"Most Supabase endpoints not responding ({working_endpoints}/{total_endpoints})",
+                    "Supabase connectivity issues detected"
+                )
+                
+        except Exception as e:
+            self.log_result(
+                "Supabase - API Endpoints", 
+                False, 
+                "Failed to test Supabase endpoints",
+                f"Error: {str(e)}"
+            )
+
+    def test_network_performance(self):
+        """URGENT: Test network performance that might cause timeouts"""
+        print("⚡ URGENT NETWORK PERFORMANCE TEST")
+        print("=" * 60)
+        
+        # Test multiple requests to identify network issues
+        test_urls = [
+            (f"{BASE_URL}/", "Homepage"),
+            (f"{BASE_URL}/auth/login", "Login Page"),
+            (f"{BASE_URL}/auth/signup", "Signup Page"),
+            (f"{API_BASE}/root", "API Root")
+        ]
+        
+        total_tests = len(test_urls)
+        fast_responses = 0
+        slow_responses = 0
+        failed_responses = 0
+        
+        for url, description in test_urls:
+            try:
+                start_time = time.time()
+                response = self.session.get(url, timeout=30)
+                response_time = time.time() - start_time
+                
                 if response.status_code == 200:
-                    content = response.text.lower()
-                    has_timeout_handling = any(keyword in content for keyword in [
-                        "timeout", "timed out", "30000", "25000", "promise.race", "abortcontroller"
-                    ])
-                    
-                    self.log_result(f"Timeout Handling - {page}", 
-                                   has_timeout_handling,
-                                   f"Page loads in {duration:.2f}s, timeout handling: {'present' if has_timeout_handling else 'not detected'}",
-                                   duration)
+                    if response_time < 3.0:
+                        fast_responses += 1
+                        self.log_result(
+                            f"Network Performance - {description}", 
+                            True, 
+                            f"Fast response: {response_time:.2f}s",
+                            "Good network performance"
+                        )
+                    elif response_time < 10.0:
+                        slow_responses += 1
+                        self.log_result(
+                            f"Network Performance - {description}", 
+                            True, 
+                            f"Slow response: {response_time:.2f}s",
+                            "May contribute to timeout issues"
+                        )
+                    else:
+                        failed_responses += 1
+                        self.log_result(
+                            f"Network Performance - {description}", 
+                            False, 
+                            f"Very slow response: {response_time:.2f}s",
+                            "Likely causing timeout issues"
+                        )
                 else:
-                    self.log_result(f"Timeout Handling - {page}", False, f"Page not accessible (Status: {response.status_code})", duration)
+                    failed_responses += 1
+                    self.log_result(
+                        f"Network Performance - {description}", 
+                        False, 
+                        f"Failed request: status {response.status_code} in {response_time:.2f}s",
+                        "Request failed"
+                    )
                     
+            except requests.exceptions.Timeout:
+                failed_responses += 1
+                self.log_result(
+                    f"Network Performance - {description}", 
+                    False, 
+                    "Request timed out after 30s",
+                    "CRITICAL: Network timeout explains login issues"
+                )
             except Exception as e:
-                duration = time.time() - start_time
-                self.log_result(f"Timeout Handling - {page}", False, f"Error: {str(e)}", duration)
-    
-    def run_comprehensive_test(self):
-        """Run all timeout protection tests"""
-        print("🎯 COMPREHENSIVE PLATFORM-WIDE INFINITE LOADING FIXES TESTING")
-        print("=" * 80)
-        print(f"Base URL: {BASE_URL}")
-        print(f"Timeout Limit: {TIMEOUT_LIMIT} seconds")
-        print(f"Test Started: {datetime.now().isoformat()}")
-        print("=" * 80)
+                failed_responses += 1
+                self.log_result(
+                    f"Network Performance - {description}", 
+                    False, 
+                    f"Network error: {str(e)}",
+                    "Network connectivity issue"
+                )
         
-        # Run all test categories
-        self.test_authentication_timeout_protection()
-        self.test_profile_operations_timeout_protection()
-        self.test_rate_cards_timeout_protection()
-        self.test_campaign_applications_timeout_protection()
-        self.test_supabase_client_timeout_configuration()
-        self.test_concurrent_request_handling()
-        self.test_timeout_error_handling()
+        # Overall network assessment
+        if fast_responses >= total_tests // 2:
+            self.log_result(
+                "Network Performance - Overall", 
+                True, 
+                f"Network performance good ({fast_responses}/{total_tests} fast responses)",
+                "Network not likely causing login timeout"
+            )
+        elif slow_responses + fast_responses >= total_tests // 2:
+            self.log_result(
+                "Network Performance - Overall", 
+                True, 
+                f"Network performance acceptable ({fast_responses + slow_responses}/{total_tests} working)",
+                "Network may contribute to login timeout"
+            )
+        else:
+            self.log_result(
+                "Network Performance - Overall", 
+                False, 
+                f"Network performance poor ({failed_responses}/{total_tests} failed)",
+                "Network issues likely causing login timeout"
+            )
+
+    def run_urgent_diagnosis(self):
+        """Run urgent diagnosis for the specific login issue"""
         
-        # Generate summary
-        self.generate_summary()
-    
-    def generate_summary(self):
-        """Generate comprehensive test summary"""
+        print("🚨 URGENT LOGIN ISSUE DIAGNOSIS")
+        print("=" * 80)
+        print(f"PROBLEM USER: {URGENT_USER_EMAIL}")
+        print(f"ISSUE: Account exists but login times out with valid credentials")
+        print(f"EXPECTED: User should login successfully and access creator dashboard")
+        print(f"TARGET URL: {BASE_URL}")
+        print(f"TIMESTAMP: {datetime.now().isoformat()}")
+        print("=" * 80)
+        print()
+        
+        # Run all diagnostic tests in order of priority
+        self.test_system_health_check()
+        self.test_user_account_existence()
+        self.test_login_timeout_diagnosis()
+        self.test_supabase_connectivity()
+        self.test_network_performance()
+        
+        # Generate urgent recommendations
+        self.generate_urgent_recommendations()
+
+    def generate_urgent_recommendations(self):
+        """Generate urgent recommendations based on test results"""
+        
         print("\n" + "=" * 80)
-        print("📊 COMPREHENSIVE TEST SUMMARY")
+        print("🎯 URGENT DIAGNOSIS RESULTS & RECOMMENDATIONS")
         print("=" * 80)
         
+        # Calculate success rates
         total_tests = len(self.results)
-        passed_tests = sum(1 for r in self.results if r["success"])
-        failed_tests = total_tests - passed_tests
+        passed_tests = sum(1 for r in self.results if r['success'])
         success_rate = (passed_tests / total_tests) * 100 if total_tests > 0 else 0
         
-        print(f"Total Tests: {total_tests}")
-        print(f"Passed: {passed_tests} ✅")
-        print(f"Failed: {failed_tests} ❌")
-        print(f"Success Rate: {success_rate:.1f}%")
+        print(f"DIAGNOSIS SUMMARY:")
+        print(f"  Tests Completed: {total_tests}")
+        print(f"  Tests Passed: {passed_tests}")
+        print(f"  Success Rate: {success_rate:.1f}%")
+        print()
         
-        # Category breakdown
-        categories = {
-            "Authentication": [r for r in self.results if "Login" in r["test"] or "Signup" in r["test"] or "Password" in r["test"]],
-            "Profile Operations": [r for r in self.results if "Profile" in r["test"]],
-            "Rate Cards": [r for r in self.results if "Rate Cards" in r["test"]],
-            "Applications": [r for r in self.results if "Applications" in r["test"]],
-            "Supabase Client": [r for r in self.results if "Supabase" in r["test"]],
-            "Concurrent Handling": [r for r in self.results if "Concurrent" in r["test"]],
-            "Timeout Handling": [r for r in self.results if "Timeout Handling" in r["test"]]
-        }
+        # Analyze critical issues
+        critical_issues = []
+        system_issues = []
+        config_issues = []
+        network_issues = []
         
-        print("\n📋 CATEGORY BREAKDOWN:")
-        for category, tests in categories.items():
-            if tests:
-                category_passed = sum(1 for t in tests if t["success"])
-                category_total = len(tests)
-                category_rate = (category_passed / category_total) * 100
-                status = "✅" if category_rate >= 80 else "⚠️" if category_rate >= 60 else "❌"
-                print(f"{status} {category}: {category_passed}/{category_total} ({category_rate:.1f}%)")
+        for result in self.results:
+            if not result['success']:
+                if 'System Health' in result['test']:
+                    system_issues.append(result)
+                elif 'Supabase' in result['test'] or 'Configuration' in result['test']:
+                    config_issues.append(result)
+                elif 'Network' in result['test'] or 'timeout' in result['message'].lower():
+                    network_issues.append(result)
+                else:
+                    critical_issues.append(result)
         
-        # Failed tests details
-        failed_results = [r for r in self.results if not r["success"]]
-        if failed_results:
-            print("\n❌ FAILED TESTS DETAILS:")
-            for result in failed_results:
-                print(f"  • {result['test']}: {result['details']}")
+        # Generate specific recommendations
+        print("🚨 URGENT ACTIONS REQUIRED:")
+        print()
         
-        # Performance summary
-        durations = [r["duration"] for r in self.results if r["duration"] is not None]
-        if durations:
-            avg_duration = sum(durations) / len(durations)
-            max_duration = max(durations)
-            print(f"\n⏱️ PERFORMANCE SUMMARY:")
-            print(f"Average Response Time: {avg_duration:.2f}s")
-            print(f"Maximum Response Time: {max_duration:.2f}s")
-            print(f"Timeout Compliance: {sum(1 for d in durations if d < TIMEOUT_LIMIT)}/{len(durations)} requests under {TIMEOUT_LIMIT}s")
+        if system_issues:
+            print("1. SYSTEM HEALTH ISSUES DETECTED:")
+            for issue in system_issues:
+                print(f"   ❌ {issue['test']}: {issue['message']}")
+            print("   → IMMEDIATE ACTION: Check server status and restart services")
+            print("   → Run: sudo supervisorctl restart all")
+            print()
         
-        # Overall assessment
-        print(f"\n🎯 OVERALL ASSESSMENT:")
-        if success_rate >= 90:
-            print("✅ EXCELLENT: Platform-wide infinite loading fixes are working excellently")
-        elif success_rate >= 80:
-            print("✅ GOOD: Platform-wide infinite loading fixes are working well with minor issues")
-        elif success_rate >= 70:
-            print("⚠️ ACCEPTABLE: Platform-wide infinite loading fixes are working but need attention")
+        if config_issues:
+            print("2. CONFIGURATION ISSUES DETECTED:")
+            for issue in config_issues:
+                print(f"   ❌ {issue['test']}: {issue['message']}")
+            print("   → IMMEDIATE ACTION: Check Supabase configuration")
+            print("   → Verify NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local")
+            print("   → Check Supabase project status and API keys")
+            print()
+        
+        if network_issues:
+            print("3. NETWORK/TIMEOUT ISSUES DETECTED:")
+            for issue in network_issues:
+                print(f"   ❌ {issue['test']}: {issue['message']}")
+            print("   → IMMEDIATE ACTION: Network connectivity causing login timeout")
+            print("   → Check internet connection and DNS resolution")
+            print("   → Consider increasing timeout values if network is slow")
+            print()
+        
+        # Specific recommendations for the user issue
+        print("🎯 SPECIFIC RECOMMENDATIONS FOR USER LOGIN ISSUE:")
+        print()
+        
+        if success_rate >= 80:
+            print("✅ SYSTEM APPEARS HEALTHY - Issue likely user-specific:")
+            print("   1. Check Supabase Auth dashboard for user account status")
+            print("   2. Verify user email confirmation status")
+            print("   3. Check if user account is suspended or disabled")
+            print("   4. Try password reset for the user")
+            print("   5. Check RLS policies in Supabase for profile access")
+        elif success_rate >= 60:
+            print("⚠️ SYSTEM HAS ISSUES - Mixed system and user problems:")
+            print("   1. Fix system issues identified above first")
+            print("   2. Then check user-specific issues")
+            print("   3. Monitor system performance during login attempts")
         else:
-            print("❌ NEEDS WORK: Platform-wide infinite loading fixes need significant improvement")
+            print("❌ CRITICAL SYSTEM ISSUES - Fix system first:")
+            print("   1. System is too unhealthy to diagnose user-specific issues")
+            print("   2. Fix all system health, configuration, and network issues")
+            print("   3. Re-run diagnosis after system fixes")
+            print("   4. Then address user-specific login problems")
+        
+        print()
+        print("🔧 IMMEDIATE NEXT STEPS:")
+        print("   1. Address highest priority issues identified above")
+        print("   2. Test login with a different user account to isolate issue")
+        print("   3. Check Supabase logs for authentication errors")
+        print("   4. Re-test login for test.creator@example.com after fixes")
         
         print("=" * 80)
+        
+        return success_rate >= 60  # Return True if system is healthy enough for user fixes
+
+def main():
+    """Main execution for urgent login diagnosis"""
+    print("🚨 SPARK PLATFORM - URGENT LOGIN ISSUE DIAGNOSIS")
+    print("Focus: Existing User Login Timeout Issue")
+    print(f"Target: {BASE_URL}")
+    print(f"Problem User: {URGENT_USER_EMAIL}")
+    print()
+    
+    tester = UrgentLoginTester()
+    
+    try:
+        system_healthy = tester.run_urgent_diagnosis()
+        
+        if system_healthy:
+            print("\n✅ DIAGNOSIS COMPLETE - System healthy enough for user-specific fixes")
+            print("   Focus on user account issues and Supabase authentication")
+        else:
+            print("\n❌ DIAGNOSIS COMPLETE - System issues must be fixed first")
+            print("   Address system health issues before user-specific problems")
+            
+    except KeyboardInterrupt:
+        print("\n⚠️ Diagnosis interrupted by user")
+    except Exception as e:
+        print(f"\n❌ Diagnosis failed with error: {str(e)}")
+        
+    print(f"\n📊 Total diagnostic tests: {len(tester.results)}")
+    print("🏁 Urgent diagnosis complete")
 
 if __name__ == "__main__":
-    tester = InfiniteLoadingTester()
-    tester.run_comprehensive_test()
+    main()
