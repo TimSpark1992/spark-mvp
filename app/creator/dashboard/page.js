@@ -342,22 +342,40 @@ function CreatorDashboardContent() {
               </div>
             ) : (
               <div className="space-y-4">
-                {campaigns.map((campaign) => (
-                  <div key={campaign.id} className="bg-[#2A2A3A]/50 rounded-xl p-4 hover:bg-[#2A2A3A] transition-colors border border-white/5">
-                    <div className="flex justify-between items-start mb-3">
-                      <Heading level={4} size="lg" className="mb-0">{campaign.title}</Heading>
-                      <Badge variant="secondary">{campaign.category}</Badge>
-                    </div>
-                    <Text size="sm" className="mb-4 line-clamp-2">
-                      {campaign.description}
-                    </Text>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center space-x-1 text-sm text-gray-400">
-                          <DollarSign className="w-4 h-4" />
-                          <span>{campaign.budget_range}</span>
+                {campaigns.map((campaign) => {
+                  // Add null checks to prevent crashes
+                  if (!campaign || !campaign.id) return null
+                  
+                  return (
+                    <div key={campaign.id} className="bg-[#2A2A3A]/50 rounded-xl p-4 hover:bg-[#2A2A3A] transition-colors border border-white/5">
+                      <div className="flex justify-between items-start mb-3">
+                        <Heading level={4} size="lg" className="mb-0">{campaign.title || 'Untitled Campaign'}</Heading>
+                        <Badge variant="secondary">{campaign.category || 'Uncategorized'}</Badge>
+                      </div>
+                      <Text size="sm" className="mb-4 line-clamp-2">
+                        {campaign.description || 'No description available'}
+                      </Text>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center space-x-1 text-sm text-gray-400">
+                            <DollarSign className="w-4 h-4" />
+                            <span>{campaign.budget_range || 'Budget not specified'}</span>
+                          </div>
+                          <div className="flex items-center space-x-1 text-sm text-gray-400">
+                            <Calendar className="w-4 h-4" />
+                            <span>{campaign.application_deadline 
+                              ? new Date(campaign.application_deadline).toLocaleDateString()
+                              : 'No deadline'
+                            }</span>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-1 text-sm text-gray-400">
+                        <Link href={`/creator/campaigns/${campaign.id}`}>
+                          <Button size="sm">Apply</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  )
+                }).filter(Boolean)}
                           <Calendar className="w-4 h-4" />
                           <span>{campaign.deadline ? new Date(campaign.deadline).toLocaleDateString() : 'No deadline'}</span>
                         </div>
