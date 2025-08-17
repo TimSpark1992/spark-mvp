@@ -84,24 +84,32 @@ export default function CreatorCampaignsPage() {
   }, [])
 
   useEffect(() => {
-    let filtered = campaigns
+    let filtered = campaigns || []
 
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(campaign =>
-        campaign.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        campaign.description.toLowerCase().includes(searchTerm.toLowerCase())
+    // Filter by search term (with null checks)
+    if (searchTerm && searchTerm.trim()) {
+      filtered = filtered.filter(campaign => {
+        if (!campaign) return false
+        const title = campaign.title || ''
+        const description = campaign.description || ''
+        const searchLower = searchTerm.toLowerCase()
+        return title.toLowerCase().includes(searchLower) ||
+               description.toLowerCase().includes(searchLower)
+      })
+    }
+
+    // Filter by category (with null checks)
+    if (selectedCategory) {
+      filtered = filtered.filter(campaign => 
+        campaign && campaign.category === selectedCategory
       )
     }
 
-    // Filter by category
-    if (selectedCategory) {
-      filtered = filtered.filter(campaign => campaign.category === selectedCategory)
-    }
-
-    // Filter by budget range
+    // Filter by budget range (with null checks)
     if (selectedBudget) {
-      filtered = filtered.filter(campaign => campaign.budget_range === selectedBudget)
+      filtered = filtered.filter(campaign => 
+        campaign && campaign.budget_range === selectedBudget
+      )
     }
 
     setFilteredCampaigns(filtered)
