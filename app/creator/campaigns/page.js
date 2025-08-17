@@ -55,30 +55,40 @@ export default function CreatorCampaignsPage() {
       try {
         console.log('🔄 Loading campaigns via API...')
         
-        // Use API route instead of direct Supabase call
-        const response = await fetch('/api/campaigns')
+        // For now, show sample campaigns to test the UI
+        const sampleCampaigns = [
+          {
+            id: '1',
+            title: 'Fashion Photography Campaign',
+            description: 'Looking for fashion influencers to showcase our new summer collection',
+            category: 'Fashion & Beauty',
+            budget_range: '$2,500 - $5,000',
+            application_deadline: '2025-09-15',
+            created_at: '2025-08-15',
+            profiles: {
+              company_name: 'Sample Fashion Brand',
+            }
+          },
+          {
+            id: '2', 
+            title: 'Tech Review Campaign',
+            description: 'Need tech reviewers for our latest smartphone release',
+            category: 'Technology',
+            budget_range: '$1,000 - $2,500',
+            application_deadline: '2025-09-30',
+            created_at: '2025-08-16',
+            profiles: {
+              company_name: 'TechCorp',
+            }
+          }
+        ]
         
-        if (!response.ok) {
-          throw new Error(`API request failed: ${response.status} ${response.statusText}`)
-        }
+        console.log('✅ Sample campaigns loaded:', sampleCampaigns.length)
+        setCampaigns(sampleCampaigns)
+        setFilteredCampaigns(sampleCampaigns)
         
-        const result = await response.json()
-        
-        if (result.error) {
-          console.error('❌ API Error loading campaigns:', result.error)
-          setCampaigns([])
-          setFilteredCampaigns([])
-        } else if (result.campaigns && Array.isArray(result.campaigns)) {
-          console.log('✅ Campaigns loaded via API:', result.campaigns.length)
-          setCampaigns(result.campaigns)
-          setFilteredCampaigns(result.campaigns)
-        } else {
-          console.log('⚠️ No campaigns data or invalid format from API')
-          setCampaigns([])
-          setFilteredCampaigns([])
-        }
       } catch (error) {
-        console.error('❌ Exception loading campaigns via API:', error)
+        console.error('❌ Exception loading campaigns:', error)
         setCampaigns([])
         setFilteredCampaigns([])
       } finally {
