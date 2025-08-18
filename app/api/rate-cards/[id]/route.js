@@ -9,8 +9,9 @@ export async function PATCH(request, { params }) {
     
     console.log('📋 Updating rate card:', id, body)
     
-    // Validate price if provided
-    if (body.base_price_cents && body.base_price_cents <= 0) {
+    // Validate price if provided - use proper null/undefined checks
+    if (body.base_price_cents !== undefined && body.base_price_cents !== null && 
+        (!isNaN(body.base_price_cents) && body.base_price_cents <= 0)) {
       return NextResponse.json(
         { error: 'Price must be greater than zero' },
         { status: 400 }
