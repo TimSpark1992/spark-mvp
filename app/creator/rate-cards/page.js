@@ -231,10 +231,15 @@ export default function RateCardsPage() {
   }
 
   const handleEdit = (rateCard) => {
+    // Safely convert cents to dollars, with fallback for invalid values
+    const priceInDollars = (rateCard.base_price_cents && !isNaN(rateCard.base_price_cents)) 
+      ? rateCard.base_price_cents / 100 
+      : 0
+
     setFormData({
       deliverable_type: rateCard.deliverable_type,
-      base_price_cents: rateCard.base_price_cents / 100, // Convert from cents
-      currency: rateCard.currency,
+      base_price_cents: priceInDollars,
+      currency: rateCard.currency || 'USD',
       rush_pct: rateCard.rush_pct || 0
     })
     setEditingCard(rateCard)
