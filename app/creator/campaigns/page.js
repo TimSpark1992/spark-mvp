@@ -217,7 +217,7 @@ export default function CreatorCampaignsPage() {
                   <SelectValue placeholder="All Budgets" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Budgets</SelectItem>
+                  <SelectItem value="all">All Budgets</SelectItem>
                   {budgetRanges.map((range) => (
                     <SelectItem key={range} value={range}>
                       {range}
