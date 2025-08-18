@@ -162,7 +162,10 @@ const CreatorOffersPage = () => {
       <ProtectedRoute requiredRole="creator">
         <Container className="py-6">
           <div className="flex justify-center items-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2] mx-auto mb-4"></div>
+              <p className="text-gray-400">Loading offers...</p>
+            </div>
           </div>
         </Container>
       </ProtectedRoute>
