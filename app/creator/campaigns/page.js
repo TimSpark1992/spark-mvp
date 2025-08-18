@@ -53,10 +53,7 @@ export default function CreatorCampaignsPage() {
   useEffect(() => {
     const loadCampaigns = async () => {
       try {
-        console.log('🔄 Loading sample campaigns for testing...')
-        
-        // Simulate API delay and return sample data
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        console.log('🔄 Loading sample campaigns for Creator dashboard...')
         
         const sampleCampaigns = [
           {
