@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/components/AuthProvider'
 import ProtectedRoute from '@/components/ProtectedRoute'
-import Navigation from '@/components/Navigation'
-import { Button } from '@/components/ui/button.jsx'
-import { Input } from '@/components/ui/input.jsx'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.jsx'
-import { Badge } from '@/components/ui/badge.jsx'
+import Layout from '@/components/shared/Layout'
+import { Container, Section } from '@/components/shared/Container'
+import Button from '@/components/ui/Button'
+import Input from '@/components/ui/Input'
+import { Card } from '@/components/ui/Card'
+import { Badge } from '@/components/ui/Badge'
+import { Heading, Text } from '@/components/ui/Typography'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
 import { 
   Search, 
@@ -16,7 +18,10 @@ import {
   DollarSign, 
   Building,
   Users,
-  ArrowRight
+  ArrowRight,
+  Briefcase,
+  Clock,
+  MapPin
 } from 'lucide-react'
 import Link from 'next/link'
 import { getCampaigns } from '@/lib/supabase'
