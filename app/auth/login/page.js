@@ -182,7 +182,19 @@ function LoginForm() {
                       <div className="flex space-x-3">
                         <Button
                           onClick={() => {
-                            const dashboardPath = '/brand/dashboard' // Could be enhanced with role detection
+                            console.log('🔄 Redirecting authenticated user to dashboard...')
+                            console.log('User profile:', profile)
+                            
+                            // Fix: Detect user role and redirect to correct dashboard
+                            let dashboardPath = '/brand/dashboard' // Default
+                            
+                            if (profile?.role === 'creator') {
+                              dashboardPath = '/creator/dashboard'
+                            } else if (profile?.role === 'admin') {
+                              dashboardPath = '/admin/panel'
+                            }
+                            
+                            console.log('🎯 Redirecting to:', dashboardPath)
                             window.location.href = dashboardPath
                           }}
                           className="flex-1"
