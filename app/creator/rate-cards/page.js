@@ -139,6 +139,15 @@ export default function RateCardsPage() {
     setSuccess('')
 
     try {
+      console.log('🔄 Starting rate card creation...')
+      console.log('📋 Form data:', formData)
+      console.log('👤 Profile:', profile)
+      
+      // Validate profile
+      if (!profile?.id) {
+        throw new Error('User profile not loaded. Please refresh the page and try again.')
+      }
+      
       // Validate form
       if (!formData.deliverable_type) {
         throw new Error('Please select a deliverable type')
@@ -156,7 +165,7 @@ export default function RateCardsPage() {
         rush_pct: formData.rush_pct || 0
       }
 
-      console.log('🔄 Starting rate card save process...')
+      console.log('🔄 Request body:', requestBody)
       
       // Enhanced timeout handling for production reliability
       const timeoutPromise = new Promise((_, reject) => 
@@ -166,6 +175,7 @@ export default function RateCardsPage() {
       let responsePromise
       if (editingCard) {
         // Update existing rate card
+        console.log('🔄 Updating existing rate card...')
         responsePromise = fetch(`/api/rate-cards/${editingCard.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -174,6 +184,7 @@ export default function RateCardsPage() {
         })
       } else {
         // Create new rate card  
+        console.log('🔄 Creating new rate card...')
         responsePromise = fetch('/api/rate-cards', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -184,13 +195,18 @@ export default function RateCardsPage() {
       
       // Race between rate card save and timeout
       const response = await Promise.race([responsePromise, timeoutPromise])
+      
+      console.log('📡 Response status:', response.status)
+      console.log('📡 Response ok:', response.ok)
+      
       const data = await response.json()
+      console.log('📡 Response data:', data)
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to save rate card')
       }
 
-      console.log('✅ Rate card saved:', data.rateCard.id)
+      console.log('✅ Rate card saved:', data.rateCard?.id)
       
       // Update local state
       if (editingCard) {
