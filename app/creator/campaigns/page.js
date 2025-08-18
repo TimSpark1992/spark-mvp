@@ -139,7 +139,7 @@ export default function CreatorCampaignsPage() {
 
   if (loading) {
     return (
-      <ProtectedRoute allowedRoles={['creator']}>
+      <ProtectedRoute requiredRole="creator">
         <div className="min-h-screen bg-gray-50">
           <Navigation />
           <div className="container mx-auto px-4 py-8">
