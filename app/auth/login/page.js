@@ -31,12 +31,43 @@ function LoginForm() {
   useEffect(() => {
     // Check if user is already authenticated when visiting login page
     const checkAuthStatus = async () => {
-      if (typeof window !== 'undefined') {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          console.log('Login page: User already authenticated:', user.email)
-          setAuthenticatedUser(user.email)
+      try {
+        console.log('🔍 Login page: Checking authentication status...')
+        
+        if (typeof window !== 'undefined') {
+          const { data: { user }, error } = await supabase.auth.getUser()
+          
+          if (error) {
+            console.error('❌ Auth check error:', error)
+            return
+          }
+          
+          if (user) {
+            console.log('✅ Login page: User already authenticated:', user.email)
+            setAuthenticatedUser(user.email)
+            
+            // Also get the profile to ensure we have role information
+            try {
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single()
+              
+              if (profileData) {
+                console.log('✅ Profile loaded for popup:', profileData.role)
+              }
+            } catch (profileError) {
+              console.warn('⚠️ Could not load profile for popup:', profileError)
+            }
+          } else {
+            console.log('📝 Login page: No authenticated user found')
+            setAuthenticatedUser(null)
+          }
         }
+      } catch (error) {
+        console.error('❌ Error checking auth status:', error)
+        setAuthenticatedUser(null)
       }
     }
     
