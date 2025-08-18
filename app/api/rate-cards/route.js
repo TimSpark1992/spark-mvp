@@ -29,8 +29,9 @@ export async function GET(request) {
     
     if (error) {
       console.error('❌ Error fetching rate cards:', error)
+      console.error('❌ Error details:', JSON.stringify(error, null, 2))
       return NextResponse.json(
-        { error: 'Failed to fetch rate cards' },
+        { error: 'Failed to fetch rate cards', details: error },
         { status: 500 }
       )
     }
