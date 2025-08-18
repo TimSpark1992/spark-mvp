@@ -154,7 +154,9 @@ export default function RateCardsPage() {
         throw new Error('Please select a deliverable type')
       }
       
-      if (!formData.base_price_cents || formData.base_price_cents <= 0) {
+      // Use more precise validation for price - check for null/undefined/NaN instead of falsy
+      if (formData.base_price_cents === null || formData.base_price_cents === undefined || 
+          isNaN(formData.base_price_cents) || formData.base_price_cents <= 0) {
         throw new Error('Please enter a valid price')
       }
 
