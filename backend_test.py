@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 """
-Backend Testing Script for Creator Campaigns Page Integration
-Testing the specific fixes mentioned in the review request:
-1. Authentication Testing - ProtectedRoute parameter fix (allowedRoles to requiredRole)
-2. Supabase Integration - Creator campaigns page real data integration
-3. Campaign Data Loading - getCampaigns function testing
-4. API Endpoints - Campaign-related API endpoints
+Backend Testing Script for Rate Card Creation API
+Testing the specific issues mentioned in the review request:
+1. POST /api/rate-cards endpoint with valid creator data
+2. Supabase createRateCard function testing
+3. Database schema verification - rate_cards table
+4. Authentication verification - Supabase access
+5. Sample data testing matching frontend requirements
 """
 
 import requests
