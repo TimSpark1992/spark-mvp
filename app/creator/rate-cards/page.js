@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Heading, Text } from '@/components/ui/Typography'
+import { formatPrice, formatDate } from '@/lib/formatters'
 import { 
   Plus,
   Edit,
