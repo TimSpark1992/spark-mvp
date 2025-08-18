@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://brand-creator-link-1.preview.emergentagent.com"
+BASE_URL = "https://spark-bugfix.preview.emergentagent.com"
 SUPABASE_URL = "https://fgcefqowzkpeivpckljf.supabase.co"
 SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnY2VmcW93emtwZWl2cGNrbGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMjcyMTAsImV4cCI6MjA2OTkwMzIxMH0.xf0wNeAawVYDr0642b0t4V0URnNMnOBT5BhSCG34cCk"
 

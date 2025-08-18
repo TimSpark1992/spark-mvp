@@ -30,7 +30,7 @@ import sys
 from datetime import datetime
 
 # Get the base URL from environment
-BASE_URL = "https://brand-creator-link-1.preview.emergentagent.com"
+BASE_URL = "https://spark-bugfix.preview.emergentagent.com"
 
 def log_test(message, status="INFO"):
     timestamp = datetime.now().strftime("%H:%M:%S")

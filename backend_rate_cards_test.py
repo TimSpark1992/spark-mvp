@@ -30,7 +30,7 @@ class RateCardsBackendTester:
         # Load environment variables
         self.supabase_url = "https://fgcefqowzkpeivpckljf.supabase.co"
         self.supabase_anon_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnY2VmcW93emtwZWl2cGNrbGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMjcyMTAsImV4cCI6MjA2OTkwMzIxMH0.xf0wNeAawVYDr0642b0t4V0URnNMnOBT5BhSCG34cCk"
-        self.base_url = "https://brand-creator-link-1.preview.emergentagent.com"
+        self.base_url = "https://spark-bugfix.preview.emergentagent.com"
         
         # Test results tracking
         self.test_results = []

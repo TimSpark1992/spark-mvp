@@ -25,7 +25,7 @@ from datetime import datetime
 import concurrent.futures
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://brand-creator-link-1.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://spark-bugfix.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(message, status="INFO"):

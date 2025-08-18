@@ -14,7 +14,7 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Configuration
-BASE_URL = "https://brand-creator-link-1.preview.emergentagent.com"
+BASE_URL = "https://spark-bugfix.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class EnhancedBrandProfileSaveTester:

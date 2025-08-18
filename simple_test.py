@@ -6,7 +6,7 @@ Simple Admin API Test - Check if endpoints are accessible
 import requests
 import json
 
-BASE_URL = "https://brand-creator-link-1.preview.emergentagent.com"
+BASE_URL = "https://spark-bugfix.preview.emergentagent.com"
 
 def test_endpoint(endpoint):
     """Test a single endpoint"""

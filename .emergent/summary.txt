@@ -1,19 +1,11 @@
 <analysis>
-The previous AI engineer successfully stabilized the Spark marketplace application by systematically addressing a series of critical production bugs, primarily focusing on login, campaign management, and overall UI responsiveness. A recurring theme was infinite loading or timeout issues, initially for login, then for campaign creation/editing, and subsequently for creator-specific functionalities like signup, profile save, and rate card/application submissions. The engineer demonstrated an iterative debugging approach, often utilizing troubleshooting agents and direct console log analysis on the live site to identify discrepancies between automated tests and real-world user experiences (e.g., production mode vs. development mode, network conditions, Supabase client timeouts). Key architectural decisions involved implementing client-side caching (), robust timeout mechanisms, and re-routing direct Supabase calls through Next.js API routes to mitigate CORS and network issues. Git repository corruption was also encountered and resolved during deployment. By the end, most critical path issues were resolved, leaving only minor UI polish and real data integration for later.
+The AI engineer's work primarily focused on stabilizing the Spark marketplace application by resolving a series of critical production bugs, predominantly infinite loading and Application error: a client-side exception has occurred issues. The process was highly iterative, demonstrating persistence in diagnosing elusive problems. Key debugging shifts included moving from code-level assumptions to requesting direct browser console errors, which revealed the true root causes like Select component validation and, more critically, build cache/environment variable conflicts, and even server startup mode mismatches.
+
+Architectural decisions included centralizing utility functions (e.g., ), implementing robust client-side loading patterns with timeouts and  flags for state management, and systematically applying fixes across relevant parts of the codebase (especially Creator-side pages). The engineer also identified and rectified infrastructure-level problems such as incorrect environment variable usage and missing database tables. Authentication-related issues, including Supabase SSR hydration and base URL configuration, were also addressed. This systematic approach, although sometimes lengthy due to misdiagnoses, ultimately led to significant stability improvements.
 </analysis>
 
 <product_requirements>
-Spark is a production-ready MVP for a KOL & Creator marketplace built with Next.js 14, Tailwind CSS, shadcn/ui, and Supabase. It supports role-based user management (Creators, Brands, Admin), a redesigned homepage, robust authentication (OAuth, RLS, no email confirmation), and functional Campaign and Application systems.
-
-The core problem addressed is the creation of a comprehensive transactional marketplace layer, which includes:
-- Dynamic pricing via KOL rate cards and a live cost estimator.
-- Full offer and acceptance workflows.
-- Escrow payments using Stripe (Checkout, Connect) with a 20% platform fee and webhook handling.
-- Anti-disintermediation features: contact masking, message sanitization, and gated file sharing.
-- Admin controls for managing fees, payment release, refunds, and manual payouts.
-- A fallback system for manual payouts.
-
-Throughout the development, the focus has been on preserving existing MVP functionalities (authentication, dashboards, campaigns, messaging) while resolving critical bugs encountered during manual testing. These included recurring infinite loading and timeout issues across login, signup, campaign creation/editing, and profile/rate card/application save operations, along with ensuring consistent data persistence and UI updates.
+Spark is an MVP for a KOL & Creator marketplace built with Next.js 14, Tailwind CSS, shadcn/ui, and Supabase. It features role-based user management (Creators, Brands, Admin), an updated homepage, and robust authentication with OAuth and Row Level Security. The core problem is establishing a comprehensive transactional marketplace layer with dynamic pricing via KOL rate cards, live cost estimation, and full offer/acceptance workflows. It integrates Stripe for escrow payments (20% platform fee, webhook handling), includes anti-disintermediation features (contact masking, message sanitization, gated file sharing), and admin controls for fees, payment release, refunds, and manual payouts. The development has prioritized preserving existing MVP functionalities (authentication, dashboards, campaigns, messaging) while resolving critical bugs like infinite loading and timeout issues in login, signup, campaign management, and profile/rate card/application submissions, ensuring consistent data persistence and UI updates.
 </product_requirements>
 
 <key_technical_concepts>
@@ -21,9 +13,10 @@ Throughout the development, the focus has been on preserving existing MVP functi
 - **Tailwind CSS & shadcn/ui**: Utility-first CSS and UI component library for styling.
 - **Supabase**: Backend-as-a-Service for authentication, database (PostgreSQL), and Row Level Security.
 - **Stripe**: Payment gateway for transactional marketplace features (escrow, checkout).
-- **Local Storage**: Client-side caching for data persistence (e.g., ).
-- **Environment Variables**: Secure configuration for sensitive data and URLs.
-- **API Routes**: Next.js backend endpoints ( prefixed) for server-side logic and data fetching.
+- **Local Storage**: Client-side caching ().
+- **Environment Variables**: Secure configuration (e.g., , ).
+- **API Routes**: Next.js backend endpoints ( prefixed) for server-side logic.
+- **SSR Hydration**: Handling server-side rendering to prevent client-side mismatches.
 </key_technical_concepts>
 
 <code_architecture>
@@ -35,55 +28,66 @@ The application uses a standard Next.js directory structure, organized into  (fo
 
 -   ****:
     -   **Importance**: Handles user login and redirects.
-    -   **Changes**: Fixed login timeout logic (increased timeout, enhanced error handling, AbortController for Supabase). Refactored DOM manipulation to use React state. Added logout option. Most recently, fixed Go to Dashboard button to dynamically redirect based on user role rather than hardcoding to brand dashboard.
+    -   **Changes**: Verified dynamic dashboard redirection logic.
 -   ****:
-    -   **Importance**: Handles user registration.
-    -   **Changes**: Addressed infinite loading bugs. Implemented robust redirect logic, fixed race conditions, improved error display, and added timeout protection.
+    -   **Importance**: Centralizes Supabase client interactions.
+    -   **Changes**: Fixed SSR hydration issues by replacing  with SSR-safe conditional logic. Added array handling fix to .
 -   ****:
-    -   **Importance**: Centralizes Supabase client interactions for data fetching and mutations.
-    -   **Changes**: Added  and  functions (later modified). Added environment variable validation. Crucially, removed  from  and other campaign/rate card/offer/payment/payout-related functions to ensure array format responses and prevent infinite loading/crashes. Configured Supabase client with a 25-second timeout for all requests using AbortController.
+    -   **Importance**: Displays campaigns for Creator users.
+    -   **Changes**: Fixed Application error caused by Select component . Integrated real Supabase data, removed 1-second delay. Applied systematic robust loading patterns (, timeout, ). Rewritten to match design system. Fixed  import paths.
 -   ****:
-    -   **Importance**: Newly created utility for consistent  cache management of campaign data.
-    -   **Changes**: Added  function to synchronize campaign status updates and ensure immediate UI reflection. Provides functions for adding, removing, updating, and clearing campaign data in cache.
+    -   **Importance**: Displays Creator applications.
+    -   **Changes**: Applied systematic robust loading patterns and  for consistent UI/UX.
 -   ****:
-    -   **Importance**: Page for editing existing campaigns.
-    -   **Changes**: Updated to use  for immediate cache synchronization after status changes. Fixed redirect to go back to  dashboard.
+    -   **Importance**: Manages Creator rate cards.
+    -   **Changes**: Applied systematic robust loading patterns. Fixed  and Invalid Date formatting by using centralized formatters. Fixed /bin/bash.00 price display bug by ensuring correct values are passed and removing problematic local  function. Fixed  and  logic for safe conversions and validation.
 -   ****:
-    -   **Importance**: Admin interface for managing campaigns and users.
-    -   **Changes**: Integrated  to ensure that campaign status updates made by admins reflect immediately across the platform.
--   ****:
-    -   **Importance**: Main dashboard for Brand users.
-    -   **Changes**: Fixed Show Tutorial button by correcting the function name from  to  to correctly interact with . Added null checks to campaign mapping for robustness.
+    -   **Importance**: Displays Creator offers.
+    -   **Changes**: Applied systematic robust loading patterns and / for consistent UI/UX.
 -   ****:
     -   **Importance**: Main dashboard for Creator users.
-    -   **Changes**: Fixed Show Tutorial button by correcting the function name from  to . Added null checks to campaign mapping for robustness.
+    -   **Changes**: Verified Show Tutorial button logic. Applied  for consistent date formatting.
 -   ****:
-    -   **Importance**: Displays campaigns relevant to Creator users.
-    -   **Changes**: Addressed Application error: a client-side exception by implementing comprehensive null checks, error handling, and safe array operations in campaign rendering. Temporarily added sample data loading with a delay for debugging purposes.
--   ****:
-    -   **Importance**: Newly created Next.js API route to fetch campaigns, to bypass client-side CORS/security restrictions when accessing Supabase directly from the browser.
-    -   **Changes**: Implemented as a proxy for  to handle server-side data fetching for the Creator campaigns page.
+    -   **Importance**: Protects routes based on user roles.
+    -   **Changes**: Fixed parameter mismatch where  was used instead of .
 -   ****:
     -   **Importance**: Supervisor configuration for running Next.js application.
-    -   **Changes**: Changed  to  to ensure the application runs in production mode.
+    -   **Changes**: Changed  to  to resolve server startup failures causing Application error.
+-   ****:
+    -   **Importance**: Environment variables.
+    -   **Changes**: Updated  to  to resolve login timeouts due to domain mismatch.
+-   ****:
+    -   **Importance**: Local environment variables, overrides .
+    -   **Changes**: Added  to resolve environment variable conflicts. Fixed corrupted .
+-   ** (Newly created)**:
+    -   **Importance**: Centralized utility for formatting prices, dates, and percentages.
+    -   **Changes**: Contains , ,  functions with robust null/NaN/undefined checks. Essential for consistent data display across the application.
+-   ****:
+    -   **Importance**: Handles API requests for individual rate cards (e.g., PATCH).
+    -   **Changes**: Improved validation logic for  to prevent  issues on update.
+-   ****:
+    -   **Importance**: SQL migration script for setting up transactional tables.
+    -   **Changes**: Identified as the source for creating the missing  table, which was executed manually via a testing agent.
 </code_architecture>
 
 <pending_tasks>
 - Comprehensive unit, integration, and E2E testing for the transactional layer (beyond initial bug fixes).
 - Creation of comprehensive documentation, including an operator runbook.
-- **Show Tutorial Button**: Fix the issue where the button is visible but clicking it doesn't open the onboarding modal (React context communication issue).
-- **Go to Dashboard Button**: Fix the convenience feature on the login page where it doesn't trigger redirect when already logged in.
-- **Creator Campaigns - Real Data Integration**: Integrate real Supabase campaign data instead of temporary sample/mock data.
+- **Show Tutorial Button**: Fix the issue where the button is visible but clicking it doesn't open the onboarding modal (React context communication issue). (Was verified as working, but may need re-validation if other changes affected it).
+- **Go to Dashboard Button**: Fix the convenience feature on the login page where it doesn't trigger redirect when already logged in. (Was verified as working, but may need re-validation).
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer was focused on resolving a persistent Application error: a client-side exception has occurred on the  page. This bug was initially reported by the user, and although the AI engineer believed it was fixed by adding comprehensive null checks and restructuring the page, the user reported it was still occurring even after clearing browser cache.
+Immediately prior to this summary, the AI engineer was systematically addressing persistent data validation and display issues across the Creator section of the application. Specifically, after resolving a recurring /bin/bash.00 price display bug that appeared when editing rate cards, it was determined that the root cause was an overly broad null/undefined check () in the  utility, combined with remnants of local formatting functions overriding centralized ones.
 
-The AI engineer's most recent investigation (Chat 564-565) revealed that the Application error itself was, in fact, **resolved**. The screenshot was showing Loading... and console logs confirmed Sample campaigns loaded: 2 and Setting loading to false. The root cause of the perceived stuck state was an **intentional 1-second delay** () that was introduced in the sample data loading logic () within  for debugging purposes. This delay caused the page to appear to be stuck on loading even though the JavaScript error was gone.
+The AI engineer's most recent actions (Chat 347-352) involved a comprehensive search for similar problematic patterns throughout the entire  directory, including:
+- Multiple instances of  functions.
+- Inconsistent validation logic using  patterns for numbers (e.g., , ).
+- Direct usage of  without robust null/undefined checks for dates.
 
-The current state is that the JavaScript error is fixed, and the page is correctly displaying a loading state, with sample data eventually appearing after the intentional delay.
+The engineer confirmed that such issues exist in multiple files and decided to systematically fix them by centralizing formatting utilities in  and ensuring all relevant components import and use these robust functions. The work is currently ongoing, with the engineer having identified  as one of the files needing attention for systematic fixes.
 </current_work>
 
 <optional_next_step>
-Remove the intentional 1-second loading delay from the Creator campaigns page.
+Systematically apply the robust formatting and validation fixes to  and other identified files.
 </optional_next_step>
