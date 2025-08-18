@@ -14,6 +14,7 @@ import { Heading, Text } from '@/components/ui/Typography'
 import OnboardingProgress from '@/components/onboarding/OnboardingProgress'
 import { useOnboarding } from '@/components/onboarding/OnboardingProvider'
 import { getCampaigns, getCreatorApplications } from '@/lib/supabase'
+import { formatDate } from '@/lib/formatters'
 import { 
   User, 
   Briefcase, 
