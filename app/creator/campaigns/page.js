@@ -52,15 +52,15 @@ export default function CreatorCampaigns() {
     let isMounted = true; // Flag to prevent state updates if component unmounts
     
     const loadCampaigns = async () => {
-      // Don't start loading if already loading or if component is unmounted
-      if (!isMounted) return;
+      // Don't start loading if already loading, data already loaded, or component unmounted
+      if (!isMounted || dataLoaded) return;
       
       try {
         console.log('🔄 Loading campaigns from Supabase...')
         
-        // Set timeout to prevent infinite loading
+        // Set shorter timeout to prevent infinite loading
         const timeoutId = setTimeout(() => {
-          if (isMounted) {
+          if (isMounted && !dataLoaded) {
             console.log('⚠️ Campaign loading timeout, using fallback data')
             const sampleCampaigns = [
               {
@@ -86,9 +86,10 @@ export default function CreatorCampaigns() {
             ]
             setCampaigns(sampleCampaigns)
             setFilteredCampaigns(sampleCampaigns)
+            setDataLoaded(true)
             setLoading(false)
           }
-        }, 10000) // 10 second timeout
+        }, 5000) // 5 second timeout (shorter)
         
         // Get real campaigns data from Supabase
         const { data: campaignsData, error } = await getCampaigns()
@@ -137,12 +138,16 @@ export default function CreatorCampaigns() {
           setFilteredCampaigns(campaignsData || [])
         }
         
+        // Mark data as loaded
+        setDataLoaded(true)
+        
       } catch (error) {
         console.error('❌ Exception loading campaigns:', error)
         // Only update state if component is still mounted
         if (isMounted) {
           setCampaigns([])
           setFilteredCampaigns([])
+          setDataLoaded(true) // Mark as loaded even on error
         }
       } finally {
         // Only update loading state if component is still mounted
@@ -159,7 +164,7 @@ export default function CreatorCampaigns() {
     return () => {
       isMounted = false
     }
-  }, []) // Empty dependency array - only run once on mount
+  }, [dataLoaded]) // Add dataLoaded to dependencies
 
   useEffect(() => {
     let filtered = campaigns || []
