@@ -542,7 +542,7 @@ export default function RateCardsPage() {
 
                         <div className="pt-2 border-t border-white/10">
                           <Text size="xs" color="secondary">
-                            Updated {new Date(rateCard.updated_at).toLocaleDateString()}
+                            Updated {formatDate(rateCard.updated_at)}
                           </Text>
                         </div>
                       </div>
