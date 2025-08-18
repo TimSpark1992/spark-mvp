@@ -271,7 +271,8 @@ export default function RateCardsPage() {
 
   const formatPrice = (priceCents, currency) => {
     // Handle null, undefined, or invalid price values
-    if (!priceCents || isNaN(priceCents) || priceCents < 0) {
+    // Note: 0 is a valid price, so we specifically check for null/undefined
+    if (priceCents === null || priceCents === undefined || isNaN(priceCents) || priceCents < 0) {
       return '$0.00'
     }
     
