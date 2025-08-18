@@ -13,6 +13,7 @@ import { Heading, Text } from '@/components/ui/Typography'
 import { getBrandCampaigns, updateCampaign } from '@/lib/supabase'
 import { updateCampaignInCache } from '@/lib/campaign-cache'
 import { sanitizeFieldValue } from '@/lib/xss-protection'
+import { formatDate } from '@/lib/formatters'
 import { 
   ArrowLeft,
   Save,
@@ -412,11 +413,11 @@ export default function EditCampaignPage() {
                     </div>
                     <div className="flex justify-between">
                       <Text size="sm">Created</Text>
-                      <Text size="sm">{campaign ? new Date(campaign.created_at).toLocaleDateString() : ''}</Text>
+                      <Text size="sm">{formatDate(campaign?.created_at)}</Text>
                     </div>
                     <div className="flex justify-between">
                       <Text size="sm">Last Updated</Text>
-                      <Text size="sm">{campaign ? new Date(campaign.updated_at).toLocaleDateString() : ''}</Text>
+                      <Text size="sm">{formatDate(campaign?.updated_at)}</Text>
                     </div>
                   </div>
                 </Card>

@@ -14,6 +14,7 @@ import { Heading, Text } from '@/components/ui/Typography'
 import OnboardingProgress from '@/components/onboarding/OnboardingProgress'
 import { useOnboarding } from '@/components/onboarding/OnboardingProvider'
 import { getBrandCampaigns, getCampaignApplications, getApplications } from '@/lib/supabase'
+import { formatDate } from '@/lib/formatters'
 import { 
   getCachedCampaigns, 
   getCachedStats,
@@ -411,7 +412,7 @@ function BrandDashboardContent() {
                           </div>
                           <div className="flex items-center space-x-1 text-sm text-gray-400">
                             <Calendar className="w-4 h-4" />
-                            <span>{campaign.deadline ? new Date(campaign.deadline).toLocaleDateString() : 'No deadline'}</span>
+                            <span>{formatDate(campaign.deadline, 'No deadline')}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
