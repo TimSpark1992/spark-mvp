@@ -28,26 +28,61 @@ export default function CreatorApplicationsPage() {
   const [filteredApplications, setFilteredApplications] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const [dataLoaded, setDataLoaded] = useState(false)
 
   useEffect(() => {
+    let isMounted = true;
+    
     const loadApplications = async () => {
-      if (!profile?.id) return
+      if (!profile?.id || !isMounted || dataLoaded) return
 
       try {
+        console.log('🔄 Loading creator applications...')
+        
+        // Set timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+          if (isMounted && !dataLoaded) {
+            console.log('⚠️ Applications loading timeout')
+            setApplications([])
+            setFilteredApplications([])
+            setDataLoaded(true)
+            setLoading(false)
+          }
+        }, 5000)
+        
         const { data, error } = await getCreatorApplications(profile.id)
+        
+        clearTimeout(timeoutId)
+        
+        if (!isMounted) return
+        
         if (error) throw new Error(error.message)
         
+        console.log('✅ Applications loaded:', data?.length || 0)
         setApplications(data || [])
         setFilteredApplications(data || [])
+        setDataLoaded(true)
+        
       } catch (error) {
-        console.error('Error loading applications:', error)
+        console.error('❌ Error loading applications:', error)
+        if (isMounted) {
+          setApplications([])
+          setFilteredApplications([])
+          setDataLoaded(true)
+        }
       } finally {
-        setLoading(false)
+        if (isMounted) {
+          setLoading(false)
+        }
       }
     }
 
     loadApplications()
-  }, [profile?.id])
+    
+    return () => {
+      isMounted = false
+    }
+  }, [profile?.id, dataLoaded])
 
   useEffect(() => {
     if (filter === 'all') {
@@ -83,11 +118,16 @@ export default function CreatorApplicationsPage() {
 
   if (loading) {
     return (
-      <Layout variant="app">
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2]"></div>
-        </div>
-      </Layout>
+      <ProtectedRoute requiredRole="creator">
+        <Layout variant="app">
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2] mx-auto mb-4"></div>
+              <Text size="lg" color="secondary">Loading applications...</Text>
+            </div>
+          </div>
+        </Layout>
+      </ProtectedRoute>
     )
   }
 
@@ -107,7 +147,11 @@ export default function CreatorApplicationsPage() {
               
               <div className="text-right">
                 <Text size="sm" color="secondary">Total Applications</Text>
-                <Heading level={3} size="2xl">{applications.length}</Heading>
+                <Heading level={3} size="2xl">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8A2BE2] to-[#FF1493]">
+                    {applications.length}
+                  </span>
+                </Heading>
               </div>
             </div>
 
@@ -188,7 +232,7 @@ export default function CreatorApplicationsPage() {
             ) : (
               <div className="space-y-6">
                 {filteredApplications.map((application) => (
-                  <Card key={application.id} className="p-6">
+                  <Card key={application.id} className="p-6 hover:bg-[#2A2A3A]/50 transition-colors border border-white/5">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-3">

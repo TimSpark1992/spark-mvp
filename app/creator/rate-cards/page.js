@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/components/AuthProvider'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/shared/Layout'
-import { Container } from '@/components/shared/Container'
+import { Container, Section } from '@/components/shared/Container'
 import Button from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -45,6 +45,7 @@ export default function RateCardsPage() {
   const [success, setSuccess] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingCard, setEditingCard] = useState(null)
+  const [dataLoaded, setDataLoaded] = useState(false)
 
   const [formData, setFormData] = useState({
     deliverable_type: '',
@@ -54,17 +55,30 @@ export default function RateCardsPage() {
   })
 
   useEffect(() => {
+    let isMounted = true;
+    
     const loadRateCards = async () => {
+      if (!profile?.id || !isMounted || dataLoaded) return
+      
       try {
         console.log('📋 Loading rate cards for creator:', profile?.id)
         
-        if (!profile?.id) {
-          setLoading(false)
-          return
-        }
+        // Set timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+          if (isMounted && !dataLoaded) {
+            console.log('⚠️ Rate cards loading timeout')
+            setRateCards([])
+            setDataLoaded(true)
+            setLoading(false)
+          }
+        }, 5000)
         
         const response = await fetch(`/api/rate-cards?creator_id=${profile.id}`)
         const data = await response.json()
+        
+        clearTimeout(timeoutId)
+        
+        if (!isMounted) return
         
         if (!response.ok) {
           throw new Error(data.error || 'Failed to load rate cards')
@@ -72,19 +86,28 @@ export default function RateCardsPage() {
         
         console.log('✅ Rate cards loaded:', data.rateCards?.length || 0)
         setRateCards(data.rateCards || [])
+        setDataLoaded(true)
         
       } catch (error) {
         console.error('❌ Error loading rate cards:', error)
-        setError(error.message)
+        if (isMounted) {
+          setError(error.message)
+          setRateCards([])
+          setDataLoaded(true)
+        }
       } finally {
-        setLoading(false)
+        if (isMounted) {
+          setLoading(false)
+        }
       }
     }
 
-    if (profile?.id) {
-      loadRateCards()
+    loadRateCards()
+    
+    return () => {
+      isMounted = false
     }
-  }, [profile?.id])
+  }, [profile?.id, dataLoaded])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -248,14 +271,13 @@ export default function RateCardsPage() {
   if (loading) {
     return (
       <ProtectedRoute requiredRole="creator">
-        <Layout>
-          <Container>
-            <div className="py-8">
-              <Card className="p-12 text-center">
-                <Text>Loading rate cards...</Text>
-              </Card>
+        <Layout variant="app">
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2] mx-auto mb-4"></div>
+              <Text size="lg" color="secondary">Loading rate cards...</Text>
             </div>
-          </Container>
+          </div>
         </Layout>
       </ProtectedRoute>
     )
@@ -263,9 +285,9 @@ export default function RateCardsPage() {
 
   return (
     <ProtectedRoute requiredRole="creator">
-      <Layout>
-        <Container>
-          <div className="py-8">
+      <Layout variant="app">
+        <Section padding="lg">
+          <Container>
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
@@ -289,13 +311,13 @@ export default function RateCardsPage() {
 
             {/* Success/Error Messages */}
             {success && (
-              <Card className="p-4 mb-6 bg-green-900/20 border-green-500/20">
+              <Card className="p-4 mb-6 bg-green-500/20 border border-green-500/20 rounded-lg">
                 <Text className="text-green-400">{success}</Text>
               </Card>
             )}
 
             {error && (
-              <Card className="p-4 mb-6 bg-red-900/20 border-red-500/20">
+              <Card className="p-4 mb-6 bg-red-500/20 border border-red-500/20 rounded-lg">
                 <Text className="text-red-400">{error}</Text>
               </Card>
             )}
@@ -407,18 +429,20 @@ export default function RateCardsPage() {
 
             {/* Rate Cards Grid */}
             {rateCards.length === 0 ? (
-              <Card className="p-12 text-center">
-                <div className="w-16 h-16 bg-[#2A2A3A] rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <DollarSign className="w-8 h-8 text-gray-500" />
+              <Card className="p-12">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-[#2A2A3A] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <DollarSign className="w-8 h-8 text-gray-500" />
+                  </div>
+                  <Heading level={3} size="lg" className="mb-2">No Rate Cards Yet</Heading>
+                  <Text size="sm" color="secondary" className="mb-6">
+                    Create rate cards to set your pricing for different types of content
+                  </Text>
+                  <Button onClick={() => setShowAddForm(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Your First Rate Card
+                  </Button>
                 </div>
-                <Heading level={3} size="lg" className="mb-2">No Rate Cards Yet</Heading>
-                <Text size="sm" className="mb-6">
-                  Create rate cards to set your pricing for different types of content
-                </Text>
-                <Button onClick={() => setShowAddForm(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Your First Rate Card
-                </Button>
               </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -427,11 +451,11 @@ export default function RateCardsPage() {
                   const IconComponent = deliverableInfo?.icon || Camera
 
                   return (
-                    <Card key={rateCard.id} className="p-6">
+                    <Card key={rateCard.id} className="p-6 hover:bg-[#2A2A3A]/50 transition-colors border border-white/5">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-12 h-12 rounded-xl bg-[#2A2A3A] flex items-center justify-center ${deliverableInfo?.color || 'text-gray-400'}`}>
-                            <IconComponent className="w-6 h-6" />
+                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-r from-[#8A2BE2] to-[#FF1493] flex items-center justify-center`}>
+                            <IconComponent className="w-6 h-6 text-white" />
                           </div>
                           <div>
                             <Heading level={4} size="md">{deliverableInfo?.label}</Heading>
@@ -490,7 +514,7 @@ export default function RateCardsPage() {
 
             {/* Getting Started Tips */}
             {rateCards.length > 0 && rateCards.length < 3 && (
-              <Card className="p-6 mt-8 bg-blue-900/20 border-blue-500/20">
+              <Card className="p-6 mt-8 bg-blue-500/20 border border-blue-500/20 rounded-lg">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0 mt-1">
                     <Zap className="w-4 h-4 text-blue-400" />
@@ -511,8 +535,8 @@ export default function RateCardsPage() {
                 </div>
               </Card>
             )}
-          </div>
-        </Container>
+          </Container>
+        </Section>
       </Layout>
     </ProtectedRoute>
   )
