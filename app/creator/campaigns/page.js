@@ -126,14 +126,14 @@ export default function CreatorCampaignsPage() {
     }
 
     // Filter by category (with null checks)
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== 'all') {
       filtered = filtered.filter(campaign => 
         campaign && campaign.category === selectedCategory
       )
     }
 
     // Filter by budget range (with null checks)
-    if (selectedBudget) {
+    if (selectedBudget && selectedBudget !== 'all') {
       filtered = filtered.filter(campaign => 
         campaign && campaign.budget_range === selectedBudget
       )
