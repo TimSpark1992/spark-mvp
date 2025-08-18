@@ -156,7 +156,7 @@ export default function CreatorCampaignsPage() {
   }
 
   return (
-    <ProtectedRoute allowedRoles={['creator']}>
+    <ProtectedRoute requiredRole="creator">
       <div className="min-h-screen bg-gray-50">
         <Navigation />
         
