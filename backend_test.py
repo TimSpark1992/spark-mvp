@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-Backend Testing Suite for Rate Cards Table Creation and Functionality
-Focuses on creating the missing rate_cards table and testing rate card operations
+Comprehensive Backend Testing for Rate Cards API
+Testing the critical rate card update functionality and service role authentication fixes
 """
 
 import requests
 import json
-import time
 import uuid
+import time
 import sys
 from datetime import datetime
 
-# Configuration - Use production URL
-BASE_URL = "https://www.sparkplatform.tech"
+# Configuration
+BASE_URL = "https://spark-bugfix.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class RateCardsBackendTester:
