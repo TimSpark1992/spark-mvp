@@ -15,7 +15,18 @@ export async function GET(request) {
     
     console.log('📋 Fetching rate cards, creator_id:', creatorId)
     
-    const { data: rateCards, error } = await getRateCards(creatorId)
+    // Use service role client to bypass RLS
+    let query = supabase
+      .from('rate_cards')
+      .select('*')
+      .eq('active', true)
+      .order('deliverable_type')
+    
+    if (creatorId) {
+      query = query.eq('creator_id', creatorId)
+    }
+    
+    const { data: rateCards, error } = await query
     
     if (error) {
       console.error('❌ Error fetching rate cards:', error)
