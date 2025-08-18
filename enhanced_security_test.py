@@ -15,7 +15,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Configuration - Use environment variable for base URL
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://spark-payments.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://brand-creator-link-1.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 class SparkMVPSecurityTester:

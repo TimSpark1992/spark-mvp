@@ -12,7 +12,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BASE_URL = "https://spark-payments.preview.emergentagent.com"
+BASE_URL = "https://brand-creator-link-1.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(message, status="INFO"):

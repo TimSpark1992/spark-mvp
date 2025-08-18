@@ -31,7 +31,7 @@ import os
 from datetime import datetime, timedelta
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://006ef4e7-1e43-4b34-92e8-18a672524883.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://brand-creator-link-1.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 class CampaignStatusTester:
