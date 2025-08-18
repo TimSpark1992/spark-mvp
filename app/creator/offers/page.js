@@ -23,28 +23,64 @@ const CreatorOffersPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
-    loadOffers();
-  }, [profile]);
-
-  const loadOffers = async () => {
-    if (!profile?.id) return;
+    let isMounted = true;
     
-    try {
-      const response = await fetch(`/api/offers?creator_id=${profile.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setOffers(data.offers || []);
-      } else {
-        setError('Failed to load offers');
+    const loadOffers = async () => {
+      if (!profile?.id || !isMounted || dataLoaded) return;
+      
+      try {
+        console.log('🔄 Loading creator offers...')
+        
+        // Set timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+          if (isMounted && !dataLoaded) {
+            console.log('⚠️ Offers loading timeout')
+            setOffers([])
+            setDataLoaded(true)
+            setLoading(false)
+          }
+        }, 5000)
+        
+        const response = await fetch(`/api/offers?creator_id=${profile.id}`)
+        
+        clearTimeout(timeoutId)
+        
+        if (!isMounted) return
+        
+        if (response.ok) {
+          const data = await response.json()
+          console.log('✅ Offers loaded:', data.offers?.length || 0)
+          setOffers(data.offers || [])
+        } else {
+          setError('Failed to load offers')
+          setOffers([])
+        }
+        
+        setDataLoaded(true)
+        
+      } catch (err) {
+        console.error('❌ Error loading offers:', err)
+        if (isMounted) {
+          setError('Failed to load offers')
+          setOffers([])
+          setDataLoaded(true)
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
       }
-    } catch (err) {
-      setError('Failed to load offers');
-    } finally {
-      setLoading(false);
     }
-  };
+
+    loadOffers()
+    
+    return () => {
+      isMounted = false
+    }
+  }, [profile?.id, dataLoaded])
 
   const handleOfferAction = async (offerId, action, counterData = null) => {
     try {
