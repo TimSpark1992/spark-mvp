@@ -84,14 +84,19 @@ export async function POST(request) {
       )
     }
     
-    const { data: rateCard, error } = await createRateCard({
-      creator_id: body.creator_id,
-      deliverable_type: body.deliverable_type,
-      base_price_cents: body.base_price_cents,
-      currency: body.currency,
-      rush_pct: body.rush_pct || 0,
-      active: true
-    })
+    // Use service role client to bypass RLS
+    const { data: rateCard, error } = await supabase
+      .from('rate_cards')
+      .insert({
+        creator_id: body.creator_id,
+        deliverable_type: body.deliverable_type,
+        base_price_cents: body.base_price_cents,
+        currency: body.currency,
+        rush_pct: body.rush_pct || 0,
+        active: true
+      })
+      .select()
+      .single()
     
     if (error) {
       console.error('❌ Error creating rate card:', error)
