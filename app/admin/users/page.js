@@ -26,6 +26,7 @@ import {
   Download,
   Settings
 } from 'lucide-react'
+import { formatPrice, formatDate } from '@/lib/formatters'
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([])
@@ -190,13 +191,6 @@ export default function AdminUsersPage() {
     if (user.warning_count >= 3) return 'High Risk'
     if (user.warning_count >= 1) return 'Warned'
     return 'Good Standing'
-  }
-
-  const formatCurrency = (cents) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(cents / 100)
   }
 
   const getLastSeenText = (timestamp) => {
@@ -392,7 +386,7 @@ export default function AdminUsersPage() {
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
-                            Joined {new Date(user.created_at).toLocaleDateString()}
+                            Joined {formatDate(user.created_at)}
                           </span>
                           <span className="flex items-center gap-1">
                             <Activity className="w-3 h-3" />
@@ -415,8 +409,8 @@ export default function AdminUsersPage() {
                             user.role === 'creator' ? 'text-green-400' : 'text-blue-400'
                           }>
                             {user.role === 'creator' 
-                              ? formatCurrency(user.total_earnings)
-                              : formatCurrency(user.total_spent)
+                              ? formatPrice(user.total_earnings)
+                              : formatPrice(user.total_spent)
                             }
                           </Text>
                           <Text size="xs" color="secondary">

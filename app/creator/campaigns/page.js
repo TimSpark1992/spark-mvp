@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Heading, Text } from '@/components/ui/Typography'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
 import { getCampaigns } from '@/lib/supabase'
+import { formatDate } from '@/lib/formatters'
 import { 
   Search, 
   Filter, 
@@ -355,10 +356,7 @@ export default function CreatorCampaigns() {
                             </div>
                             <div className="flex items-center space-x-1 text-sm text-gray-400">
                               <Calendar className="w-4 h-4" />
-                              <span>Posted {campaign.created_at 
-                                ? new Date(campaign.created_at).toLocaleDateString()
-                                : 'Recently'
-                              }</span>
+                              <span>Posted {formatDate(campaign.created_at) || 'Recently'}</span>
                             </div>
                           </div>
                         </div>
@@ -380,7 +378,7 @@ export default function CreatorCampaigns() {
                             <div className="flex items-center space-x-2">
                               <Clock className="w-4 h-4 text-yellow-400" />
                               <Text size="sm" className="text-yellow-400">
-                                Apply by {new Date(campaign.application_deadline).toLocaleDateString()}
+                                Apply by {formatDate(campaign.application_deadline)}
                               </Text>
                             </div>
                           )}

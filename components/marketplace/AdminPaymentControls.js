@@ -19,7 +19,7 @@ import {
   Search,
   Filter
 } from 'lucide-react'
-import { formatPrice } from '@/lib/marketplace/pricing'
+import { formatPrice, formatDate } from '@/lib/formatters'
 
 export default function AdminPaymentControls({ className = '' }) {
   const [payments, setPayments] = useState([])
@@ -359,7 +359,7 @@ export default function AdminPaymentControls({ className = '' }) {
                         {formatPrice(payout.amount_cents, payout.currency)} to {payout.creator?.full_name || 'N/A'}
                       </Text>
                       <Text size="xs" color="secondary">
-                        Method: {payout.method} • Created: {new Date(payout.created_at).toLocaleDateString()}
+                        Method: {payout.method} • Created: {formatDate(payout.created_at)}
                       </Text>
                     </div>
                   </div>
