@@ -10,12 +10,14 @@ export async function PATCH(request, { params }) {
     console.log('📋 Updating rate card:', id, body)
     
     // Validate price if provided - use proper null/undefined checks
-    if (body.base_price_cents !== undefined && body.base_price_cents !== null && 
-        (!isNaN(body.base_price_cents) && body.base_price_cents <= 0)) {
-      return NextResponse.json(
-        { error: 'Price must be greater than zero' },
-        { status: 400 }
-      )
+    if (body.base_price_cents !== undefined && body.base_price_cents !== null) {
+      // Check if it's a valid number and greater than 0
+      if (isNaN(body.base_price_cents) || body.base_price_cents <= 0) {
+        return NextResponse.json(
+          { error: 'Price must be a valid number greater than zero' },
+          { status: 400 }
+        )
+      }
     }
     
     // Validate currency if provided
