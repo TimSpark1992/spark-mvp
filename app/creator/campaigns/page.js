@@ -34,6 +34,7 @@ export default function CreatorCampaigns() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedBudget, setSelectedBudget] = useState('all')
+  const [dataLoaded, setDataLoaded] = useState(false) // Track if data has been loaded
 
   const categories = [
     'Fashion & Beauty', 'Technology', 'Food & Beverage', 'Travel & Lifestyle',
