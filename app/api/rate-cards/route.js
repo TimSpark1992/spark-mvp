@@ -111,6 +111,7 @@ export async function POST(request) {
     
     if (error) {
       console.error('❌ Error creating rate card:', error)
+      console.error('❌ Error details:', JSON.stringify(error, null, 2))
       
       // Handle unique constraint violation
       if (error.code === '23505') {
@@ -121,7 +122,7 @@ export async function POST(request) {
       }
       
       return NextResponse.json(
-        { error: 'Failed to create rate card' },
+        { error: 'Failed to create rate card', details: error },
         { status: 500 }
       )
     }
