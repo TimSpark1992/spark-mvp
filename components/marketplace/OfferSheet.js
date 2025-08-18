@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, DollarSign, Clock, User, Package, CheckCircle, XCircle, Edit } from 'lucide-react';
+import { formatPrice, formatDate } from '@/lib/formatters';
 
 const OfferSheet = ({ 
   offer = null, 
@@ -68,11 +69,6 @@ const OfferSheet = ({
       total_cents: total
     }));
   }, [formData.base_price_cents, formData.quantity, formData.rush_fee_pct, formData.platform_fee_pct]);
-
-  const formatPrice = (cents, currency = 'USD') => {
-    const symbols = { USD: '$', MYR: 'RM', SGD: 'S$' };
-    return `${symbols[currency]}${(cents / 100).toFixed(2)}`;
-  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -228,7 +224,7 @@ const OfferSheet = ({
                 <label className="text-sm font-medium text-gray-700">Deadline</label>
                 <div className="flex items-center mt-1">
                   <Clock className="w-4 h-4 mr-2 text-gray-500" />
-                  <span>{offer?.deadline ? new Date(offer.deadline).toLocaleDateString() : 'Not set'}</span>
+                  <span>{formatDate(offer?.deadline) || 'Not set'}</span>
                 </div>
               </div>
             </div>

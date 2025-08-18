@@ -24,6 +24,7 @@ import {
   Eye,
   Plus
 } from 'lucide-react';
+import { formatPrice, formatDate } from '@/lib/formatters';
 
 const ManualPayoutsPage = () => {
   const [payouts, setPayouts] = useState([]);
@@ -148,21 +149,6 @@ const ManualPayoutsPage = () => {
       setError('Failed to load payouts');
       setLoading(false);
     }
-  };
-
-  const formatPrice = (cents, currency = 'USD') => {
-    const symbols = { USD: '$', MYR: 'RM', SGD: 'S$' };
-    return `${symbols[currency]}${(cents / 100).toFixed(2)}`;
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   const getStatusBadge = (status) => {

@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ArrowLeft, Plus, Eye, Edit, Trash2, Users, DollarSign } from 'lucide-react';
 import OfferSheet from '@/components/marketplace/OfferSheet';
+import { formatPrice, formatDate } from '@/lib/formatters';
 
 const OffersPage = () => {
   const params = useParams();
@@ -101,11 +102,6 @@ const OffersPage = () => {
     } catch (err) {
       throw err;
     }
-  };
-
-  const formatPrice = (cents, currency = 'USD') => {
-    const symbols = { USD: '$', MYR: 'RM', SGD: 'S$' };
-    return `${symbols[currency]}${(cents / 100).toFixed(2)}`;
   };
 
   const getStatusBadge = (status) => {
@@ -262,7 +258,7 @@ const OffersPage = () => {
                               {formatPrice(offer.total_cents, offer.currency)}
                             </p>
                             <p className="text-sm text-gray-600">
-                              Due: {offer.deadline ? new Date(offer.deadline).toLocaleDateString() : 'Not set'}
+                              Due: {formatDate(offer.deadline) || 'Not set'}
                             </p>
                           </div>
                           

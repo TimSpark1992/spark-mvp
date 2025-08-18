@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ArrowLeft, Users, Target, DollarSign } from 'lucide-react';
 import OfferSheet from '@/components/marketplace/OfferSheet';
 import CostEstimator from '@/components/marketplace/CostEstimator';
+import { formatPrice, formatDate } from '@/lib/formatters';
 
 const CreateOfferPage = () => {
   const params = useParams();
@@ -92,11 +93,6 @@ const CreateOfferPage = () => {
     }
   };
 
-  const formatPrice = (cents, currency = 'USD') => {
-    const symbols = { USD: '$', MYR: 'RM', SGD: 'S$' };
-    return `${symbols[currency]}${(cents / 100).toFixed(2)}`;
-  };
-
   if (loading) {
     return (
       <ProtectedRoute requiredRole="brand">
@@ -160,7 +156,7 @@ const CreateOfferPage = () => {
                 <div>
                   <p className="text-sm text-gray-600">Deadline</p>
                   <p className="font-medium">
-                    {campaign.end_date ? new Date(campaign.end_date).toLocaleDateString() : 'Not set'}
+                    {formatDate(campaign.end_date) || 'Not set'}
                   </p>
                 </div>
               </div>
