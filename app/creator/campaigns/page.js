@@ -19,6 +19,7 @@ import {
   ArrowRight
 } from 'lucide-react'
 import Link from 'next/link'
+import { getCampaigns } from '@/lib/supabase'
 
 export default function CreatorCampaignsPage() {
   const { profile } = useAuth()
