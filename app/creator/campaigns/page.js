@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Heading, Text } from '@/components/ui/Typography'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
+import { getCampaigns } from '@/lib/supabase'
 import { 
   Search, 
   Filter, 
@@ -24,9 +25,8 @@ import {
   MapPin
 } from 'lucide-react'
 import Link from 'next/link'
-import { getCampaigns } from '@/lib/supabase'
 
-export default function CreatorCampaignsPage() {
+export default function CreatorCampaigns() {
   const { profile } = useAuth()
   const [campaigns, setCampaigns] = useState([])
   const [filteredCampaigns, setFilteredCampaigns] = useState([])
@@ -36,24 +36,15 @@ export default function CreatorCampaignsPage() {
   const [selectedBudget, setSelectedBudget] = useState('all')
 
   const categories = [
-    'Fashion & Beauty',
-    'Technology',
-    'Food & Beverage',
-    'Travel & Lifestyle',
-    'Health & Wellness',
-    'Entertainment',
-    'Education',
-    'Sports & Fitness',
-    'Home & Garden',
-    'Business & Finance'
+    'Fashion & Beauty', 'Technology', 'Food & Beverage', 'Travel & Lifestyle',
+    'Health & Wellness', 'Entertainment', 'Education', 'Sports & Fitness',
+    'Home & Garden', 'Business & Finance', 'Art & Design', 'Music',
+    'Gaming', 'Parenting', 'DIY & Crafts', 'Photography'
   ]
 
   const budgetRanges = [
-    '$500 - $1,000',
-    '$1,000 - $2,500',
-    '$2,500 - $5,000',
-    '$5,000 - $10,000',
-    '$10,000+'
+    '$500 - $1,000', '$1,000 - $2,500', '$2,500 - $5,000', 
+    '$5,000 - $10,000', '$10,000+'
   ]
 
   useEffect(() => {
@@ -156,188 +147,207 @@ export default function CreatorCampaignsPage() {
   if (loading) {
     return (
       <ProtectedRoute requiredRole="creator">
-        <div className="min-h-screen bg-gray-50">
-          <Navigation />
-          <div className="container mx-auto px-4 py-8">
-            <div className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading campaigns...</p>
-              </div>
+        <Layout variant="app">
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2] mx-auto mb-4"></div>
+              <Text size="lg" color="secondary">Loading campaigns...</Text>
             </div>
           </div>
-        </div>
+        </Layout>
       </ProtectedRoute>
     )
   }
 
   return (
     <ProtectedRoute requiredRole="creator">
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        
-        <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Browse Campaigns</h1>
-            <p className="text-gray-600">
-              Discover exciting collaboration opportunities with brands
-            </p>
-          </div>
-
-          {/* Filters */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Filter Campaigns</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Search campaigns..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+      <Layout variant="app">
+        <Section padding="lg">
+          <Container>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <Heading level={1} size="3xl" className="mb-2">Browse Campaigns</Heading>
+                <Text size="lg" color="secondary">
+                  Discover exciting collaboration opportunities with brands
+                </Text>
               </div>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <Text size="sm" color="secondary">Available Campaigns</Text>
+                  <Heading level={3} size="2xl">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8A2BE2] to-[#FF1493]">
+                      {filteredCampaigns.length}
+                    </span>
+                  </Heading>
+                </div>
+              </div>
+            </div>
 
-              {/* Category Filter */}
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {/* Filters */}
+            <Card className="p-6 mb-8">
+              <div className="flex items-center gap-2 mb-6">
+                <Filter className="w-5 h-5 text-[#8A2BE2]" />
+                <Heading level={3} size="lg">Filter Campaigns</Heading>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    type="text"
+                    placeholder="Search campaigns..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
 
-              {/* Budget Filter */}
-              <Select value={selectedBudget} onValueChange={setSelectedBudget}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Budgets" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Budgets</SelectItem>
-                  {budgetRanges.map((range) => (
-                    <SelectItem key={range} value={range}>
-                      {range}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              {/* Clear Filters */}
-              {(searchTerm || selectedCategory || selectedBudget) && (
-                <Button variant="outline" onClick={clearFilters}>
+                <Select value={selectedBudget} onValueChange={setSelectedBudget}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Budgets" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Budgets</SelectItem>
+                    {budgetRanges.map((range) => (
+                      <SelectItem key={range} value={range}>
+                        {range}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Button variant="secondary" onClick={clearFilters}>
                   Clear Filters
                 </Button>
+              </div>
+            </Card>
+
+            {/* Results Summary */}
+            <div className="flex items-center justify-between mb-6">
+              <Text color="secondary">
+                Showing {filteredCampaigns.length} of {campaigns.length} campaigns
+              </Text>
+              {(searchTerm || selectedCategory !== 'all' || selectedBudget !== 'all') && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Filter className="w-3 h-3" />
+                  Filters applied
+                </Badge>
               )}
             </div>
-          </div>
 
-          {/* Results Header */}
-          <div className="flex justify-between items-center mb-6">
-            <p className="text-gray-600">
-              Showing {filteredCampaigns.length} of {campaigns.length} campaigns
-            </p>
-            {(searchTerm || selectedCategory || selectedBudget) && (
-              <Badge variant="secondary">
-                Filters applied
-              </Badge>
-            )}
-          </div>
-
-          {/* Campaigns Grid */}
-          {filteredCampaigns.length === 0 ? (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  No campaigns found
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  {searchTerm || selectedCategory || selectedBudget
-                    ? 'Try adjusting your filters to see more campaigns.'
-                    : 'There are no active campaigns at the moment. Check back later!'}
-                </p>
-                {(searchTerm || selectedCategory || selectedBudget) && (
-                  <Button onClick={clearFilters}>
-                    Clear Filters
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCampaigns.map((campaign) => {
-                // Add comprehensive null checks
-                if (!campaign || !campaign.id) return null
-                
-                return (
-                  <Card key={campaign.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex justify-between items-start mb-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {campaign.category || 'Uncategorized'}
-                        </Badge>
-                        <span className="text-xs text-gray-500">
-                          {campaign.created_at 
-                            ? new Date(campaign.created_at).toLocaleDateString()
-                            : 'No date'
-                          }
-                        </span>
+            {/* Campaigns Grid */}
+            {filteredCampaigns.length === 0 ? (
+              <Card className="p-12">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-[#2A2A3A] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Briefcase className="w-8 h-8 text-gray-500" />
+                  </div>
+                  <Heading level={4} size="lg" className="mb-2">No campaigns found</Heading>
+                  <Text size="sm" color="secondary" className="mb-6">
+                    {campaigns.length === 0 
+                      ? 'Check back later for new opportunities!'
+                      : 'Try adjusting your filters to see more campaigns.'
+                    }
+                  </Text>
+                  {(searchTerm || selectedCategory !== 'all' || selectedBudget !== 'all') && (
+                    <Button variant="secondary" onClick={clearFilters}>
+                      Clear Filters
+                    </Button>
+                  )}
+                </div>
+              </Card>
+            ) : (
+              <div className="grid gap-6">
+                {filteredCampaigns.map((campaign) => {
+                  // Add null checks to prevent crashes
+                  if (!campaign || !campaign.id) return null
+                  
+                  return (
+                    <Card key={campaign.id} className="p-6 hover:bg-[#2A2A3A]/50 transition-colors border border-white/5">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <Heading level={4} size="lg" className="mb-0">
+                              {campaign.title || 'Untitled Campaign'}
+                            </Heading>
+                            <Badge variant="secondary">{campaign.category || 'Uncategorized'}</Badge>
+                          </div>
+                          
+                          <div className="flex items-center gap-4 mb-4">
+                            <div className="flex items-center space-x-1 text-sm text-gray-400">
+                              <Building className="w-4 h-4" />
+                              <span>{campaign.profiles?.company_name || 'Brand'}</span>
+                            </div>
+                            <div className="flex items-center space-x-1 text-sm text-gray-400">
+                              <Calendar className="w-4 h-4" />
+                              <span>Posted {campaign.created_at 
+                                ? new Date(campaign.created_at).toLocaleDateString()
+                                : 'Recently'
+                              }</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <CardTitle className="text-lg line-clamp-2">
-                        {campaign.title || 'Untitled Campaign'}
-                      </CardTitle>
-                    </CardHeader>
-                    
-                    <CardContent className="space-y-4">
-                      <p className="text-gray-600 text-sm line-clamp-3">
+
+                      <Text size="sm" className="mb-4 line-clamp-2">
                         {campaign.description || 'No description available'}
-                      </p>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center text-sm text-gray-600">
-                          <DollarSign className="w-4 h-4 mr-2" />
-                          <span>{campaign.budget_range || 'Budget not specified'}</span>
+                      </Text>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                        <div className="flex items-center gap-6">
+                          <div className="flex items-center space-x-2">
+                            <DollarSign className="w-4 h-4 text-green-400" />
+                            <Text size="sm" weight="medium" className="text-green-400">
+                              {campaign.budget_range || 'Budget not specified'}
+                            </Text>
+                          </div>
+                          {campaign.application_deadline && (
+                            <div className="flex items-center space-x-2">
+                              <Clock className="w-4 h-4 text-yellow-400" />
+                              <Text size="sm" className="text-yellow-400">
+                                Apply by {new Date(campaign.application_deadline).toLocaleDateString()}
+                              </Text>
+                            </div>
+                          )}
                         </div>
                         
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Building className="w-4 h-4 mr-2" />
-                          <span>{campaign.profiles?.company_name || campaign.profiles?.full_name || 'Unknown Brand'}</span>
-                        </div>
-                        
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Calendar className="w-4 h-4 mr-2" />
-                          <span>Apply by {campaign.application_deadline 
-                            ? new Date(campaign.application_deadline).toLocaleDateString()
-                            : 'No deadline'
-                          }</span>
+                        <div className="flex items-center gap-3">
+                          <Link href={`/creator/campaigns/${campaign.id}`}>
+                            <Button variant="ghost" size="sm">
+                              View Details
+                            </Button>
+                          </Link>
+                          <Link href={`/creator/campaigns/${campaign.id}`}>
+                            <Button size="sm">
+                              <ArrowRight className="w-4 h-4 mr-2" />
+                              Apply Now
+                            </Button>
+                          </Link>
                         </div>
                       </div>
-                      
-                      <div className="pt-4">
-                        <Link href={`/creator/campaigns/${campaign.id}`}>
-                          <Button className="w-full">
-                            View Details
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        </Link>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              }).filter(Boolean)}
-            </div>
-          )}
-        </div>
-      </div>
+                    </Card>
+                  )
+                }).filter(Boolean)}
+              </div>
+            )}
+          </Container>
+        </Section>
+      </Layout>
     </ProtectedRoute>
   )
 }
