@@ -32,8 +32,9 @@ export async function PATCH(request, { params }) {
     
     if (error) {
       console.error('❌ Error updating rate card:', error)
+      // Return more detailed error information
       return NextResponse.json(
-        { error: 'Failed to update rate card' },
+        { error: error.message || error.details || 'Failed to update rate card', supabaseError: error },
         { status: 500 }
       )
     }
