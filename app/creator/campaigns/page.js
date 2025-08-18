@@ -144,8 +144,8 @@ export default function CreatorCampaignsPage() {
 
   const clearFilters = () => {
     setSearchTerm('')
-    setSelectedCategory('')
-    setSelectedBudget('')
+    setSelectedCategory('all')
+    setSelectedBudget('all')
   }
 
   if (loading) {
