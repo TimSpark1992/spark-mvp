@@ -27,8 +27,8 @@ export default function CreatorCampaignsPage() {
   const [filteredCampaigns, setFilteredCampaigns] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('')
-  const [selectedBudget, setSelectedBudget] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedBudget, setSelectedBudget] = useState('all')
 
   const categories = [
     'Fashion & Beauty',
