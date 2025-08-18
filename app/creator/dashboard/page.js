@@ -365,7 +365,7 @@ function CreatorDashboardContent() {
                           <div className="flex items-center space-x-1 text-sm text-gray-400">
                             <Calendar className="w-4 h-4" />
                             <span>{campaign.application_deadline 
-                              ? new Date(campaign.application_deadline).toLocaleDateString()
+                              ? formatDate(campaign.application_deadline)
                               : 'No deadline'
                             }</span>
                           </div>
