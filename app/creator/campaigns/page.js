@@ -56,9 +56,6 @@ export default function CreatorCampaignsPage() {
       try {
         console.log('🔄 Loading campaigns from Supabase...')
         
-        // Import getCampaigns function
-        const { getCampaigns } = await import('@/lib/supabase')
-        
         // Get real campaigns data from Supabase
         const { data: campaignsData, error } = await getCampaigns()
         
