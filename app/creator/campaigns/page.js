@@ -53,38 +53,51 @@ export default function CreatorCampaignsPage() {
   useEffect(() => {
     const loadCampaigns = async () => {
       try {
-        console.log('🔄 Loading sample campaigns for Creator dashboard...')
+        console.log('🔄 Loading campaigns from Supabase...')
         
-        const sampleCampaigns = [
-          {
-            id: '1',
-            title: 'Fashion Photography Campaign',
-            description: 'Looking for fashion influencers to showcase our new summer collection',
-            category: 'Fashion & Beauty',
-            budget_range: '$2,500 - $5,000',
-            application_deadline: '2025-09-15',
-            created_at: '2025-08-15',
-            profiles: {
-              company_name: 'Sample Fashion Brand',
-            }
-          },
-          {
-            id: '2', 
-            title: 'Tech Review Campaign',
-            description: 'Need tech reviewers for our latest smartphone release',
-            category: 'Technology',
-            budget_range: '$1,000 - $2,500',
-            application_deadline: '2025-09-30',
-            created_at: '2025-08-16',
-            profiles: {
-              company_name: 'TechCorp',
-            }
-          }
-        ]
+        // Import getCampaigns function
+        const { getCampaigns } = await import('@/lib/supabase')
         
-        console.log('✅ Sample campaigns loaded:', sampleCampaigns.length)
-        setCampaigns(sampleCampaigns)
-        setFilteredCampaigns(sampleCampaigns)
+        // Get real campaigns data from Supabase
+        const { data: campaignsData, error } = await getCampaigns()
+        
+        if (error) {
+          console.error('❌ Error loading campaigns:', error)
+          // Fallback to sample data if Supabase fails
+          const sampleCampaigns = [
+            {
+              id: '1',
+              title: 'Fashion Photography Campaign',
+              description: 'Looking for fashion influencers to showcase our new summer collection',
+              category: 'Fashion & Beauty',
+              budget_range: '$2,500 - $5,000',
+              application_deadline: '2025-09-15',
+              created_at: '2025-08-15',
+              profiles: {
+                company_name: 'Sample Fashion Brand',
+              }
+            },
+            {
+              id: '2', 
+              title: 'Tech Review Campaign',
+              description: 'Need tech reviewers for our latest smartphone release',
+              category: 'Technology',
+              budget_range: '$1,000 - $2,500',
+              application_deadline: '2025-09-30',
+              created_at: '2025-08-16',
+              profiles: {
+                company_name: 'TechCorp',
+              }
+            }
+          ]
+          console.log('⚠️ Using fallback sample data')
+          setCampaigns(sampleCampaigns)
+          setFilteredCampaigns(sampleCampaigns)
+        } else {
+          console.log('✅ Real campaigns loaded:', campaignsData?.length || 0)
+          setCampaigns(campaignsData || [])
+          setFilteredCampaigns(campaignsData || [])
+        }
         
       } catch (error) {
         console.error('❌ Exception loading campaigns:', error)
