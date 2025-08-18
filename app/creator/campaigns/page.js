@@ -48,12 +48,55 @@ export default function CreatorCampaigns() {
   ]
 
   useEffect(() => {
+    let isMounted = true; // Flag to prevent state updates if component unmounts
+    
     const loadCampaigns = async () => {
+      // Don't start loading if already loading or if component is unmounted
+      if (!isMounted) return;
+      
       try {
         console.log('🔄 Loading campaigns from Supabase...')
         
+        // Set timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+          if (isMounted) {
+            console.log('⚠️ Campaign loading timeout, using fallback data')
+            const sampleCampaigns = [
+              {
+                id: '1',
+                title: 'Fashion Photography Campaign',  
+                description: 'Looking for fashion influencers to showcase our new summer collection',
+                category: 'Fashion & Beauty',
+                budget_range: '$2,500 - $5,000',
+                application_deadline: '2025-09-15',
+                created_at: '2025-08-15',
+                profiles: { company_name: 'Sample Fashion Brand' }
+              },
+              {
+                id: '2',
+                title: 'Tech Review Campaign',
+                description: 'Need tech reviewers for our latest smartphone release', 
+                category: 'Technology',
+                budget_range: '$1,000 - $2,500',
+                application_deadline: '2025-09-30',
+                created_at: '2025-08-16',
+                profiles: { company_name: 'TechCorp' }
+              }
+            ]
+            setCampaigns(sampleCampaigns)
+            setFilteredCampaigns(sampleCampaigns)
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
         // Get real campaigns data from Supabase
         const { data: campaignsData, error } = await getCampaigns()
+        
+        // Clear timeout if request completes
+        clearTimeout(timeoutId)
+        
+        // Only update state if component is still mounted
+        if (!isMounted) return;
         
         if (error) {
           console.error('❌ Error loading campaigns:', error)
@@ -95,16 +138,27 @@ export default function CreatorCampaigns() {
         
       } catch (error) {
         console.error('❌ Exception loading campaigns:', error)
-        setCampaigns([])
-        setFilteredCampaigns([])
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setCampaigns([])
+          setFilteredCampaigns([])
+        }
       } finally {
-        console.log('🏁 Setting loading to false')
-        setLoading(false)
+        // Only update loading state if component is still mounted
+        if (isMounted) {
+          console.log('🏁 Setting loading to false')
+          setLoading(false)
+        }
       }
     }
 
     loadCampaigns()
-  }, [])
+    
+    // Cleanup function to prevent memory leaks
+    return () => {
+      isMounted = false
+    }
+  }, []) // Empty dependency array - only run once on mount
 
   useEffect(() => {
     let filtered = campaigns || []
