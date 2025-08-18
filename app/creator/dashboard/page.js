@@ -398,7 +398,7 @@ function CreatorDashboardContent() {
                       {application.campaigns?.title}
                     </Heading>
                     <Text size="sm" color="secondary">
-                      Applied {new Date(application.applied_at).toLocaleDateString()}
+                      Applied {formatDate(application.applied_at)}
                     </Text>
                   </div>
                   <Badge variant={getStatusColor(application.status)} className="flex items-center gap-1">
