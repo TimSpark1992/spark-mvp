@@ -18,7 +18,8 @@ API_BASE = f"{BASE_URL}/api"
 class RateCardsAPITester:
     def __init__(self):
         self.test_results = []
-        self.test_creator_id = str(uuid.uuid4())
+        # Use an existing creator ID from the database
+        self.test_creator_id = "5b408260-4d3d-4392-a589-0a485a4152a9"
         self.created_rate_cards = []
         
     def log_test(self, test_name, success, details="", error=None):
