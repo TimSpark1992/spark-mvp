@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Heading, Text } from '@/components/ui/Typography'
 import { getCreatorApplications } from '@/lib/supabase'
+import { formatDate } from '@/lib/formatters'
 import { 
   FileText,
   CheckCircle,
@@ -247,7 +248,7 @@ export default function CreatorApplicationsPage() {
                               </div>
                               <div className="flex items-center gap-1">
                                 <Calendar className="w-4 h-4" />
-                                <span>Applied {new Date(application.applied_at).toLocaleDateString()}</span>
+                                <span>Applied {formatDate(application.applied_at)}</span>
                               </div>
                             </div>
                           </div>
