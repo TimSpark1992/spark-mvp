@@ -270,9 +270,33 @@ export default function RateCardsPage() {
   }
 
   const formatPrice = (priceCents, currency) => {
+    // Handle null, undefined, or invalid price values
+    if (!priceCents || isNaN(priceCents) || priceCents < 0) {
+      return '$0.00'
+    }
+    
     const price = priceCents / 100
     const currencyInfo = CURRENCIES.find(c => c.code === currency)
     return `${currencyInfo?.symbol || '$'}${price.toFixed(2)}`
+  }
+
+  const formatDate = (dateString) => {
+    // Handle null, undefined, or invalid date values
+    if (!dateString) {
+      return 'Recently'
+    }
+    
+    try {
+      const date = new Date(dateString)
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'Recently'
+      }
+      return date.toLocaleDateString()
+    } catch (error) {
+      console.warn('Invalid date format:', dateString, error)
+      return 'Recently'
+    }
   }
 
   const getAvailableDeliverableTypes = () => {
