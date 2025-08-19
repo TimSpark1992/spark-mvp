@@ -82,12 +82,13 @@ export default function CreatorProfilePage() {
   }
 
   const handleSocialLinkChange = (platform, value) => {
-    const sanitizedValue = sanitizeFieldValue('url', value)
+    // Don't sanitize during typing - only store the raw value
+    // Sanitization will happen on form submission
     setFormData(prev => ({
       ...prev,
       social_links: {
         ...prev.social_links,
-        [platform]: sanitizedValue
+        [platform]: value
       }
     }))
   }
