@@ -204,25 +204,46 @@ export default function CreatorProfilePage() {
     setError('')
 
     try {
-      const fileName = `${profile.id}/profile-${Date.now()}-${file.name}`
+      // Check if upload functions are available
+      if (typeof uploadFile !== 'function' || typeof getFileUrl !== 'function') {
+        throw new Error('Upload functionality is not available. Please check your connection.')
+      }
+
+      const fileName = `${profile.id}/profile-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+      console.log('📤 Uploading profile picture:', fileName)
+      
       const { data: uploadData, error: uploadError } = await uploadFile('profiles', fileName, file)
       
-      if (uploadError) throw new Error(uploadError.message)
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        throw new Error(uploadError.message || 'Failed to upload image to storage')
+      }
 
+      console.log('✅ Profile picture uploaded, getting URL...')
       const profilePictureUrl = getFileUrl('profiles', fileName)
       
+      if (!profilePictureUrl) {
+        throw new Error('Failed to generate image URL')
+      }
+
+      console.log('🔄 Updating profile with picture URL...')
       // Update profile with new picture
       const { error: updateError } = await updateProfile(profile.id, {
         profile_picture: profilePictureUrl
       })
       
-      if (updateError) throw new Error(updateError.message)
-      
+      if (updateError) {
+        console.error('Profile update error:', updateError)
+        throw new Error(updateError.message || 'Failed to update profile')
+      }
+
+      console.log('🔄 Refreshing profile data...')
       await refreshProfile()
       setSuccess('Profile picture updated successfully!')
+      console.log('✅ Profile picture upload completed successfully')
       
     } catch (error) {
-      console.error('Error uploading profile picture:', error)
+      console.error('❌ Error uploading profile picture:', error)
       setError(error.message || 'Failed to upload profile picture')
     } finally {
       setUploadLoading(prev => ({ ...prev, profilePicture: false }))
