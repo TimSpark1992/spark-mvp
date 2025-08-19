@@ -185,10 +185,11 @@ export default function RateCardsPage() {
         throw new Error('Please enter a valid price')
       }
 
+      // Convert dollars to cents for API submission
       const requestBody = {
         creator_id: profile.id,
         deliverable_type: formData.deliverable_type,
-        base_price_cents: formData.base_price_cents * 100, // Convert to cents
+        base_price_cents: Math.round((formData.base_price_dollars || 0) * 100), // Convert to cents
         currency: formData.currency,
         rush_pct: formData.rush_pct || 0
       }
