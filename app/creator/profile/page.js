@@ -216,12 +216,18 @@ export default function CreatorProfilePage() {
     try {
       console.log('🔄 Starting Creator profile save process...')
       
+      // Sanitize form data before submission
+      const sanitizedData = {}
+      for (const [key, value] of Object.entries(formData)) {
+        sanitizedData[key] = sanitizeFieldValue(key, value)
+      }
+      
       // Enhanced timeout handling for production reliability
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('Profile save request timed out. Please check your connection and try again.')), 30000)
       )
       
-      const updatePromise = updateProfile(profile.id, formData)
+      const updatePromise = updateProfile(profile.id, sanitizedData)
       
       // Race between update and timeout
       const { error: updateError } = await Promise.race([updatePromise, timeoutPromise])
