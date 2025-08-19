@@ -47,21 +47,23 @@ export default function RateCardsPage() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingCard, setEditingCard] = useState(null)
   const [dataLoaded, setDataLoaded] = useState(false)
+  const [showPublicView, setShowPublicView] = useState(false) // Show public view when not authenticated
   
   // Add safety timeout to prevent infinite loading
   const [loadingTimeout, setLoadingTimeout] = useState(false)
   
   useEffect(() => {
-    // Safety timeout to prevent infinite loading (15 seconds max)
+    // Safety timeout to prevent infinite loading (10 seconds max)
     const safetyTimeout = setTimeout(() => {
-      console.log('🚨 SAFETY TIMEOUT: Forcing loading to stop after 15 seconds')
+      console.log('🚨 SAFETY TIMEOUT: Forcing loading to stop after 10 seconds')
       setLoadingTimeout(true)
       setLoading(false)
       setDataLoaded(true)
-      if (!error) {
-        setError('Loading timeout - please refresh the page')
+      // If no authentication, show public view
+      if (!profile?.id && !authLoading) {
+        setShowPublicView(true)
       }
-    }, 15000)
+    }, 10000)
     
     return () => clearTimeout(safetyTimeout)
   }, [])
@@ -75,9 +77,10 @@ export default function RateCardsPage() {
       dataLoaded,
       loading,
       loadingTimeout,
+      showPublicView,
       rateCardsCount: rateCards.length
     })
-  }, [authLoading, profile?.id, profile?.role, dataLoaded, loading, loadingTimeout, rateCards.length])
+  }, [authLoading, profile?.id, profile?.role, dataLoaded, loading, loadingTimeout, showPublicView, rateCards.length])
 
   const [formData, setFormData] = useState({
     deliverable_type: '',
