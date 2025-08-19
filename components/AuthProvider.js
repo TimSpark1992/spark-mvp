@@ -21,8 +21,17 @@ export function AuthProvider({ children }) {
   const router = useRouter()
 
   useEffect(() => {
-    // Get initial user
+    // Get initial user with faster timeout for unauthenticated users
+    const authTimeout = setTimeout(() => {
+      console.log('⚠️ Auth timeout - assuming no user')
+      setUser(null)
+      setProfile(null)
+      setLoading(false)
+    }, 5000) // 5 second timeout for auth check
+    
     getCurrentUser().then(async ({ user, error }) => {
+      clearTimeout(authTimeout) // Clear timeout since we got a response
+      
       if (user) {
         setUser(user)
         // Get user profile with retry mechanism
@@ -51,7 +60,15 @@ export function AuthProvider({ children }) {
         if (!profile) {
           console.warn('Initial profile retrieval failed after all retries for user:', user.id)
         }
+      } else {
+        console.log('🔓 No user authenticated - redirecting to login')
       }
+      setLoading(false)
+    }).catch((err) => {
+      clearTimeout(authTimeout)
+      console.error('❌ Auth check error:', err)
+      setUser(null)
+      setProfile(null) 
       setLoading(false)
     })
 
