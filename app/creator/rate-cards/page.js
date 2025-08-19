@@ -452,10 +452,11 @@ export default function RateCardsPage() {
                           type="number"
                           min="0"
                           max="200"
-                          value={formData.rush_pct}
+                          step="0.1"
+                          value={formData.rush_pct || ''}
                           onChange={handleInputChange}
                           className="w-full pl-10 pr-3 py-2 bg-[#2A2A3A] border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8A2BE2]"
-                          placeholder="0"
+                          placeholder="0.0"
                         />
                       </div>
                       <Text size="xs" color="secondary">
