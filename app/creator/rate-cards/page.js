@@ -59,20 +59,26 @@ export default function RateCardsPage() {
     let isMounted = true;
     
     const loadRateCards = async () => {
-      if (!profile?.id || !isMounted || dataLoaded) return
+      // Only load if we have a profile and haven't loaded data yet
+      if (!profile?.id || dataLoaded) return
+      
+      // Prevent multiple simultaneous requests
+      if (loading) return
       
       try {
         console.log('📋 Loading rate cards for creator:', profile?.id)
+        setLoading(true)
+        setError('')
         
-        // Set timeout to prevent infinite loading
+        // Set timeout to prevent infinite loading (10 seconds)
         const timeoutId = setTimeout(() => {
           if (isMounted && !dataLoaded) {
-            console.log('⚠️ Rate cards loading timeout')
+            console.log('⚠️ Rate cards loading timeout - using fallback')
             setRateCards([])
             setDataLoaded(true)
             setLoading(false)
           }
-        }, 5000)
+        }, 10000)
         
         const response = await fetch(`/api/rate-cards?creator_id=${profile.id}`)
         const data = await response.json()
@@ -108,7 +114,7 @@ export default function RateCardsPage() {
     return () => {
       isMounted = false
     }
-  }, [profile?.id, dataLoaded])
+  }, [profile?.id]) // Remove dataLoaded from dependencies to prevent infinite loop
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
