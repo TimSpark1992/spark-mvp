@@ -76,8 +76,9 @@ export default function CreatorProfilePage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    const sanitizedValue = sanitizeFieldValue(name, value)
-    setFormData(prev => ({ ...prev, [name]: sanitizedValue }))
+    // Don't sanitize during typing - only store the raw value
+    // Sanitization will happen on form submission
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSocialLinkChange = (platform, value) => {
