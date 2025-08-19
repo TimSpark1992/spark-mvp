@@ -261,7 +261,7 @@ export default function RateCardsPage() {
   const handleEdit = (rateCard) => {
     setFormData({
       deliverable_type: rateCard.deliverable_type,
-      base_price_cents: rateCard.base_price_cents || 0, // Keep as cents for internal storage
+      base_price_dollars: (rateCard.base_price_cents || 0) / 100, // Convert cents to dollars for display
       currency: rateCard.currency || 'USD',
       rush_pct: rateCard.rush_pct || 0
     })
