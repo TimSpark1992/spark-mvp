@@ -38,7 +38,7 @@ const CURRENCIES = [
 ]
 
 export default function RateCardsPage() {
-  const { profile } = useAuth()
+  const { profile, loading: authLoading } = useAuth()
   const [rateCards, setRateCards] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -47,6 +47,37 @@ export default function RateCardsPage() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingCard, setEditingCard] = useState(null)
   const [dataLoaded, setDataLoaded] = useState(false)
+  
+  // Add safety timeout to prevent infinite loading
+  const [loadingTimeout, setLoadingTimeout] = useState(false)
+  
+  useEffect(() => {
+    // Safety timeout to prevent infinite loading (15 seconds max)
+    const safetyTimeout = setTimeout(() => {
+      console.log('🚨 SAFETY TIMEOUT: Forcing loading to stop after 15 seconds')
+      setLoadingTimeout(true)
+      setLoading(false)
+      setDataLoaded(true)
+      if (!error) {
+        setError('Loading timeout - please refresh the page')
+      }
+    }, 15000)
+    
+    return () => clearTimeout(safetyTimeout)
+  }, [])
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('🔍 Rate Cards Page State:', {
+      authLoading,
+      profileId: profile?.id,
+      profileRole: profile?.role,
+      dataLoaded,
+      loading,
+      loadingTimeout,
+      rateCardsCount: rateCards.length
+    })
+  }, [authLoading, profile?.id, profile?.role, dataLoaded, loading, loadingTimeout, rateCards.length])
 
   const [formData, setFormData] = useState({
     deliverable_type: '',
