@@ -47,27 +47,6 @@ export default function RateCardsPage() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingCard, setEditingCard] = useState(null)
   const [dataLoaded, setDataLoaded] = useState(false)
-  const [showPublicView, setShowPublicView] = useState(false) // Show public view when not authenticated
-  
-  // Add safety timeout to prevent infinite loading
-  const [loadingTimeout, setLoadingTimeout] = useState(false)
-  
-  useEffect(() => {
-    // Safety timeout to prevent infinite loading - only if we're genuinely stuck
-    const safetyTimeout = setTimeout(() => {
-      // Only trigger timeout if we're still in a loading state AND haven't loaded data
-      if (loading && !dataLoaded && !rateCards.length) {
-        console.log('🚨 SAFETY TIMEOUT: Page appears stuck in loading')
-        setLoadingTimeout(true)
-        setLoading(false)
-        setDataLoaded(true)
-      } else {
-        console.log('⏰ Safety timeout cleared - page is working normally')
-      }
-    }, 30000) // Increased to 30 seconds and only if genuinely stuck
-    
-    return () => clearTimeout(safetyTimeout)
-  }, []) // Only run once on mount
   
   // Debug logging
   useEffect(() => {
@@ -77,11 +56,9 @@ export default function RateCardsPage() {
       profileRole: profile?.role,
       dataLoaded,
       loading,
-      loadingTimeout,
-      showPublicView,
       rateCardsCount: rateCards.length
     })
-  }, [authLoading, profile?.id, profile?.role, dataLoaded, loading, loadingTimeout, showPublicView, rateCards.length])
+  }, [authLoading, profile?.id, profile?.role, dataLoaded, loading, rateCards.length])
 
   const [formData, setFormData] = useState({
     deliverable_type: '',
