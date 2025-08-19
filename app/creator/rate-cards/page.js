@@ -44,6 +44,9 @@ export default function RateCardsPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [editingCard, setEditingCard] = useState(null)
+  const [dataLoaded, setDataLoaded] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deletingCard, setDeletingCard] = useState(null)
   
