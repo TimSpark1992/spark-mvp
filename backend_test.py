@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Rate Cards API and Infinite Loading Fix
-Testing the rate cards functionality and API response times as requested in the review.
-Focus: Infinite loading issue resolution, API response times, authentication flow, error scenarios
+Backend Testing for Rate Cards API - Timeout Removal Verification
+Testing the rate cards functionality after removing disruptive timeout mechanisms
+Focus: API functionality, no timeout disruptions, error handling, edit functionality
 """
 
 import requests
 import json
 import time
 import sys
+import os
 from datetime import datetime
 
 # Configuration - Use production URL from .env
-BASE_URL = "https://4f187fa2-e698-4163-ab14-cb3017f6b9af.preview.emergentagent.com"
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://4f187fa2-e698-4163-ab14-cb3017f6b9af.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 class RateCardsAPITester:
