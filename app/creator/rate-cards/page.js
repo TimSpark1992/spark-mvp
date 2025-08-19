@@ -53,20 +53,21 @@ export default function RateCardsPage() {
   const [loadingTimeout, setLoadingTimeout] = useState(false)
   
   useEffect(() => {
-    // Safety timeout to prevent infinite loading (10 seconds max)
+    // Safety timeout to prevent infinite loading - only if we're genuinely stuck
     const safetyTimeout = setTimeout(() => {
-      console.log('🚨 SAFETY TIMEOUT: Forcing loading to stop after 10 seconds')
-      setLoadingTimeout(true)
-      setLoading(false)
-      setDataLoaded(true)
-      // If no authentication, show public view
-      if (!profile?.id && !authLoading) {
-        setShowPublicView(true)
+      // Only trigger timeout if we're still in a loading state AND haven't loaded data
+      if (loading && !dataLoaded && !rateCards.length) {
+        console.log('🚨 SAFETY TIMEOUT: Page appears stuck in loading')
+        setLoadingTimeout(true)
+        setLoading(false)
+        setDataLoaded(true)
+      } else {
+        console.log('⏰ Safety timeout cleared - page is working normally')
       }
-    }, 10000)
+    }, 30000) // Increased to 30 seconds and only if genuinely stuck
     
     return () => clearTimeout(safetyTimeout)
-  }, [])
+  }, []) // Only run once on mount
   
   // Debug logging
   useEffect(() => {
