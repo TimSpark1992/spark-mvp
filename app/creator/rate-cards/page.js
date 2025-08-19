@@ -330,41 +330,48 @@ export default function RateCardsPage() {
       .filter(([key]) => !usedTypes.includes(key) || (editingCard && editingCard.deliverable_type === key))
   }
 
-  if (loading || loadingTimeout) {
+  if (loading && !loadingTimeout) {
     return (
       <ProtectedRoute requiredRole="creator">
         <Layout variant="app">
           <div className="min-h-screen flex items-center justify-center">
             <div className="text-center space-y-4">
-              {!loadingTimeout ? (
-                <>
-                  <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2] mx-auto"></div>
-                  <Text size="lg" color="secondary">Loading rate cards...</Text>
-                  <Text size="sm" color="secondary">
-                    {authLoading ? 'Authenticating...' : 
-                     !profile?.id ? 'Loading profile...' : 
-                     'Fetching your rate cards...'}
-                  </Text>
-                </>
-              ) : (
-                <>
-                  <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01" />
-                    </svg>
-                  </div>
-                  <Text size="lg" weight="semibold">Loading Timeout</Text>
-                  <Text size="sm" color="secondary" className="max-w-md">
-                    The page is taking longer than expected to load. This might be due to network issues.
-                  </Text>
-                  <Button 
-                    onClick={() => window.location.reload()} 
-                    className="mt-4"
-                  >
-                    Refresh Page
-                  </Button>
-                </>
-              )}
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2] mx-auto"></div>
+              <Text size="lg" color="secondary">Loading your rate cards...</Text>
+              <Text size="sm" color="secondary">
+                {authLoading ? 'Authenticating...' : 
+                 !profile?.id ? 'Loading profile...' : 
+                 'Fetching your rate cards...'}
+              </Text>
+            </div>
+          </div>
+        </Layout>
+      </ProtectedRoute>
+    )
+  }
+
+  // Only show timeout UI if genuinely timed out
+  if (loadingTimeout) {
+    return (
+      <ProtectedRoute requiredRole="creator">
+        <Layout variant="app">
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01" />
+                </svg>
+              </div>
+              <Text size="lg" weight="semibold">Connection Issue</Text>
+              <Text size="sm" color="secondary" className="max-w-md">
+                There seems to be a network issue. Please check your connection and try again.
+              </Text>
+              <Button 
+                onClick={() => window.location.reload()} 
+                className="mt-4"
+              >
+                Refresh Page
+              </Button>
             </div>
           </div>
         </Layout>
