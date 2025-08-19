@@ -86,50 +86,65 @@ export default function RateCardsPage() {
     rush_pct: 0
   })
 
+  // Main data loading effect with improved conditions
   useEffect(() => {
     let isMounted = true;
     
     const loadRateCards = async () => {
-      // Only load if we have a profile and haven't loaded data yet
-      if (!profile?.id || dataLoaded) return
+      // Comprehensive loading conditions
+      const shouldLoad = profile?.id && 
+                        !dataLoaded && 
+                        !loading && 
+                        !loadingTimeout &&
+                        !authLoading
       
-      // Prevent multiple simultaneous requests
-      if (loading) return
+      if (!shouldLoad) {
+        console.log('📋 Skipping rate cards load:', {
+          hasProfile: !!profile?.id,
+          dataLoaded,
+          loading,
+          loadingTimeout,
+          authLoading
+        })
+        return
+      }
       
       try {
         console.log('📋 Loading rate cards for creator:', profile?.id)
         setLoading(true)
         setError('')
         
-        // Set timeout to prevent infinite loading (10 seconds)
+        // Extended timeout for production network conditions
         const timeoutId = setTimeout(() => {
           if (isMounted && !dataLoaded) {
-            console.log('⚠️ Rate cards loading timeout - using fallback')
+            console.log('⚠️ Rate cards API timeout - using fallback')
             setRateCards([])
             setDataLoaded(true)
             setLoading(false)
+            setError('Request timeout - showing cached data. Please refresh to retry.')
           }
-        }, 10000)
+        }, 12000)
         
         const response = await fetch(`/api/rate-cards?creator_id=${profile.id}`)
-        const data = await response.json()
         
         clearTimeout(timeoutId)
         
         if (!isMounted) return
         
+        const data = await response.json()
+        
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to load rate cards')
+          throw new Error(data.error || `HTTP ${response.status}: Failed to load rate cards`)
         }
         
-        console.log('✅ Rate cards loaded:', data.rateCards?.length || 0)
+        console.log('✅ Rate cards loaded successfully:', data.rateCards?.length || 0)
         setRateCards(data.rateCards || [])
         setDataLoaded(true)
         
       } catch (error) {
         console.error('❌ Error loading rate cards:', error)
         if (isMounted) {
-          setError(error.message)
+          setError(`Failed to load rate cards: ${error.message}`)
           setRateCards([])
           setDataLoaded(true)
         }
@@ -140,12 +155,15 @@ export default function RateCardsPage() {
       }
     }
 
-    loadRateCards()
+    // Only load when authentication is complete and profile is available
+    if (!authLoading) {
+      loadRateCards()
+    }
     
     return () => {
       isMounted = false
     }
-  }, [profile?.id]) // Remove dataLoaded from dependencies to prevent infinite loop
+  }, [profile?.id, authLoading]) // Keep dependencies minimal and essential
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
