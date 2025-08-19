@@ -14,6 +14,7 @@ export default function ProtectedRoute({ children, requiredRole = null, redirect
     if (!loading) {
       if (!user) {
         // Only redirect to login if user is not authenticated
+        console.log('🔓 ProtectedRoute: No user - redirecting to login')
         router.push(redirectTo)
         return
       }
@@ -40,7 +41,12 @@ export default function ProtectedRoute({ children, requiredRole = null, redirect
       <div className="min-h-screen flex items-center justify-center bg-[#0F0F1A]">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2] mx-auto"></div>
-          <p className="text-white">Loading...</p>
+          <p className="text-white">
+            {user === null ? 'Redirecting to login...' : 'Loading your profile...'}
+          </p>
+          <p className="text-gray-400 text-sm">
+            This should only take a few seconds
+          </p>
         </div>
       </div>
     )
