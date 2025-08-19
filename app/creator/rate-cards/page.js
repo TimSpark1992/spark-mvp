@@ -62,7 +62,7 @@ export default function RateCardsPage() {
 
   const [formData, setFormData] = useState({
     deliverable_type: '',
-    base_price_cents: '',
+    base_price_cents: 0, // Store as cents internally, but display as dollars
     currency: 'USD',
     rush_pct: 0
   })
