@@ -89,52 +89,62 @@ export default function RateCardsPage() {
     rush_pct: 0
   })
 
-  // Main data loading effect with improved conditions
+  // Main data loading effect with public/private view support
   useEffect(() => {
     let isMounted = true;
     
     const loadRateCards = async () => {
-      // Comprehensive loading conditions
-      const shouldLoad = profile?.id && 
-                        !dataLoaded && 
-                        !loading && 
-                        !loadingTimeout &&
-                        !authLoading
+      // Don't load if already loaded or timed out
+      if (dataLoaded || loadingTimeout) return
       
-      if (!shouldLoad) {
-        console.log('📋 Skipping rate cards load:', {
-          hasProfile: !!profile?.id,
-          dataLoaded,
-          loading,
-          loadingTimeout,
-          authLoading
-        })
-        return
-      }
+      // Wait for auth to complete
+      if (authLoading) return
       
       try {
-        console.log('📋 Loading rate cards for creator:', profile?.id)
+        console.log('📋 Loading rate cards...')
         setLoading(true)
         setError('')
+        
+        let response, data
+        
+        if (profile?.id) {
+          // Authenticated user - load their personal rate cards
+          console.log('📋 Loading personal rate cards for creator:', profile.id)
+          response = await fetch(`/api/rate-cards?creator_id=${profile.id}`)
+        } else {
+          // Not authenticated - load public rate cards
+          console.log('📋 Loading public rate cards (no authentication)')
+          setShowPublicView(true)
+          response = await fetch('/api/rate-cards')
+        }
         
         // Extended timeout for production network conditions
         const timeoutId = setTimeout(() => {
           if (isMounted && !dataLoaded) {
             console.log('⚠️ Rate cards API timeout - using fallback')
-            setRateCards([])
+            // Show sample data for better UX
+            setRateCards([
+              {
+                id: 'sample-1',
+                creator_profile: { full_name: 'Demo Creator', username: 'demo_creator' },
+                deliverable_type: 'IG_Reel',
+                base_price_cents: 7500,
+                currency: 'USD',
+                rush_pct: 25,
+                active: true,
+                created_at: new Date().toISOString()
+              }
+            ])
             setDataLoaded(true)
             setLoading(false)
-            setError('Request timeout - showing cached data. Please refresh to retry.')
+            setError('Showing sample data due to connection timeout')
           }
-        }, 12000)
+        }, 8000)
         
-        const response = await fetch(`/api/rate-cards?creator_id=${profile.id}`)
-        
+        data = await response.json()
         clearTimeout(timeoutId)
         
         if (!isMounted) return
-        
-        const data = await response.json()
         
         if (!response.ok) {
           throw new Error(data.error || `HTTP ${response.status}: Failed to load rate cards`)
@@ -148,7 +158,29 @@ export default function RateCardsPage() {
         console.error('❌ Error loading rate cards:', error)
         if (isMounted) {
           setError(`Failed to load rate cards: ${error.message}`)
-          setRateCards([])
+          // Show sample data as fallback
+          setRateCards([
+            {
+              id: 'sample-1',
+              creator_profile: { full_name: 'Sample Creator', username: 'sample_creator' },
+              deliverable_type: 'IG_Reel', 
+              base_price_cents: 7500,
+              currency: 'USD',
+              rush_pct: 25,
+              active: true,
+              created_at: new Date().toISOString()
+            },
+            {
+              id: 'sample-2',
+              creator_profile: { full_name: 'Demo Creator', username: 'demo_creator' },
+              deliverable_type: 'TikTok_Post',
+              base_price_cents: 5000,
+              currency: 'USD',
+              rush_pct: 20,
+              active: true,
+              created_at: new Date().toISOString()
+            }
+          ])
           setDataLoaded(true)
         }
       } finally {
@@ -158,15 +190,12 @@ export default function RateCardsPage() {
       }
     }
 
-    // Only load when authentication is complete and profile is available
-    if (!authLoading) {
-      loadRateCards()
-    }
+    loadRateCards()
     
     return () => {
       isMounted = false
     }
-  }, [profile?.id, authLoading]) // Keep dependencies minimal and essential
+  }, [profile?.id, authLoading, dataLoaded, loadingTimeout]) // Responsive to auth changes
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
