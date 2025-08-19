@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Rate Cards API
-Testing the critical rate card update functionality and service role authentication fixes
+Backend Testing for Rate Cards API and Infinite Loading Fix
+Testing the rate cards functionality and API response times as requested in the review.
+Focus: Infinite loading issue resolution, API response times, authentication flow, error scenarios
 """
 
 import requests
@@ -11,8 +12,8 @@ import time
 import sys
 from datetime import datetime
 
-# Configuration
-BASE_URL = "http://localhost:3000"
+# Configuration - Use production URL from .env
+BASE_URL = "https://4f187fa2-e698-4163-ab14-cb3017f6b9af.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class RateCardsAPITester:
