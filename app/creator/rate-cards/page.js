@@ -95,8 +95,9 @@ export default function RateCardsPage() {
     let isMounted = true;
     
     const loadRateCards = async () => {
-      // Only load if we have an authenticated creator profile
-      if (!profile?.id || dataLoaded || loadingTimeout || authLoading) {
+      // Only load if we have an authenticated creator profile and haven't loaded yet
+      if (!profile?.id || dataLoaded || authLoading) {
+        console.log('📋 Skipping load:', { hasProfile: !!profile?.id, dataLoaded, authLoading })
         return
       }
       
@@ -105,19 +106,19 @@ export default function RateCardsPage() {
         setLoading(true)
         setError('')
         
-        // API timeout for network conditions
+        // API timeout - only for the actual network request
         const timeoutId = setTimeout(() => {
           if (isMounted && !dataLoaded) {
-            console.log('⚠️ Rate cards API timeout')
-            setDataLoaded(true)
+            console.log('⚠️ API request timeout - showing error')
+            setError('Network timeout - please try refreshing the page')
             setLoading(false)
-            setError('Request timeout - please refresh to retry')
+            setDataLoaded(true)
           }
-        }, 8000)
+        }, 10000) // 10 seconds for API request only
         
         const response = await fetch(`/api/rate-cards?creator_id=${profile.id}`)
         
-        clearTimeout(timeoutId)
+        clearTimeout(timeoutId) // Clear timeout since API responded
         
         if (!isMounted) return
         
@@ -130,6 +131,7 @@ export default function RateCardsPage() {
         console.log('✅ Personal rate cards loaded successfully:', data.rateCards?.length || 0)
         setRateCards(data.rateCards || [])
         setDataLoaded(true)
+        setLoading(false) // Success - stop loading immediately
         
       } catch (error) {
         console.error('❌ Error loading rate cards:', error)
@@ -137,10 +139,7 @@ export default function RateCardsPage() {
           setError(`Failed to load rate cards: ${error.message}`)
           setRateCards([])
           setDataLoaded(true)
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false)
+          setLoading(false) // Error - stop loading immediately
         }
       }
     }
@@ -153,7 +152,7 @@ export default function RateCardsPage() {
     return () => {
       isMounted = false
     }
-  }, [profile?.id, profile?.role, authLoading, dataLoaded, loadingTimeout]) // Key dependencies only
+  }, [profile?.id, profile?.role, authLoading]) // Minimal dependencies
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
