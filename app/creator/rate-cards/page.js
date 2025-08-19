@@ -592,6 +592,121 @@ export default function RateCardsPage() {
                 </div>
               </Card>
             )}
+          {/* Custom Delete Confirmation Modal */}
+          {showDeleteModal && deletingCard && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-[#1A1A2A] border border-white/10 rounded-2xl max-w-md w-full mx-4 shadow-2xl">
+                <div className="p-6">
+                  {/* Header with Icon */}
+                  <div className="flex items-center justify-center mb-6">
+                    <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
+                      <svg 
+                        className="w-8 h-8 text-red-400" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  {/* Title */}
+                  <div className="text-center mb-6">
+                    <Heading level={3} size="lg" className="mb-3">
+                      Delete Rate Card
+                    </Heading>
+                    <Text color="secondary" className="mb-2">
+                      You're about to permanently delete your{" "}
+                      <span className="font-semibold text-white">
+                        {DELIVERABLE_TYPES[deletingCard.deliverable_type]?.label}
+                      </span>{" "}
+                      rate card.
+                    </Text>
+                    <div className="bg-[#2A2A3A] rounded-lg p-4 mt-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-400">Current Price:</span>
+                        <span className="font-semibold text-green-400">
+                          {formatPrice(deletingCard.base_price_cents, deletingCard.currency)}
+                        </span>
+                      </div>
+                      {deletingCard.rush_pct > 0 && (
+                        <div className="flex items-center justify-between text-sm mt-2">
+                          <span className="text-gray-400">Rush Fee:</span>
+                          <span className="font-semibold text-yellow-400">
+                            +{deletingCard.rush_pct}%
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Warning Message */}
+                  <div className="bg-red-900/20 border border-red-500/20 rounded-lg p-4 mb-6">
+                    <div className="flex items-start space-x-3">
+                      <svg 
+                        className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5C2.962 18.333 3.924 20 5.464 20z" 
+                        />
+                      </svg>
+                      <div>
+                        <Text size="sm" weight="medium" className="text-red-400 mb-1">
+                          This action cannot be undone
+                        </Text>
+                        <Text size="sm" color="secondary">
+                          Once deleted, you'll need to recreate this rate card from scratch.
+                        </Text>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex space-x-3">
+                    <Button
+                      variant="outline"
+                      onClick={cancelDelete}
+                      className="flex-1 border-white/20 text-gray-300 hover:bg-white/5"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={confirmDelete}
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      <svg 
+                        className="w-4 h-4 mr-2" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
+                        />
+                      </svg>
+                      Delete Rate Card
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           </Container>
         </Section>
       </Layout>
