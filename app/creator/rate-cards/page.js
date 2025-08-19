@@ -148,7 +148,7 @@ export default function RateCardsPage() {
   const resetForm = () => {
     setFormData({
       deliverable_type: '',
-      base_price_cents: '',
+      base_price_dollars: 0,
       currency: 'USD',
       rush_pct: 0
     })
