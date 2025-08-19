@@ -422,11 +422,11 @@ export default function RateCardsPage() {
                       <div className="relative">
                         <DollarSign className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         <input
-                          name="base_price_cents"
+                          name="base_price_dollars"
                           type="number"
                           min="0.01"
                           step="0.01"
-                          value={formData.base_price_cents ? (formData.base_price_cents / 100).toFixed(2) : ''}
+                          value={formData.base_price_dollars || ''}
                           onChange={handleInputChange}
                           required
                           className="w-full pl-10 pr-3 py-2 bg-[#2A2A3A] border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8A2BE2]"
