@@ -139,25 +139,46 @@ export default function CreatorProfilePage() {
     setError('')
 
     try {
-      const fileName = `${profile.id}/media-kit-${Date.now()}-${file.name}`
+      // Check if upload functions are available
+      if (typeof uploadFile !== 'function' || typeof getFileUrl !== 'function') {
+        throw new Error('Upload functionality is not available. Please check your connection.')
+      }
+
+      const fileName = `${profile.id}/media-kit-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+      console.log('📤 Uploading media kit:', fileName)
+      
       const { data: uploadData, error: uploadError } = await uploadFile('media-kits', fileName, file)
       
-      if (uploadError) throw new Error(uploadError.message)
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        throw new Error(uploadError.message || 'Failed to upload file to storage')
+      }
 
+      console.log('✅ Media kit uploaded, getting URL...')
       const mediaKitUrl = getFileUrl('media-kits', fileName)
       
+      if (!mediaKitUrl) {
+        throw new Error('Failed to generate file URL')
+      }
+
+      console.log('🔄 Updating profile with media kit URL...')
       // Update profile with media kit URL
       const { error: updateError } = await updateProfile(profile.id, {
         media_kit_url: mediaKitUrl
       })
       
-      if (updateError) throw new Error(updateError.message)
-      
+      if (updateError) {
+        console.error('Profile update error:', updateError)
+        throw new Error(updateError.message || 'Failed to update profile')
+      }
+
+      console.log('🔄 Refreshing profile data...')
       await refreshProfile()
       setSuccess('Media kit uploaded successfully!')
+      console.log('✅ Media kit upload completed successfully')
       
     } catch (error) {
-      console.error('Error uploading media kit:', error)
+      console.error('❌ Error uploading media kit:', error)
       setError(error.message || 'Failed to upload media kit')
     } finally {
       setUploadLoading(prev => ({ ...prev, mediaKit: false }))
