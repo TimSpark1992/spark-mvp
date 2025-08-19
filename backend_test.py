@@ -18,29 +18,81 @@ API_BASE = f"{BASE_URL}/api"
 
 class RateCardsAPITester:
     def __init__(self):
+        self.session = requests.Session()
+        self.session.timeout = 30  # 30 second timeout to match frontend safety
         self.test_results = []
-        # Use an existing creator ID from the database
-        self.test_creator_id = "5b408260-4d3d-4392-a589-0a485a4152a9"
-        self.created_rate_cards = []
+        # Use test creator ID
+        self.test_creator_id = "test-creator-123"
         
-    def log_test(self, test_name, success, details="", error=None):
-        """Log test results"""
+    def log_test(self, test_name, success, details="", error=None, response_time=None):
+        """Log test results with response time tracking"""
         result = {
             "test": test_name,
             "success": success,
             "details": details,
             "error": str(error) if error else None,
+            "response_time": response_time,
             "timestamp": datetime.now().isoformat()
         }
         self.test_results.append(result)
         
         status = "✅ PASS" if success else "❌ FAIL"
-        print(f"{status} {test_name}")
+        time_info = f" ({response_time:.2f}s)" if response_time else ""
+        print(f"{status} {test_name}{time_info}")
         if details:
             print(f"   Details: {details}")
         if error:
             print(f"   Error: {error}")
         print()
+
+    def test_api_response_time(self):
+        """Test 1: Rate Cards API Response Time - verify API responds within reasonable time"""
+        print("🔍 Testing Rate Cards API Response Time...")
+        
+        try:
+            start_time = time.time()
+            response = self.session.get(f"{API_BASE}/rate-cards")
+            response_time = time.time() - start_time
+            
+            if response_time > 15:  # Frontend has 15s safety timeout
+                self.log_test(
+                    "API Response Time", 
+                    False, 
+                    f"API response too slow: {response_time:.2f}s (exceeds 15s safety timeout)",
+                    response_time=response_time
+                )
+                return False
+            elif response_time > 12:  # Frontend has 12s API timeout
+                self.log_test(
+                    "API Response Time", 
+                    False, 
+                    f"API response slow: {response_time:.2f}s (exceeds 12s API timeout)",
+                    response_time=response_time
+                )
+                return False
+            else:
+                self.log_test(
+                    "API Response Time", 
+                    True, 
+                    f"API responds within acceptable time (< 12s timeout)",
+                    response_time=response_time
+                )
+                return True
+                
+        except requests.exceptions.Timeout:
+            self.log_test(
+                "API Response Time", 
+                False, 
+                "API request timed out after 30 seconds"
+            )
+            return False
+        except Exception as e:
+            self.log_test(
+                "API Response Time", 
+                False, 
+                f"API request failed: {str(e)}"
+            )
+            return False
 
     def test_rate_cards_get_empty(self):
         """Test GET /api/rate-cards with no data"""
