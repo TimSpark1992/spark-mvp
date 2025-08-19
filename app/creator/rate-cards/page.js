@@ -272,32 +272,42 @@ export default function RateCardsPage() {
   }
 
   const handleDelete = async (rateCard) => {
-    if (!window.confirm(`Are you sure you want to delete your ${DELIVERABLE_TYPES[rateCard.deliverable_type]?.label} rate card?`)) {
-      return
-    }
+    // Show custom modal instead of window.confirm
+    setDeletingCard(rateCard)
+    setShowDeleteModal(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!deletingCard) return
 
     try {
-      console.log('🗑️ Deleting rate card:', rateCard.id)
+      console.log('🗑️ Deleting rate card:', deletingCard.id)
 
-      const response = await fetch(`/api/rate-cards/${rateCard.id}`, {
+      const response = await fetch(`/api/rate-cards/${deletingCard.id}`, {
         method: 'DELETE'
       })
 
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to delete rate card')
+      if (response.ok) {
+        setRateCards(rateCards.filter(card => card.id !== deletingCard.id))
+        setSuccess('Rate card deleted successfully!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete rate card')
       }
-
-      console.log('✅ Rate card deleted')
-      
-      // Update local state
-      setRateCards(prev => prev.filter(card => card.id !== rateCard.id))
-      setSuccess('Rate card deleted successfully!')
-
     } catch (error) {
       console.error('❌ Error deleting rate card:', error)
       setError(error.message)
+      setTimeout(() => setError(''), 5000)
+    } finally {
+      setDeletingCard(null)
+      setShowDeleteModal(false)
     }
+  }
+
+  const cancelDelete = () => {
+    setDeletingCard(null)
+    setShowDeleteModal(false)
   }
 
   const getAvailableDeliverableTypes = () => {
