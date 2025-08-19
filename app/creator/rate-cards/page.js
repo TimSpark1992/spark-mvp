@@ -414,30 +414,49 @@ export default function RateCardsPage() {
   }
 
   return (
-    <ProtectedRoute requiredRole="creator">
-      <Layout variant="app">
-        <Section padding="lg">
-          <Container>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-4">
-                <Link href="/creator/dashboard">
-                  <Button variant="ghost" size="sm">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Dashboard
-                  </Button>
-                </Link>
-                <div>
-                  <Heading level={1} size="3xl">Rate Cards</Heading>
-                  <Text size="lg" color="secondary">Manage your pricing for different deliverables</Text>
-                </div>
+    <Layout variant="app">
+      <Section padding="lg">
+        <Container>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <Link href={profile?.id ? "/creator/dashboard" : "/"}>
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  {profile?.id ? 'Back to Dashboard' : 'Back to Home'}
+                </Button>
+              </Link>
+              <div>
+                <Heading level={1} size="3xl">
+                  {showPublicView || !profile?.id ? 'Public Rate Cards' : 'My Rate Cards'}
+                </Heading>
+                <Text size="lg" color="secondary">
+                  {showPublicView || !profile?.id 
+                    ? 'Browse creator pricing across different deliverables'
+                    : 'Manage your pricing for different deliverables'
+                  }
+                </Text>
               </div>
-              
+            </div>
+            
+            {profile?.id && profile?.role === 'creator' && (
               <Button onClick={() => setShowAddForm(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Rate Card
               </Button>
-            </div>
+            )}
+
+            {(!profile?.id || showPublicView) && (
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => window.location.href = '/auth/login'}>
+                  Sign In
+                </Button>
+                <Button onClick={() => window.location.href = '/auth/signup'}>
+                  Join as Creator
+                </Button>
+              </div>
+            )}
+          </div>
 
             {/* Success/Error Messages */}
             {success && (
