@@ -687,6 +687,5 @@ export default function RateCardsPage() {
           </Container>
         </Section>
       </Layout>
-    </ProtectedRoute>
   )
 }
