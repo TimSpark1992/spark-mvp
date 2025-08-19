@@ -122,17 +122,16 @@ export default function RateCardsPage() {
   const handleInputChange = (e) => {
     const { name, value } = e.target
     
-    if (name === 'base_price_cents') {
-      // Handle base price as dollars (convert to cents for storage)
-      const dollarAmount = parseFloat(value) || 0
-      const centsAmount = Math.round(dollarAmount * 100)
+    if (name === 'base_price_dollars') {
+      // Handle base price as dollars - store directly as dollars for clean input experience
+      const dollarAmount = value === '' ? 0 : parseFloat(value) || 0
       setFormData(prev => ({
         ...prev,
-        [name]: centsAmount
+        [name]: dollarAmount
       }))
     } else if (name === 'rush_pct') {
       // Handle rush percentage (keep as percentage)
-      const percentage = parseFloat(value) || 0
+      const percentage = value === '' ? 0 : parseFloat(value) || 0
       setFormData(prev => ({
         ...prev,
         [name]: percentage
