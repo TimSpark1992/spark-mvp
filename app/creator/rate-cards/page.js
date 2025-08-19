@@ -67,14 +67,13 @@ export default function RateCardsPage() {
     rush_pct: 0
   })
 
-  // Main data loading effect for personal rate cards
+  // Main data loading effect for personal rate cards - simple and clean
   useEffect(() => {
     let isMounted = true;
     
     const loadRateCards = async () => {
       // Only load if we have an authenticated creator profile and haven't loaded yet
       if (!profile?.id || dataLoaded || authLoading) {
-        console.log('📋 Skipping load:', { hasProfile: !!profile?.id, dataLoaded, authLoading })
         return
       }
       
@@ -83,19 +82,7 @@ export default function RateCardsPage() {
         setLoading(true)
         setError('')
         
-        // API timeout - only for the actual network request
-        const timeoutId = setTimeout(() => {
-          if (isMounted && !dataLoaded) {
-            console.log('⚠️ API request timeout - showing error')
-            setError('Network timeout - please try refreshing the page')
-            setLoading(false)
-            setDataLoaded(true)
-          }
-        }, 10000) // 10 seconds for API request only
-        
         const response = await fetch(`/api/rate-cards?creator_id=${profile.id}`)
-        
-        clearTimeout(timeoutId) // Clear timeout since API responded
         
         if (!isMounted) return
         
@@ -113,10 +100,11 @@ export default function RateCardsPage() {
       } catch (error) {
         console.error('❌ Error loading rate cards:', error)
         if (isMounted) {
+          // Show error but don't disrupt the page - just show an error message
           setError(`Failed to load rate cards: ${error.message}`)
           setRateCards([])
           setDataLoaded(true)
-          setLoading(false) // Error - stop loading immediately
+          setLoading(false) // Error - stop loading, show the page anyway
         }
       }
     }
