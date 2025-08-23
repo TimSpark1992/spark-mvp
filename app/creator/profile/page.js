@@ -204,47 +204,155 @@ export default function CreatorProfilePage() {
     setError('')
 
     try {
-      // Check if upload functions are available
-      if (typeof uploadFile !== 'function' || typeof getFileUrl !== 'function') {
-        throw new Error('Upload functionality is not available. Please check your connection.')
+      console.log('🔍 Checking upload function availability...')
+      console.log('uploadFile type:', typeof uploadFile)
+      console.log('getFileUrl type:', typeof getFileUrl)
+      console.log('updateProfile type:', typeof updateProfile)
+      console.log('profile data:', profile)
+
+      // Enhanced function availability checks with detailed logging
+      if (!uploadFile || typeof uploadFile !== 'function') {
+        console.error('❌ uploadFile function is not available:', uploadFile)
+        throw new Error('Upload functionality is not properly initialized. Please refresh the page and try again.')
+      }
+      
+      if (!getFileUrl || typeof getFileUrl !== 'function') {
+        console.error('❌ getFileUrl function is not available:', getFileUrl)  
+        throw new Error('URL generation functionality is not properly initialized. Please refresh the page and try again.')
+      }
+      
+      if (!updateProfile || typeof updateProfile !== 'function') {
+        console.error('❌ updateProfile function is not available:', updateProfile)
+        throw new Error('Profile update functionality is not properly initialized. Please refresh the page and try again.')
       }
 
-      const fileName = `${profile.id}/profile-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-      console.log('📤 Uploading profile picture:', fileName)
+      if (!profile || !profile.id) {
+        console.error('❌ Profile data is not available:', profile)
+        throw new Error('Profile information is not available. Please refresh the page and try again.')
+      }
+
+      // Sanitize filename more thoroughly
+      const sanitizedFileName = file.name
+        .replace(/[^a-zA-Z0-9.-]/g, '_')
+        .replace(/_{2,}/g, '_')
+        .toLowerCase()
       
-      const { data: uploadData, error: uploadError } = await uploadFile('profiles', fileName, file)
+      const fileName = `${profile.id}/profile-${Date.now()}-${sanitizedFileName}`
+      console.log('📤 Uploading profile picture with filename:', fileName)
+      
+      // Add timeout wrapper for upload operation
+      const uploadTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Upload timed out after 30 seconds')), 30000)
+      )
+      
+      const uploadPromise = uploadFile('profiles', fileName, file)
+      const uploadResult = await Promise.race([uploadPromise, uploadTimeout])
+      
+      console.log('📡 Upload result received:', uploadResult)
+      
+      if (!uploadResult) {
+        throw new Error('Upload function returned null result')
+      }
+      
+      const { data: uploadData, error: uploadError } = uploadResult
       
       if (uploadError) {
-        console.error('Upload error:', uploadError)
-        throw new Error(uploadError.message || 'Failed to upload image to storage')
+        console.error('❌ Upload error details:', uploadError)
+        
+        // Check for specific error types
+        if (uploadError.message?.includes('bucket') || uploadError.code === 'BUCKET_NOT_FOUND') {
+          throw new Error('Storage is not configured. Please contact support to enable file uploads.')
+        } else if (uploadError.message?.includes('permission') || uploadError.message?.includes('policy')) {
+          throw new Error('You do not have permission to upload files. Please contact support.')
+        } else if (uploadError.message?.includes('timeout')) {
+          throw new Error('Upload timed out. Please check your internet connection and try again.')
+        } else {
+          throw new Error(uploadError.message || 'Failed to upload image to storage')
+        }
       }
 
-      console.log('✅ Profile picture uploaded, getting URL...')
-      const profilePictureUrl = getFileUrl('profiles', fileName)
+      console.log('✅ Profile picture uploaded successfully, getting URL...')
+      console.log('📊 Upload data:', uploadData)
       
-      if (!profilePictureUrl) {
-        throw new Error('Failed to generate image URL')
+      // Enhanced URL generation with error checking
+      let profilePictureUrl
+      try {
+        profilePictureUrl = getFileUrl('profiles', fileName)
+        console.log('🔗 Generated URL:', profilePictureUrl)
+      } catch (urlError) {
+        console.error('❌ URL generation error:', urlError)
+        throw new Error('Failed to generate image URL. Please try again.')
+      }
+      
+      if (!profilePictureUrl || typeof profilePictureUrl !== 'string') {
+        console.error('❌ Invalid URL generated:', profilePictureUrl)
+        throw new Error('Generated image URL is invalid. Please try again.')
       }
 
       console.log('🔄 Updating profile with picture URL...')
-      // Update profile with new picture
-      const { error: updateError } = await updateProfile(profile.id, {
+      
+      // Add timeout wrapper for profile update
+      const updateTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Profile update timed out after 20 seconds')), 20000)
+      )
+      
+      const updatePromise = updateProfile(profile.id, {
         profile_picture: profilePictureUrl
       })
       
+      const updateResult = await Promise.race([updatePromise, updateTimeout])
+      console.log('📊 Profile update result:', updateResult)
+      
+      if (!updateResult) {
+        throw new Error('Profile update function returned null result')
+      }
+      
+      const { error: updateError } = updateResult
+      
       if (updateError) {
-        console.error('Profile update error:', updateError)
+        console.error('❌ Profile update error:', updateError)
         throw new Error(updateError.message || 'Failed to update profile')
       }
 
       console.log('🔄 Refreshing profile data...')
-      await refreshProfile()
+      
+      // Add error handling for profile refresh
+      try {
+        if (refreshProfile && typeof refreshProfile === 'function') {
+          await refreshProfile()
+        } else {
+          console.warn('⚠️ refreshProfile function not available, skipping refresh')
+        }
+      } catch (refreshError) {
+        console.warn('⚠️ Profile refresh failed (non-critical):', refreshError)
+        // Don't throw error here as the upload was successful
+      }
+      
       setSuccess('Profile picture updated successfully!')
       console.log('✅ Profile picture upload completed successfully')
       
     } catch (error) {
-      console.error('❌ Error uploading profile picture:', error)
-      setError(error.message || 'Failed to upload profile picture')
+      console.error('❌ Critical error during profile picture upload:', error)
+      console.error('❌ Error stack:', error.stack)
+      
+      // Provide more specific error messages based on error type
+      let errorMessage = 'Failed to upload profile picture'
+      
+      if (error.message.includes('not properly initialized')) {
+        errorMessage = error.message + ' This might be due to a page loading issue.'
+      } else if (error.message.includes('Storage is not configured')) {
+        errorMessage = 'File upload is temporarily unavailable. Please contact support.'
+      } else if (error.message.includes('permission')) {
+        errorMessage = 'You do not have permission to upload files. Please contact support.'
+      } else if (error.message.includes('timeout')) {
+        errorMessage = 'Upload timed out. Please check your internet connection and try a smaller image.'
+      } else if (error.message.includes('size')) {
+        errorMessage = error.message
+      } else {
+        errorMessage = error.message || errorMessage
+      }
+      
+      setError(errorMessage)
     } finally {
       setUploadLoading(prev => ({ ...prev, profilePicture: false }))
     }
