@@ -698,24 +698,29 @@ export default function CreatorProfilePage() {
                         </Text>
                       )}
                       
-                      <label className="block">
-                        <Button 
-                          variant="secondary" 
-                          size="sm" 
-                          className="w-full"
-                          disabled={uploadLoading.mediaKit}
-                        >
-                          <Upload className="w-4 h-4 mr-2" />
-                          {uploadLoading.mediaKit ? 'Uploading...' : 'Upload Media Kit'}
-                        </Button>
+                      <div className="relative">
                         <input
                           type="file"
+                          id="media-kit-upload"
                           accept=".pdf,image/jpeg,image/png,image/webp"
                           onChange={handleMediaKitUpload}
                           className="hidden"
                           disabled={uploadLoading.mediaKit}
                         />
-                      </label>
+                        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          className="w-full"
+                          disabled={uploadLoading.mediaKit}
+                          onClick={() => {
+                            const input = document.getElementById('media-kit-upload')
+                            if (input) input.click()
+                          }}
+                        >
+                          <Upload className="w-4 h-4 mr-2" />
+                          {uploadLoading.mediaKit ? 'Uploading...' : 'Upload Media Kit'}
+                        </Button>
+                      </div>
                       <Text size="xs" color="secondary" className="mt-2">
                         PDF, JPEG, PNG, or WebP (max 10MB)
                       </Text>
