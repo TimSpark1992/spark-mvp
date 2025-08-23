@@ -1008,9 +1008,16 @@ export default function CreatorProfilePage() {
                     size="sm"
                     className="flex-1 bg-gradient-to-r from-[#8A2BE2] to-[#FF1493] hover:from-[#7A1BD2] to-[#E01483]"
                     onClick={() => {
+                      console.log('📱 Navigating to dashboard...')
                       setShowSuccessModal(false)
                       setSuccess('')
-                      window.location.href = '/creator/dashboard'
+                      try {
+                        router.push('/creator/dashboard')
+                      } catch (error) {
+                        console.error('❌ Navigation error:', error)
+                        // Fallback to window location
+                        window.location.href = '/creator/dashboard'
+                      }
                     }}
                   >
                     Go to Dashboard
