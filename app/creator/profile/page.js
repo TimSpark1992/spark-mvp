@@ -139,47 +139,154 @@ export default function CreatorProfilePage() {
     setError('')
 
     try {
-      // Check if upload functions are available
-      if (typeof uploadFile !== 'function' || typeof getFileUrl !== 'function') {
-        throw new Error('Upload functionality is not available. Please check your connection.')
+      console.log('🔍 Checking media kit upload function availability...')
+      console.log('uploadFile type:', typeof uploadFile)
+      console.log('getFileUrl type:', typeof getFileUrl)
+      console.log('updateProfile type:', typeof updateProfile)
+
+      // Enhanced function availability checks with detailed logging
+      if (!uploadFile || typeof uploadFile !== 'function') {
+        console.error('❌ uploadFile function is not available:', uploadFile)
+        throw new Error('Upload functionality is not properly initialized. Please refresh the page and try again.')
+      }
+      
+      if (!getFileUrl || typeof getFileUrl !== 'function') {
+        console.error('❌ getFileUrl function is not available:', getFileUrl)  
+        throw new Error('URL generation functionality is not properly initialized. Please refresh the page and try again.')
+      }
+      
+      if (!updateProfile || typeof updateProfile !== 'function') {
+        console.error('❌ updateProfile function is not available:', updateProfile)
+        throw new Error('Profile update functionality is not properly initialized. Please refresh the page and try again.')
       }
 
-      const fileName = `${profile.id}/media-kit-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-      console.log('📤 Uploading media kit:', fileName)
+      if (!profile || !profile.id) {
+        console.error('❌ Profile data is not available:', profile)
+        throw new Error('Profile information is not available. Please refresh the page and try again.')
+      }
+
+      // Sanitize filename more thoroughly
+      const sanitizedFileName = file.name
+        .replace(/[^a-zA-Z0-9.-]/g, '_')
+        .replace(/_{2,}/g, '_')
+        .toLowerCase()
       
-      const { data: uploadData, error: uploadError } = await uploadFile('media-kits', fileName, file)
+      const fileName = `${profile.id}/media-kit-${Date.now()}-${sanitizedFileName}`
+      console.log('📤 Uploading media kit with filename:', fileName)
+      
+      // Add timeout wrapper for upload operation
+      const uploadTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Upload timed out after 45 seconds')), 45000)
+      )
+      
+      const uploadPromise = uploadFile('media-kits', fileName, file)
+      const uploadResult = await Promise.race([uploadPromise, uploadTimeout])
+      
+      console.log('📡 Media kit upload result received:', uploadResult)
+      
+      if (!uploadResult) {
+        throw new Error('Upload function returned null result')
+      }
+      
+      const { data: uploadData, error: uploadError } = uploadResult
       
       if (uploadError) {
-        console.error('Upload error:', uploadError)
-        throw new Error(uploadError.message || 'Failed to upload file to storage')
+        console.error('❌ Media kit upload error details:', uploadError)
+        
+        // Check for specific error types
+        if (uploadError.message?.includes('bucket') || uploadError.code === 'BUCKET_NOT_FOUND') {
+          throw new Error('Storage is not configured. Please contact support to enable file uploads.')
+        } else if (uploadError.message?.includes('permission') || uploadError.message?.includes('policy')) {
+          throw new Error('You do not have permission to upload files. Please contact support.')
+        } else if (uploadError.message?.includes('timeout')) {
+          throw new Error('Upload timed out. Please check your internet connection and try again.')
+        } else {
+          throw new Error(uploadError.message || 'Failed to upload file to storage')
+        }
       }
 
-      console.log('✅ Media kit uploaded, getting URL...')
-      const mediaKitUrl = getFileUrl('media-kits', fileName)
+      console.log('✅ Media kit uploaded successfully, getting URL...')
+      console.log('📊 Upload data:', uploadData)
       
-      if (!mediaKitUrl) {
-        throw new Error('Failed to generate file URL')
+      // Enhanced URL generation with error checking
+      let mediaKitUrl
+      try {
+        mediaKitUrl = getFileUrl('media-kits', fileName)
+        console.log('🔗 Generated media kit URL:', mediaKitUrl)
+      } catch (urlError) {
+        console.error('❌ Media kit URL generation error:', urlError)
+        throw new Error('Failed to generate file URL. Please try again.')
+      }
+      
+      if (!mediaKitUrl || typeof mediaKitUrl !== 'string') {
+        console.error('❌ Invalid media kit URL generated:', mediaKitUrl)
+        throw new Error('Generated file URL is invalid. Please try again.')
       }
 
       console.log('🔄 Updating profile with media kit URL...')
-      // Update profile with media kit URL
-      const { error: updateError } = await updateProfile(profile.id, {
+      
+      // Add timeout wrapper for profile update
+      const updateTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Profile update timed out after 20 seconds')), 20000)
+      )
+      
+      const updatePromise = updateProfile(profile.id, {
         media_kit_url: mediaKitUrl
       })
       
+      const updateResult = await Promise.race([updatePromise, updateTimeout])
+      console.log('📊 Media kit profile update result:', updateResult)
+      
+      if (!updateResult) {
+        throw new Error('Profile update function returned null result')
+      }
+      
+      const { error: updateError } = updateResult
+      
       if (updateError) {
-        console.error('Profile update error:', updateError)
+        console.error('❌ Media kit profile update error:', updateError)
         throw new Error(updateError.message || 'Failed to update profile')
       }
 
       console.log('🔄 Refreshing profile data...')
-      await refreshProfile()
+      
+      // Add error handling for profile refresh
+      try {
+        if (refreshProfile && typeof refreshProfile === 'function') {
+          await refreshProfile()
+        } else {
+          console.warn('⚠️ refreshProfile function not available, skipping refresh')
+        }
+      } catch (refreshError) {
+        console.warn('⚠️ Profile refresh failed (non-critical):', refreshError)
+        // Don't throw error here as the upload was successful
+      }
+      
       setSuccess('Media kit uploaded successfully!')
       console.log('✅ Media kit upload completed successfully')
       
     } catch (error) {
-      console.error('❌ Error uploading media kit:', error)
-      setError(error.message || 'Failed to upload media kit')
+      console.error('❌ Critical error during media kit upload:', error)
+      console.error('❌ Error stack:', error.stack)
+      
+      // Provide more specific error messages based on error type
+      let errorMessage = 'Failed to upload media kit'
+      
+      if (error.message.includes('not properly initialized')) {
+        errorMessage = error.message + ' This might be due to a page loading issue.'
+      } else if (error.message.includes('Storage is not configured')) {
+        errorMessage = 'File upload is temporarily unavailable. Please contact support.'
+      } else if (error.message.includes('permission')) {
+        errorMessage = 'You do not have permission to upload files. Please contact support.'
+      } else if (error.message.includes('timeout')) {
+        errorMessage = 'Upload timed out. Please check your internet connection and try a smaller file.'
+      } else if (error.message.includes('size')) {
+        errorMessage = error.message
+      } else {
+        errorMessage = error.message || errorMessage
+      }
+      
+      setError(errorMessage)
     } finally {
       setUploadLoading(prev => ({ ...prev, mediaKit: false }))
     }
