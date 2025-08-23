@@ -39,30 +39,101 @@ function CreatorDashboardContent() {
   const [campaigns, setCampaigns] = useState([])
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
+  const [dataLoaded, setDataLoaded] = useState(false)
 
   useEffect(() => {
+    let mounted = true
+    
     const loadData = async () => {
-      try {
-        const { data: campaignsData, error: campaignsError } = await getCampaigns()
-        if (campaignsData) {
-          setCampaigns(campaignsData.slice(0, 6))
-        }
-
-        if (profile?.id) {
-          const { data: applicationsData, error: applicationsError } = await getCreatorApplications(profile.id)
-          if (applicationsData) {
-            setApplications(applicationsData)
-          }
-        }
-      } catch (error) {
-        console.error('Error loading data:', error)
-      } finally {
+      // Prevent duplicate loading if data already loaded
+      if (dataLoaded) {
         setLoading(false)
+        return
+      }
+
+      try {
+        console.log('🔄 Loading creator dashboard data...')
+        
+        // Add timeout protection (systematic fix pattern)
+        const loadTimeout = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Dashboard data loading timed out after 15 seconds')), 15000)
+        )
+        
+        // Load campaigns with timeout protection
+        const campaignsPromise = getCampaigns().then(result => {
+          if (mounted && result?.data) {
+            setCampaigns(result.data.slice(0, 6))
+            console.log('✅ Campaigns loaded successfully')
+          }
+          return result
+        })
+        
+        // Load applications with timeout protection (only if profile exists)
+        let applicationsPromise = Promise.resolve({ data: [] })
+        if (profile?.id) {
+          applicationsPromise = getCreatorApplications(profile.id).then(result => {
+            if (mounted && result?.data) {
+              setApplications(result.data)
+              console.log('✅ Applications loaded successfully')
+            }
+            return result
+          })
+        }
+        
+        // Wait for both with timeout protection
+        await Promise.race([
+          Promise.all([campaignsPromise, applicationsPromise]),
+          loadTimeout
+        ])
+        
+        if (mounted) {
+          setDataLoaded(true)
+          console.log('🎉 Creator dashboard data loaded successfully')
+        }
+        
+      } catch (error) {
+        console.error('❌ Error loading creator dashboard data:', error)
+        
+        if (mounted) {
+          // Don't clear existing data on error, just log it (systematic fix pattern)
+          console.warn('⚠️ Keeping existing dashboard data despite load error')
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false)
+          console.log('🔄 Creator dashboard loading state cleared')
+        }
       }
     }
 
+    // Add additional safety timeout (systematic fix pattern)
+    const safetyTimeout = setTimeout(() => {
+      if (mounted && loading) {
+        console.warn('⚠️ Dashboard safety timeout - forcing loading to false')
+        setLoading(false)
+      }
+    }, 20000) // 20 second safety net
+
     loadData()
-  }, [profile?.id])
+    
+    return () => {
+      mounted = false
+      clearTimeout(safetyTimeout)
+    }
+  }, [profile?.id, dataLoaded]) // Keep profile?.id dependency but add dataLoaded to prevent loops
+
+  // Add additional loading protection based on profile availability
+  useEffect(() => {
+    // If we have a profile but loading is still true after 10 seconds, force it to false
+    if (profile && loading) {
+      const forceLoadTimeout = setTimeout(() => {
+        console.warn('⚠️ Forcing dashboard loading to false due to profile availability')
+        setLoading(false)
+      }, 10000)
+      
+      return () => clearTimeout(forceLoadTimeout)
+    }
+  }, [profile, loading])
 
   const profileCompletion = () => {
     let completed = 0
