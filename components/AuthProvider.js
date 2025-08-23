@@ -114,11 +114,35 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
+  const refreshProfile = async () => {
+    if (!user) {
+      console.warn('⚠️ Cannot refresh profile - no user authenticated')
+      return
+    }
+
+    try {
+      console.log('🔄 Refreshing profile data for user:', user.id)
+      const { data: profileData, error } = await getProfile(user.id)
+      
+      if (profileData) {
+        setProfile(profileData)
+        console.log('✅ Profile refreshed successfully')
+      } else if (error) {
+        console.error('❌ Error refreshing profile:', error)
+        // Don't throw error here to avoid breaking the UI
+      }
+    } catch (err) {
+      console.error('❌ Profile refresh failed:', err)
+      // Don't throw error here to avoid breaking the UI
+    }
+  }
+
   const value = {
     user,
     profile,
     loading,
     setProfile,
+    refreshProfile,
     isAuthenticated: !!user,
     isCreator: profile?.role === 'creator',
     isBrand: profile?.role === 'brand',
