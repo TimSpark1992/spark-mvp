@@ -254,27 +254,30 @@ export default function CreatorProfilePage() {
 
       console.log('🔄 Updating profile with media kit URL...')
       
-      // Add timeout wrapper for profile update
-      const updateTimeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Profile update timed out after 20 seconds')), 20000)
-      )
-      
-      const updatePromise = updateProfile(profile.id, {
-        media_kit_url: mediaKitUrl
-      })
-      
-      const updateResult = await Promise.race([updatePromise, updateTimeout])
-      console.log('📊 Media kit profile update result:', updateResult)
-      
-      if (!updateResult) {
-        throw new Error('Profile update function returned null result')
-      }
-      
-      const { error: updateError } = updateResult
-      
-      if (updateError) {
-        console.error('❌ Media kit profile update error:', updateError)
-        throw new Error(updateError.message || 'Failed to update profile')
+      // Simplified profile update without Promise.race complexity
+      try {
+        const updateResult = await updateProfile(profile.id, {
+          media_kit_url: mediaKitUrl
+        })
+        
+        console.log('📊 Media kit profile update result:', updateResult)
+        
+        if (!updateResult) {
+          throw new Error('Profile update function returned null result')
+        }
+        
+        const { error: updateError } = updateResult
+        
+        if (updateError) {
+          console.error('❌ Media kit profile update error:', updateError)
+          throw new Error(updateError.message || 'Failed to update profile')
+        }
+        
+        console.log('✅ Profile updated successfully with new media kit URL')
+        
+      } catch (updateErr) {
+        console.error('❌ Media kit profile update failed:', updateErr)
+        throw new Error(`Profile update failed: ${updateErr.message}`)
       }
 
       console.log('🔄 Refreshing profile data...')
