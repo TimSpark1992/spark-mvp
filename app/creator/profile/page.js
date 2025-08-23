@@ -38,6 +38,7 @@ export default function CreatorProfilePage() {
   const [error, setError] = useState('')
   const [storageStatus, setStorageStatus] = useState(null)
   const [showStorageSetup, setShowStorageSetup] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
 
   const [formData, setFormData] = useState({
     full_name: '',
