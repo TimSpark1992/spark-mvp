@@ -76,8 +76,32 @@ export default function CreatorProfilePage() {
         },
         category_tags: profile.category_tags || []
       })
+      
+      // Verify storage configuration when profile loads
+      checkStorageConfiguration()
     }
   }, [profile])
+
+  const checkStorageConfiguration = async () => {
+    try {
+      console.log('🔍 Checking storage configuration...')
+      const status = await verifyStorageBuckets()
+      setStorageStatus(status)
+      
+      if (!status.profiles || !status.mediaKits) {
+        console.warn('⚠️ Storage buckets not properly configured:', status)
+      } else {
+        console.log('✅ Storage configuration verified')
+      }
+    } catch (error) {
+      console.error('❌ Storage verification failed:', error)
+      setStorageStatus({ 
+        profiles: false, 
+        mediaKits: false, 
+        errors: [error.message] 
+      })
+    }
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
