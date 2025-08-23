@@ -98,39 +98,31 @@ class ProfileUploadFixTester:
             if "const refreshProfile = async" in content:
                 self.log("✅ refreshProfile function is defined in AuthProvider")
                 
-                # Check function implementation
-                refresh_profile_match = re.search(r'const refreshProfile = async \(\) => \{([^}]+)\}', content, re.DOTALL)
-                if refresh_profile_match:
-                    body = refresh_profile_match.group(1)
-                    
-                    # Check for user authentication check
-                    if "if (!user)" in body:
-                        self.log("✅ refreshProfile function has user authentication check")
-                    else:
-                        self.log("⚠️ refreshProfile function missing user check", "WARNING")
-                    
-                    # Check for getProfile call
-                    if "getProfile(user.id)" in body:
-                        self.log("✅ refreshProfile function calls getProfile correctly")
-                    else:
-                        self.log("❌ refreshProfile function missing getProfile call", "ERROR")
-                        return False
-                    
-                    # Check for setProfile call
-                    if "setProfile(profileData)" in body:
-                        self.log("✅ refreshProfile function updates profile state")
-                    else:
-                        self.log("❌ refreshProfile function doesn't update profile state", "ERROR")
-                        return False
-                    
-                    # Check for error handling
-                    if "try {" in body and "catch" in body:
-                        self.log("✅ refreshProfile function has proper error handling")
-                    else:
-                        self.log("⚠️ refreshProfile function missing try-catch error handling", "WARNING")
+                # Check for user authentication check
+                if "if (!user)" in content:
+                    self.log("✅ refreshProfile function has user authentication check")
                 else:
-                    self.log("❌ refreshProfile function implementation not found", "ERROR")
+                    self.log("⚠️ refreshProfile function missing user check", "WARNING")
+                
+                # Check for getProfile call
+                if "await getProfile(user.id)" in content:
+                    self.log("✅ refreshProfile function calls getProfile correctly")
+                else:
+                    self.log("❌ refreshProfile function missing getProfile call", "ERROR")
                     return False
+                
+                # Check for setProfile call
+                if "setProfile(profileData)" in content:
+                    self.log("✅ refreshProfile function updates profile state")
+                else:
+                    self.log("❌ refreshProfile function doesn't update profile state", "ERROR")
+                    return False
+                
+                # Check for error handling
+                if "try {" in content and "catch" in content:
+                    self.log("✅ refreshProfile function has proper error handling")
+                else:
+                    self.log("⚠️ refreshProfile function missing try-catch error handling", "WARNING")
                 
                 # Check if refreshProfile is exported in the value object
                 if "refreshProfile," in content:
