@@ -13,6 +13,7 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Heading, Text } from '@/components/ui/Typography'
 import { updateProfile, uploadFile, getFileUrl } from '@/lib/supabase'
 import { sanitizeFieldValue } from '@/lib/xss-protection'
+import { verifyStorageBuckets, getStorageSetupInstructions } from '@/lib/verify-storage-setup'
 import { 
   User,
   Camera,
@@ -24,7 +25,9 @@ import {
   Instagram,
   Globe,
   FileText,
-  CheckCircle
+  CheckCircle,
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react'
 
 export default function CreatorProfilePage() {
