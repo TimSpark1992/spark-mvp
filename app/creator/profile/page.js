@@ -515,17 +515,41 @@ export default function CreatorProfilePage() {
         sanitizedData[key] = sanitizeFieldValue(key, value)
       }
       
-      // Simplified profile update without Promise.race complexity
-      const { error: updateError } = await updateProfile(profile.id, sanitizedData)
+      console.log('📊 Sanitized data for profile update:', sanitizedData)
       
-      if (updateError) throw new Error(updateError.message)
+      // Add timeout protection for profile update (systematic fix pattern)
+      const updateTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Profile update timed out after 15 seconds')), 15000)
+      )
+      
+      const updatePromise = updateProfile(profile.id, sanitizedData)
+      const updateResult = await Promise.race([updatePromise, updateTimeout])
+      
+      console.log('📊 Profile update result:', updateResult)
+      
+      if (!updateResult) {
+        throw new Error('Profile update returned no result')
+      }
+      
+      const { error: updateError } = updateResult
+      
+      if (updateError) {
+        console.error('❌ Profile update error:', updateError)
+        throw new Error(updateError.message || 'Failed to update profile')
+      }
 
       console.log('✅ Creator profile update successful, refreshing profile...')
       
-      // Add error handling for refreshProfile
+      // Add timeout protection for profile refresh (systematic fix pattern)
       try {
         if (refreshProfile && typeof refreshProfile === 'function') {
-          await refreshProfile()
+          const refreshTimeout = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Profile refresh timed out after 10 seconds')), 10000)
+          )
+          
+          const refreshPromise = refreshProfile()
+          await Promise.race([refreshPromise, refreshTimeout])
+          console.log('✅ Profile refresh completed successfully')
         } else {
           console.warn('⚠️ refreshProfile function not available, skipping refresh')
         }
@@ -537,11 +561,32 @@ export default function CreatorProfilePage() {
       setSuccess('Profile updated successfully!')
       console.log('🎉 Creator profile save completed successfully')
       
+      // Force loading state to false after 1 second as additional protection
+      setTimeout(() => {
+        setLoading(false)
+      }, 1000)
+      
     } catch (error) {
       console.error('❌ Creator profile save failed:', error)
-      setError(error.message || 'Failed to update profile')
+      
+      // Provide specific error messages based on error type (systematic fix pattern)
+      let errorMessage = 'Failed to update profile'
+      
+      if (error.message.includes('timed out')) {
+        errorMessage = 'Profile save timed out. Please check your internet connection and try again.'
+      } else if (error.message.includes('network') || error.message.includes('fetch')) {
+        errorMessage = 'Network error occurred. Please check your connection and try again.'
+      } else if (error.message.includes('validation')) {
+        errorMessage = 'Please check your input and try again.'
+      } else {
+        errorMessage = error.message || errorMessage
+      }
+      
+      setError(errorMessage)
     } finally {
+      // Always ensure loading is set to false (systematic fix pattern)
       setLoading(false)
+      console.log('🔄 Profile save process completed, loading state cleared')
     }
   }
 
