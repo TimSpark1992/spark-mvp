@@ -627,33 +627,26 @@ agent_communication:
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "CRITICAL SIGNUP INFINITE LOADING BUG FIX (January 13, 2025) - Fix infinite loading issue during new user signup process where users get stuck at 'Creating account...' screen indefinitely after successful profile creation in Supabase. The signup process completes successfully but redirect to dashboard never happens, leaving users with infinite loading state.
+user_problem_statement: |
+  User reports persistent "TypeError: r is not a function" error when trying to upload profile pictures on the Creator Profile page (/creator/profile). This error prevents users from uploading new profile pictures and is affecting the user experience. The issue was previously investigated but the error persists on the frontend.
 
-✅ ISSUE IDENTIFIED: Race condition between profile creation and AuthProvider retrieval causing timeout in redirect logic.
+  CONTEXT: The application is a KOL & Creator marketplace (Spark) built with Next.js 14 and Supabase. Profile picture upload functionality uses Supabase storage buckets ('profiles') and involves the handleProfilePictureUpload function in /app/app/creator/profile/page.js.
 
-✅ ROOT CAUSE FOUND: Original Promise syntax error - `await new Promise(resolve => setTimeout(resolve, 2500))` was not properly calling resolve function.
+  INVESTIGATION FINDINGS:
+  - Backend testing revealed that Supabase storage buckets are not properly configured
+  - RLS (Row Level Security) policies may be missing for storage.objects table
+  - The "TypeError: r is not a function" error likely occurs due to failed Supabase operations
+  - Upload functions (uploadFile, getFileUrl) from /app/lib/supabase.js appear to be failing silently
 
-✅ COMPREHENSIVE FIXES APPLIED:
-1. Fixed Promise syntax to `await new Promise(resolve => setTimeout(() => resolve(), 3500))`
-2. Increased profile propagation wait time from 2500ms to 3500ms to handle Supabase RLS policy propagation delays
-3. Added enhanced user feedback with 'Setting up your profile...' message during profile propagation
-4. Implemented comprehensive debug logging for redirect process
-5. Added multiple redirect methods (window.location.replace, window.location.href)
-6. Created fallback success message with manual redirect links
-7. Enhanced error handling and timeout mechanisms
+  FIXES APPLIED:
+  - Enhanced error handling in handleProfilePictureUpload function with detailed logging
+  - Added function availability checks and timeout protections
+  - Created storage verification system (/app/lib/verify-storage-setup.js)
+  - Added storage setup instructions and UI notifications
+  - Improved filename sanitization and error messaging
+  - Added comprehensive debugging and fallback mechanisms
 
-✅ VERIFICATION: All debug logs now appear correctly:
-- '🔄 Starting redirect process...'
-- '🔄 Waiting for profile propagation...'
-- '🔄 Redirecting to dashboard...'
-- '🔄 Redirect path: /brand/dashboard'
-- '🔄 Attempting redirect to: /brand/dashboard'
-
-✅ USER EXPERIENCE IMPROVEMENTS:
-- Button text changes from 'Creating account...' to 'Setting up your profile...' during profile setup
-- Clear success messages with clickable dashboard links if redirect fails
-- Comprehensive error handling prevents infinite loading states
-- 10-second timeout protection with user-friendly fallback messages"
+  REQUIRES TESTING: Backend storage configuration and frontend upload functionality
 
 backend:
   - task: "Campaign Status Update and Cache Synchronization Fix"
