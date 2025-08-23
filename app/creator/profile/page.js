@@ -32,6 +32,7 @@ import {
 } from 'lucide-react'
 
 export default function CreatorProfilePage() {
+  const router = useRouter()
   const { profile, refreshProfile } = useAuth()
   const [loading, setLoading] = useState(false)
   const [uploadLoading, setUploadLoading] = useState({})
