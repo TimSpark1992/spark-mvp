@@ -951,6 +951,73 @@ export default function CreatorProfilePage() {
             </div>
           </Container>
         </Section>
+
+        {/* Success Modal */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-[#1C1C2D] border border-white/10 rounded-xl p-8 max-w-md w-full mx-4 transform animate-in fade-in-50 zoom-in-95 duration-200">
+              <div className="text-center space-y-4">
+                {/* Success Icon */}
+                <div className="mx-auto w-16 h-16 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-8 h-8 text-green-400" />
+                </div>
+                
+                {/* Success Title */}
+                <div>
+                  <Heading level={3} size="xl" className="text-white mb-2">
+                    Profile Saved Successfully!
+                  </Heading>
+                  <Text size="sm" color="secondary" className="text-gray-300">
+                    Your creator profile has been updated and is now live
+                  </Text>
+                </div>
+
+                {/* Profile Completion Progress */}
+                <div className="bg-[#2A2A3A] rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <Text size="sm" weight="medium">Profile Complete</Text>
+                    <Text size="sm" className="text-transparent bg-clip-text bg-gradient-to-r from-[#8A2BE2] to-[#FF1493]">
+                      {profileCompletion()}%
+                    </Text>
+                  </div>
+                  <div className="w-full bg-[#1C1C2D] rounded-full h-2">
+                    <div 
+                      className="h-2 bg-gradient-to-r from-[#8A2BE2] to-[#FF1493] rounded-full transition-all duration-500 ease-out"
+                      style={{ width: `${profileCompletion()}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      setShowSuccessModal(false)
+                      setSuccess('')
+                    }}
+                  >
+                    Continue Editing
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="flex-1 bg-gradient-to-r from-[#8A2BE2] to-[#FF1493] hover:from-[#7A1BD2] to-[#E01483]"
+                    onClick={() => {
+                      setShowSuccessModal(false)
+                      setSuccess('')
+                      window.location.href = '/creator/dashboard'
+                    }}
+                  >
+                    Go to Dashboard
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </Layout>
     </ProtectedRoute>
   )
