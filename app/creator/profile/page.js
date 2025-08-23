@@ -427,27 +427,30 @@ export default function CreatorProfilePage() {
 
       console.log('🔄 Updating profile with picture URL...')
       
-      // Add timeout wrapper for profile update
-      const updateTimeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Profile update timed out after 20 seconds')), 20000)
-      )
-      
-      const updatePromise = updateProfile(profile.id, {
-        profile_picture: profilePictureUrl
-      })
-      
-      const updateResult = await Promise.race([updatePromise, updateTimeout])
-      console.log('📊 Profile update result:', updateResult)
-      
-      if (!updateResult) {
-        throw new Error('Profile update function returned null result')
-      }
-      
-      const { error: updateError } = updateResult
-      
-      if (updateError) {
-        console.error('❌ Profile update error:', updateError)
-        throw new Error(updateError.message || 'Failed to update profile')
+      // Simplified profile update without Promise.race complexity
+      try {
+        const updateResult = await updateProfile(profile.id, {
+          profile_picture: profilePictureUrl
+        })
+        
+        console.log('📊 Profile update result:', updateResult)
+        
+        if (!updateResult) {
+          throw new Error('Profile update function returned null result')
+        }
+        
+        const { error: updateError } = updateResult
+        
+        if (updateError) {
+          console.error('❌ Profile update error:', updateError)
+          throw new Error(updateError.message || 'Failed to update profile')
+        }
+        
+        console.log('✅ Profile updated successfully with new picture URL')
+        
+      } catch (updateErr) {
+        console.error('❌ Profile update failed:', updateErr)
+        throw new Error(`Profile update failed: ${updateErr.message}`)
       }
 
       console.log('🔄 Refreshing profile data...')
