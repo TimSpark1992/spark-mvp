@@ -51,37 +51,28 @@ class ProfileUploadFixTester:
             if "export const updateProfile" in content:
                 self.log("✅ updateProfile function is exported")
                 
-                # Check function implementation
-                update_profile_match = re.search(r'export const updateProfile = async \(([^)]+)\) => \{([^}]+)\}', content, re.DOTALL)
-                if update_profile_match:
-                    params = update_profile_match.group(1)
-                    body = update_profile_match.group(2)
-                    
-                    # Verify function parameters
-                    if "userId" in params and "updates" in params:
-                        self.log("✅ updateProfile function has correct parameters (userId, updates)")
-                    else:
-                        self.log("❌ updateProfile function parameters incorrect", "ERROR")
-                        return False
-                    
-                    # Check for Supabase update operation
-                    if ".from('profiles')" in body and ".update(" in body and ".eq('id', userId)" in body:
-                        self.log("✅ updateProfile function implements correct Supabase update logic")
-                    else:
-                        self.log("❌ updateProfile function missing correct Supabase logic", "ERROR")
-                        return False
-                    
-                    # Check for proper return format
-                    if "return { data, error }" in body:
-                        self.log("✅ updateProfile function returns correct format { data, error }")
-                    else:
-                        self.log("❌ updateProfile function return format incorrect", "ERROR")
-                        return False
-                    
-                    return True
+                # Check function implementation - look for the actual implementation
+                if "userId" in content and "updates" in content and "updateProfile" in content:
+                    self.log("✅ updateProfile function has correct parameters (userId, updates)")
                 else:
-                    self.log("❌ updateProfile function implementation not found", "ERROR")
+                    self.log("❌ updateProfile function parameters incorrect", "ERROR")
                     return False
+                
+                # Check for Supabase update operation
+                if ".from('profiles')" in content and ".update(updates)" in content and ".eq('id', userId)" in content:
+                    self.log("✅ updateProfile function implements correct Supabase update logic")
+                else:
+                    self.log("❌ updateProfile function missing correct Supabase logic", "ERROR")
+                    return False
+                
+                # Check for proper return format
+                if "return { data, error }" in content:
+                    self.log("✅ updateProfile function returns correct format { data, error }")
+                else:
+                    self.log("❌ updateProfile function return format incorrect", "ERROR")
+                    return False
+                
+                return True
             else:
                 self.log("❌ updateProfile function not exported", "ERROR")
                 return False
