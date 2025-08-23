@@ -560,7 +560,14 @@ export default function CreatorProfilePage() {
       }
       
       setSuccess('Profile updated successfully!')
+      setShowSuccessModal(true)
       console.log('🎉 Creator profile save completed successfully')
+      
+      // Auto-hide success modal after 3 seconds
+      setTimeout(() => {
+        setShowSuccessModal(false)
+        setSuccess('')
+      }, 3000)
       
       // Force loading state to false after 1 second as additional protection
       setTimeout(() => {
