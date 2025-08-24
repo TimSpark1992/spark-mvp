@@ -22,8 +22,8 @@ import json
 import os
 from datetime import datetime
 
-# Configuration
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://4f187fa2-e698-4163-ab14-cb3017f6b9af.preview.emergentagent.com')
+# Configuration - Use local URL for testing since external routing may not be configured
+BASE_URL = "http://localhost:3000"  # Local testing for backend performance
 API_BASE = f"{BASE_URL}/api"
 
 # Test timeouts based on UI improvements
