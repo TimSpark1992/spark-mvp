@@ -106,13 +106,13 @@ function CreatorDashboardContent() {
       }
     }
 
-    // Add additional safety timeout (systematic fix pattern)
+    // Add reduced safety timeout (systematic fix pattern)
     const safetyTimeout = setTimeout(() => {
       if (mounted && loading) {
         console.warn('⚠️ Dashboard safety timeout - forcing loading to false')
         setLoading(false)
       }
-    }, 20000) // 20 second safety net
+    }, 10000) // Reduced from 20 seconds to 10 seconds
 
     loadData()
     
