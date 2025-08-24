@@ -267,7 +267,26 @@ export default function RateCardsPage() {
       console.log('📡 Response data:', data)
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to save rate card')
+        // Enhanced error handling for duplicate rate cards
+        if (data.error && data.error.includes('already exists')) {
+          // Find the existing rate card for better UX
+          const existingCard = rateCards.find(
+            card => card.deliverable_type === formData.deliverable_type && 
+                   card.currency === formData.currency
+          )
+          
+          if (existingCard) {
+            const deliverableInfo = DELIVERABLE_TYPES[existingCard.deliverable_type]
+            throw new Error(
+              `You already have a ${deliverableInfo?.label || formData.deliverable_type} rate card in ${formData.currency}. ` +
+              `Would you like to edit your existing rate card instead? Current price: ${formatPrice(existingCard.base_price_cents, existingCard.currency)}`
+            )
+          } else {
+            throw new Error(data.error || 'A rate card already exists for this deliverable type and currency')
+          }
+        } else {
+          throw new Error(data.error || 'Failed to save rate card')
+        }
       }
 
       console.log('✅ Rate card saved:', data.rateCard?.id)
