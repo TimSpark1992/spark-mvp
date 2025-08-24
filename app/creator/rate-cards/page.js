@@ -57,6 +57,8 @@ export default function RateCardsPage() {
   const [editingCard, setEditingCard] = useState(null)
   const [dataLoaded, setDataLoaded] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState(false)
+  const [deletedCardInfo, setDeletedCardInfo] = useState(null)
   const [deletingCard, setDeletingCard] = useState(null)
   
   // Debug logging
