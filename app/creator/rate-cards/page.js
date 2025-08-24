@@ -328,6 +328,12 @@ export default function RateCardsPage() {
       if (response.ok) {
         console.log('✅ Rate card deleted from database')
         
+        // Store deleted card info for success modal
+        setDeletedCardInfo({
+          type: DELIVERABLE_TYPES[deletingCard.deliverable_type]?.label,
+          price: formatPrice(deletingCard.base_price_cents, deletingCard.currency)
+        })
+        
         // Update both local state and cache systematically
         const updatedRateCards = rateCards.filter(card => card.id !== deletingCard.id)
         setRateCards(updatedRateCards)
@@ -340,8 +346,9 @@ export default function RateCardsPage() {
         
         console.log('💾 Rate card removed from cache and state updated')
         
-        setSuccess('Rate card deleted successfully!')
-        setTimeout(() => setSuccess(''), 3000)
+        // Show success modal instead of basic success message
+        setShowDeleteSuccessModal(true)
+        
       } else {
         const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to delete rate card')
