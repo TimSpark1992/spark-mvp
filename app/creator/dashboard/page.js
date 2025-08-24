@@ -54,12 +54,12 @@ function CreatorDashboardContent() {
       try {
         console.log('🔄 Loading creator dashboard data...')
         
-        // Add timeout protection (systematic fix pattern)
+        // Reduce timeout for faster loading (systematic fix pattern)
         const loadTimeout = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Dashboard data loading timed out after 15 seconds')), 15000)
+          setTimeout(() => reject(new Error('Dashboard data loading timed out after 8 seconds')), 8000)
         )
         
-        // Load campaigns with timeout protection
+        // Load campaigns with faster timeout protection
         const campaignsPromise = getCampaigns().then(result => {
           if (mounted && result?.data) {
             setCampaigns(result.data.slice(0, 6))
@@ -68,7 +68,7 @@ function CreatorDashboardContent() {
           return result
         })
         
-        // Load applications with timeout protection (only if profile exists)
+        // Load applications with faster timeout protection (only if profile exists)
         let applicationsPromise = Promise.resolve({ data: [] })
         if (profile?.id) {
           applicationsPromise = getCreatorApplications(profile.id).then(result => {
@@ -80,7 +80,7 @@ function CreatorDashboardContent() {
           })
         }
         
-        // Wait for both with timeout protection
+        // Wait for both with reduced timeout protection
         await Promise.race([
           Promise.all([campaignsPromise, applicationsPromise]),
           loadTimeout
