@@ -558,6 +558,21 @@ export default function RateCardsPage() {
                           <option key={key} value={key}>{value.label}</option>
                         ))}
                       </select>
+                      
+                      {/* Show helpful message if no types available */}
+                      {getAvailableDeliverableTypes().length === 0 && formData.currency && (
+                        <Text size="xs" className="text-yellow-400 mt-1">
+                          You already have rate cards for all deliverable types in {formData.currency}. 
+                          Try selecting a different currency or edit your existing rate cards.
+                        </Text>
+                      )}
+                      
+                      {/* Show count of available types */}
+                      {getAvailableDeliverableTypes().length > 0 && formData.currency && (
+                        <Text size="xs" color="secondary" className="mt-1">
+                          {getAvailableDeliverableTypes().length} deliverable type{getAvailableDeliverableTypes().length !== 1 ? 's' : ''} available in {formData.currency}
+                        </Text>
+                      )}
                     </div>
 
                     <div className="space-y-2">
