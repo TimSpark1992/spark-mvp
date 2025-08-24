@@ -306,7 +306,7 @@ export default function RateCardsPage() {
   }
 
   const confirmDelete = async () => {
-    if (!deletingCard) return
+    if (!deletingCard || !profile?.id) return
 
     try {
       console.log('🗑️ Deleting rate card:', deletingCard.id)
@@ -316,7 +316,20 @@ export default function RateCardsPage() {
       })
 
       if (response.ok) {
-        setRateCards(rateCards.filter(card => card.id !== deletingCard.id))
+        console.log('✅ Rate card deleted from database')
+        
+        // Update both local state and cache systematically
+        const updatedRateCards = rateCards.filter(card => card.id !== deletingCard.id)
+        setRateCards(updatedRateCards)
+        
+        // Remove from cache to prevent reappearing
+        removeRateCardFromCache(profile.id, deletingCard.id)
+        
+        // Also update cache with the complete updated list for consistency
+        updateRateCardsCache(profile.id, updatedRateCards)
+        
+        console.log('💾 Rate card removed from cache and state updated')
+        
         setSuccess('Rate card deleted successfully!')
         setTimeout(() => setSuccess(''), 3000)
       } else {
