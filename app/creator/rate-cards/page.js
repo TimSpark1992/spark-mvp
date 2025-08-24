@@ -78,7 +78,7 @@ export default function RateCardsPage() {
     rush_pct: 0
   })
 
-  // Main data loading effect for personal rate cards - simple and clean
+  // Main data loading effect for personal rate cards - with cache integration
   useEffect(() => {
     let isMounted = true;
     
@@ -93,6 +93,19 @@ export default function RateCardsPage() {
         setLoading(true)
         setError('')
         
+        // First, try to get from cache
+        const cachedRateCards = getCachedRateCards(profile.id)
+        if (cachedRateCards && cachedRateCards.length > 0) {
+          console.log('💾 Using cached rate cards:', cachedRateCards.length)
+          if (isMounted) {
+            setRateCards(cachedRateCards)
+            setDataLoaded(true)
+            setLoading(false)
+          }
+          return
+        }
+        
+        console.log('🌐 Cache miss, fetching from API...')
         const response = await fetch(`/api/rate-cards?creator_id=${profile.id}`)
         
         if (!isMounted) return
@@ -103,8 +116,14 @@ export default function RateCardsPage() {
           throw new Error(data.error || `Failed to load rate cards (${response.status})`)
         }
         
-        console.log('✅ Personal rate cards loaded successfully:', data.rateCards?.length || 0)
-        setRateCards(data.rateCards || [])
+        console.log('✅ Personal rate cards loaded from API:', data.rateCards?.length || 0)
+        
+        const rateCardsData = data.rateCards || []
+        
+        // Update both state and cache
+        setRateCards(rateCardsData)
+        updateRateCardsCache(profile.id, rateCardsData)
+        
         setDataLoaded(true)
         setLoading(false) // Success - stop loading immediately
         
