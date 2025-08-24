@@ -15,7 +15,7 @@ BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 # Test data
-TEST_CREATOR_ID = str(uuid.uuid4())
+TEST_CREATOR_ID = "5b408260-4d3d-4392-a589-0a485a4152a9"  # Existing creator ID
 TEST_RATE_CARDS = []
 
 def log_test(message, status="INFO"):
