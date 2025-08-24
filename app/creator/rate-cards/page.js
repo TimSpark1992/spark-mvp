@@ -22,6 +22,15 @@ import {
   ArrowLeft
 } from 'lucide-react'
 import Link from 'next/link'
+import { getCampaigns } from '@/lib/supabase'
+import { 
+  getCachedRateCards,
+  updateRateCardsCache,
+  removeRateCardFromCache,
+  addRateCardToCache,
+  updateRateCardInCache,
+  clearRateCardCache
+} from '@/lib/rate-card-cache'
 
 const DELIVERABLE_TYPES = {
   'IG_Reel': { label: 'Instagram Reel', icon: Camera, color: 'text-purple-400' },
