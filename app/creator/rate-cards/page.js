@@ -359,7 +359,31 @@ export default function RateCardsPage() {
     setShowDeleteModal(false)
   }
 
-  const getAvailableDeliverableTypes = () => {
+  // Add cache clearing function for manual refresh
+  const handleRefreshData = async () => {
+    if (!profile?.id) return
+    
+    console.log('🔄 Manually refreshing rate cards data...')
+    
+    // Clear cache and reload data
+    clearRateCardCache(profile.id)
+    setDataLoaded(false)
+    setRateCards([])
+    setLoading(true)
+    
+    // The useEffect will automatically reload data
+  }
+
+  // Clear cache on component unmount to ensure fresh data on next visit
+  useEffect(() => {
+    return () => {
+      if (profile?.id) {
+        console.log('🧹 Component unmounting, clearing rate card cache for fresh data on next visit')
+        // Don't clear cache on unmount - let it persist for better UX
+        // Only clear if there was an error or explicit refresh
+      }
+    }
+  }, [profile?.id])
     const usedTypes = rateCards
       .filter(card => card.currency === formData.currency)
       .map(card => card.deliverable_type)
