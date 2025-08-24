@@ -122,14 +122,14 @@ function CreatorDashboardContent() {
     }
   }, [profile?.id, dataLoaded]) // Keep profile?.id dependency but add dataLoaded to prevent loops
 
-  // Add additional loading protection based on profile availability
+  // Add faster loading protection based on profile availability
   useEffect(() => {
-    // If we have a profile but loading is still true after 10 seconds, force it to false
+    // If we have a profile but loading is still true after 5 seconds, force it to false
     if (profile && loading) {
       const forceLoadTimeout = setTimeout(() => {
         console.warn('⚠️ Forcing dashboard loading to false due to profile availability')
         setLoading(false)
-      }, 10000)
+      }, 5000) // Reduced from 10 seconds to 5 seconds
       
       return () => clearTimeout(forceLoadTimeout)
     }
