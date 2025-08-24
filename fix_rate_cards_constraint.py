@@ -17,6 +17,10 @@ FIX: Replace with partial unique index that only applies WHERE active = true.
 import os
 from supabase import create_client, Client
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv('/app/.env.local')
 
 def log_message(message, status="INFO"):
     """Log messages with timestamp"""
