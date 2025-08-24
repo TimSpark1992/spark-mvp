@@ -81,6 +81,19 @@ def test_rate_card_deletion_api(rate_card_id):
     log_test(f"Testing rate card deletion API for ID: {rate_card_id}")
     
     try:
+        # Get initial count
+        response_before = requests.get(
+            f"{API_BASE}/rate-cards?creator_id={TEST_CREATOR_ID}",
+            timeout=15
+        )
+        
+        if response_before.status_code != 200:
+            log_test("❌ Failed to get initial rate card count", "ERROR")
+            return None
+        
+        initial_count = len(response_before.json().get('rateCards', []))
+        log_test(f"Initial rate card count: {initial_count}")
+        
         # Test deletion
         response = requests.delete(
             f"{API_BASE}/rate-cards/{rate_card_id}",
@@ -89,12 +102,29 @@ def test_rate_card_deletion_api(rate_card_id):
         
         if response.status_code == 200:
             data = response.json()
-            if data.get('success') and data.get('rateCard'):
-                deleted_card = data['rateCard']
+            if data.get('success'):
                 log_test(f"✅ Rate card deletion API successful", "SUCCESS")
-                log_test(f"   - Rate card ID: {deleted_card.get('id')}")
-                log_test(f"   - Active status: {deleted_card.get('active')}")
-                return deleted_card
+                
+                # Verify the rate card is removed from active results
+                time.sleep(1)  # Small delay for consistency
+                response_after = requests.get(
+                    f"{API_BASE}/rate-cards?creator_id={TEST_CREATOR_ID}",
+                    timeout=15
+                )
+                
+                if response_after.status_code == 200:
+                    final_count = len(response_after.json().get('rateCards', []))
+                    log_test(f"Final rate card count: {final_count}")
+                    
+                    if final_count == initial_count - 1:
+                        log_test(f"   - Rate card successfully removed from active results")
+                        return {"id": rate_card_id, "deleted": True}
+                    else:
+                        log_test(f"❌ Rate card not removed from active results", "ERROR")
+                        return None
+                else:
+                    log_test(f"❌ Failed to verify deletion", "ERROR")
+                    return None
             else:
                 log_test(f"❌ Rate card deletion failed: Invalid response format", "ERROR")
                 return None
