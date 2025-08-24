@@ -40,41 +40,55 @@ def test_health_check():
 
 def create_test_rate_card(deliverable_type="IG_Reel", base_price_cents=50000, currency="USD"):
     """Create a test rate card for deletion testing"""
-    log_test(f"Creating test rate card: {deliverable_type}")
+    log_test(f"Creating test rate card: {deliverable_type} - {currency}")
     
-    rate_card_data = {
-        "creator_id": TEST_CREATOR_ID,
-        "deliverable_type": deliverable_type,
-        "base_price_cents": base_price_cents,
-        "currency": currency,
-        "rush_pct": 25
-    }
+    # Use unique combinations to avoid conflicts
+    unique_combinations = [
+        ("IG_Reel", "MYR"),
+        ("IG_Story", "SGD"), 
+        ("TikTok_Post", "USD"),
+        ("YouTube_Video", "MYR"),
+        ("Bundle", "SGD")
+    ]
     
-    try:
-        response = requests.post(
-            f"{API_BASE}/rate-cards",
-            json=rate_card_data,
-            headers={"Content-Type": "application/json"},
-            timeout=15
-        )
+    # Find an unused combination
+    for combo_type, combo_currency in unique_combinations:
+        rate_card_data = {
+            "creator_id": TEST_CREATOR_ID,
+            "deliverable_type": combo_type,
+            "base_price_cents": base_price_cents + len(TEST_RATE_CARDS) * 1000,  # Vary price
+            "currency": combo_currency,
+            "rush_pct": 25
+        }
         
-        if response.status_code == 201:
-            data = response.json()
-            if data.get('success') and data.get('rateCard'):
-                rate_card = data['rateCard']
-                TEST_RATE_CARDS.append(rate_card)
-                log_test(f"✅ Rate card created: {rate_card['id']}", "SUCCESS")
-                return rate_card
-            else:
-                log_test(f"❌ Rate card creation failed: Invalid response format", "ERROR")
-                return None
-        else:
-            log_test(f"❌ Rate card creation failed: {response.status_code} - {response.text}", "ERROR")
-            return None
+        try:
+            response = requests.post(
+                f"{API_BASE}/rate-cards",
+                json=rate_card_data,
+                headers={"Content-Type": "application/json"},
+                timeout=15
+            )
             
-    except Exception as e:
-        log_test(f"❌ Rate card creation exception: {str(e)}", "ERROR")
-        return None
+            if response.status_code == 201:
+                data = response.json()
+                if data.get('success') and data.get('rateCard'):
+                    rate_card = data['rateCard']
+                    TEST_RATE_CARDS.append(rate_card)
+                    log_test(f"✅ Rate card created: {rate_card['id']} ({combo_type} - {combo_currency})", "SUCCESS")
+                    return rate_card
+                else:
+                    log_test(f"❌ Rate card creation failed: Invalid response format", "ERROR")
+            elif response.status_code == 409:
+                # This combination already exists, try next one
+                continue
+            else:
+                log_test(f"❌ Rate card creation failed: {response.status_code} - {response.text}", "ERROR")
+                
+        except Exception as e:
+            log_test(f"❌ Rate card creation exception: {str(e)}", "ERROR")
+    
+    log_test(f"❌ Could not create rate card - all combinations may be in use", "ERROR")
+    return None
 
 def test_rate_card_deletion_api(rate_card_id):
     """Test the DELETE /api/rate-cards/{id} endpoint"""
