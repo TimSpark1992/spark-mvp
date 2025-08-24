@@ -19,7 +19,8 @@ import {
   Camera,
   Play,
   Package,
-  ArrowLeft
+  ArrowLeft,
+  CheckCircle
 } from 'lucide-react'
 import Link from 'next/link'
 import { getCampaigns } from '@/lib/supabase'
