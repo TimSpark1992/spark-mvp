@@ -33,9 +33,28 @@ def fix_rate_cards_constraint():
     log_message("🔧 FIXING RATE CARDS DATABASE CONSTRAINT")
     log_message("=" * 60)
     
-    # Get Supabase credentials
-    supabase_url = os.getenv('NEXT_PUBLIC_SUPABASE_URL')
-    supabase_service_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
+    # Get Supabase credentials from .env.local file
+    try:
+        with open('/app/.env.local', 'r') as f:
+            env_content = f.read()
+            
+        # Parse environment variables
+        env_vars = {}
+        for line in env_content.strip().split('\n'):
+            if '=' in line and not line.startswith('#'):
+                key, value = line.split('=', 1)
+                env_vars[key.strip()] = value.strip()
+        
+        supabase_url = env_vars.get('NEXT_PUBLIC_SUPABASE_URL')
+        supabase_service_key = env_vars.get('SUPABASE_SERVICE_ROLE_KEY')
+        
+        log_message(f"✅ Loaded environment variables from .env.local")
+        log_message(f"   Supabase URL: {supabase_url[:50]}..." if supabase_url else "   Supabase URL: Missing")
+        log_message(f"   Service Key: {'Present' if supabase_service_key else 'Missing'}")
+        
+    except Exception as e:
+        log_message(f"❌ Error loading .env.local: {str(e)}", "ERROR")
+        return False
     
     if not supabase_url or not supabase_service_key:
         log_message("❌ Missing Supabase environment variables", "ERROR")
