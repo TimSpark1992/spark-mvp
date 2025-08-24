@@ -488,7 +488,43 @@ export default function RateCardsPage() {
 
             {error && (
               <Card className="p-4 mb-6 bg-red-500/20 border border-red-500/20 rounded-lg">
-                <Text className="text-red-400">{error}</Text>
+                <div className="flex items-start gap-3">
+                  <div className="flex-1">
+                    <Text className="text-red-400 mb-3">{error}</Text>
+                    
+                    {/* Add Edit Existing Rate Card option if error suggests duplicate */}
+                    {error.includes('already have a') && error.includes('rate card') && (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => {
+                            // Find and edit the existing rate card
+                            const existingCard = rateCards.find(
+                              card => card.deliverable_type === formData.deliverable_type && 
+                                     card.currency === formData.currency
+                            )
+                            if (existingCard) {
+                              handleEdit(existingCard)
+                              setError('')
+                            }
+                          }}
+                          className="bg-yellow-600/20 border-yellow-500/30 text-yellow-300 hover:bg-yellow-600/30"
+                        >
+                          Edit Existing Rate Card
+                        </Button>
+                        <Button
+                          variant="ghost"  
+                          size="sm"
+                          onClick={() => setError('')}
+                          className="text-gray-400 hover:text-gray-300"
+                        >
+                          Dismiss
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </Card>
             )}
 
