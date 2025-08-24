@@ -350,6 +350,14 @@ export default function RateCardsPage() {
         // Show success modal instead of basic success message
         setShowDeleteSuccessModal(true)
         
+        // Auto-dismiss success modal after 4 seconds
+        setTimeout(() => {
+          if (mounted) {
+            setShowDeleteSuccessModal(false)
+            setDeletedCardInfo(null)
+          }
+        }, 4000)
+        
       } else {
         const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to delete rate card')
