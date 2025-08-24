@@ -199,6 +199,18 @@ backend:
           agent: "testing"
           comment: "✅ CACHE INVALIDATION SUCCESS: Cache properly invalidated on all operations with comprehensive verification. Deletion operations clear cache immediately, multiple time-based checks confirm no stale data (tested over 3 intervals with 1-second delays), removeRateCardFromCache function working correctly, addRateCardToCache and updateRateCardInCache functions operational. Cache invalidation working correctly over time with no persistence of deleted items."
 
+  - task: "Database Unique Constraint Fix for Rate Cards"
+    implemented: false
+    working: false
+    file: "/app/lib/database-setup.sql, /app/create_rate_cards_table.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "🚨 CRITICAL DATABASE BUG CONFIRMED: The rate_cards table has a unique constraint UNIQUE(creator_id, deliverable_type, currency) that applies to ALL records including soft-deleted ones. This prevents users from recreating rate cards after deletion. SPECIFIC ISSUE: User cannot create YouTube Video USD rate card despite no active card existing - blocked by constraint checking soft-deleted records. ROOT CAUSE: Constraint in /app/create_rate_cards_table.py line 66 does not include 'WHERE active = true' condition. REQUIRED FIX: Replace constraint with partial unique index that only applies to active records. SQL COMMANDS NEEDED: 1) ALTER TABLE rate_cards DROP CONSTRAINT rate_cards_creator_id_deliverable_type_currency_key; 2) CREATE UNIQUE INDEX rate_cards_unique_active ON rate_cards (creator_id, deliverable_type, currency) WHERE active = true; This is the exact bug reported in the review request and requires immediate database schema fix."
+
 frontend:
   - task: "Campaign Data Persistence Fixes"
     implemented: true
