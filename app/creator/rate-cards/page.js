@@ -792,6 +792,71 @@ export default function RateCardsPage() {
             </div>
           )}
 
+          {/* Delete Success Modal */}
+          {showDeleteSuccessModal && deletedCardInfo && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-[#1A1A2A] border border-white/10 rounded-2xl max-w-md w-full mx-4 shadow-2xl transform animate-in fade-in-50 zoom-in-95 duration-200">
+                <div className="p-8">
+                  {/* Success Icon */}
+                  <div className="flex items-center justify-center mb-6">
+                    <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-8 h-8 text-green-400" />
+                    </div>
+                  </div>
+                  
+                  {/* Success Title */}
+                  <div className="text-center mb-6">
+                    <Heading level={3} size="xl" className="text-white mb-3">
+                      Rate Card Deleted Successfully!
+                    </Heading>
+                    <Text size="sm" color="secondary" className="text-gray-300 mb-4">
+                      Your <span className="font-semibold text-white">{deletedCardInfo.type}</span> rate card 
+                      ({deletedCardInfo.price}) has been permanently removed from your profile.
+                    </Text>
+                    
+                    {/* Deleted Card Summary */}
+                    <div className="bg-[#2A2A3A] rounded-lg p-4 mb-4">
+                      <div className="flex items-center justify-center gap-2 text-sm">
+                        <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span className="text-gray-400">Permanently Deleted</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => {
+                        setShowDeleteSuccessModal(false)
+                        setDeletedCardInfo(null)
+                      }}
+                    >
+                      Continue Managing
+                    </Button>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="flex-1 bg-gradient-to-r from-[#8A2BE2] to-[#FF1493] hover:from-[#7A1BD2] to-[#E01483]"
+                      onClick={() => {
+                        setShowDeleteSuccessModal(false)
+                        setDeletedCardInfo(null)
+                        // Fast navigation to dashboard
+                        window.location.href = '/creator/dashboard'
+                      }}
+                    >
+                      Back to Dashboard
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           </Container>
         </Section>
       </Layout>
