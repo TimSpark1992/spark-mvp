@@ -267,14 +267,22 @@ export default function RateCardsPage() {
 
       console.log('✅ Rate card saved:', data.rateCard?.id)
       
-      // Update local state
+      // Update local state and cache systematically
       if (editingCard) {
-        setRateCards(prev => prev.map(card => 
+        // Update existing rate card in both state and cache
+        const updatedRateCards = rateCards.map(card => 
           card.id === editingCard.id ? data.rateCard : card
-        ))
+        )
+        setRateCards(updatedRateCards)
+        updateRateCardsCache(profile.id, updatedRateCards)
+        console.log('💾 Rate card updated in cache')
         setSuccess('Rate card updated successfully!')
       } else {
-        setRateCards(prev => [...prev, data.rateCard])
+        // Add new rate card to both state and cache
+        const updatedRateCards = [...rateCards, data.rateCard]
+        setRateCards(updatedRateCards)
+        updateRateCardsCache(profile.id, updatedRateCards)
+        console.log('💾 Rate card added to cache')
         setSuccess('Rate card created successfully!')
       }
 
