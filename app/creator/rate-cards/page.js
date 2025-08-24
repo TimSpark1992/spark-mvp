@@ -49,6 +49,7 @@ const CURRENCIES = [
 ]
 
 export default function RateCardsPage() {
+  const router = useRouter()
   const { profile, loading: authLoading } = useAuth()
   const [rateCards, setRateCards] = useState([])
   const [loading, setLoading] = useState(true)
