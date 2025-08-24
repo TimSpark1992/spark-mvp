@@ -384,6 +384,8 @@ export default function RateCardsPage() {
       }
     }
   }, [profile?.id])
+
+  const getAvailableDeliverableTypes = () => {
     const usedTypes = rateCards
       .filter(card => card.currency === formData.currency)
       .map(card => card.deliverable_type)
