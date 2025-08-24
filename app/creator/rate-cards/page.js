@@ -853,10 +853,17 @@ export default function RateCardsPage() {
                       size="sm"
                       className="flex-1 bg-gradient-to-r from-[#8A2BE2] to-[#FF1493] hover:from-[#7A1BD2] to-[#E01483]"
                       onClick={() => {
+                        console.log('📱 Navigating to dashboard from delete success modal...')
                         setShowDeleteSuccessModal(false)
                         setDeletedCardInfo(null)
-                        // Fast navigation to dashboard
-                        window.location.href = '/creator/dashboard'
+                        try {
+                          // Use Next.js router for proper client-side navigation
+                          router.push('/creator/dashboard')
+                        } catch (error) {
+                          console.error('❌ Navigation error:', error)
+                          // Fallback to window location only if router fails
+                          window.location.href = '/creator/dashboard'
+                        }
                       }}
                     >
                       Back to Dashboard
