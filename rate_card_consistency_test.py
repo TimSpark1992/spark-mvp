@@ -22,7 +22,7 @@ import time
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://4f187fa2-e698-4163-ab14-cb3017f6b9af.preview.emergentagent.com"
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 # Test creator ID from previous tests
