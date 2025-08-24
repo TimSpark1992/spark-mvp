@@ -2236,15 +2236,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Admin Platform Settings API"
-    - "Manual Payouts Management API"
-    - "Admin User Management API"
-    - "Platform Analytics API"
-    - "Admin Dashboard Component"
-    - "Platform Settings Component"
-    - "Manual Payout Controls"
-    - "Admin Analytics Dashboard"
-  stuck_tasks: []
+    - "Database Unique Constraint Fix for Rate Cards"
+  stuck_tasks:
+    - "Database Unique Constraint Fix for Rate Cards"
+  test_all: false
+  test_priority: "critical_first"
   test_all: false
   test_priority: "high_first"
 
