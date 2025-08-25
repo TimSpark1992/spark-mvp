@@ -28,11 +28,12 @@ import Link from 'next/link'
 export default function ConversationPage() {
   const params = useParams()
   const router = useRouter()
-  const { profile } = useAuth()
+  const { profile, loading: authLoading } = useAuth()
   const [conversation, setConversation] = useState(null)
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(true)
+  const [dataLoaded, setDataLoaded] = useState(false)
   const [sendingMessage, setSendingMessage] = useState(false)
   const messagesEndRef = useRef(null)
 
