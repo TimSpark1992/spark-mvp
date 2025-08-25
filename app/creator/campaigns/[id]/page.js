@@ -249,13 +249,23 @@ export default function CampaignDetailsPage() {
     }
   }
 
-  if (loading) {
+  if (loading && !dataLoaded) {
     return (
-      <Layout variant="app">
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2]"></div>
-        </div>
-      </Layout>
+      <ProtectedRoute requiredRole="creator">
+        <Layout variant="app">
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2] mx-auto"></div>
+              <Text size="lg" color="secondary">Loading campaign details...</Text>
+              <Text size="sm" color="secondary">
+                {authLoading ? 'Authenticating...' : 
+                 !profile?.id ? 'Loading profile...' : 
+                 'Fetching campaign information...'}
+              </Text>
+            </div>
+          </div>
+        </Layout>
+      </ProtectedRoute>
     )
   }
 
