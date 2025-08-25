@@ -30,9 +30,10 @@ import Link from 'next/link'
 export default function CampaignDetailsPage() {
   const params = useParams()
   const router = useRouter()
-  const { profile } = useAuth()
+  const { profile, loading: authLoading } = useAuth()
   const [campaign, setCampaign] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [dataLoaded, setDataLoaded] = useState(false)
   const [applicationLoading, setApplicationLoading] = useState(false)
   const [hasApplied, setHasApplied] = useState(false)
   const [applicationStatus, setApplicationStatus] = useState(null)
