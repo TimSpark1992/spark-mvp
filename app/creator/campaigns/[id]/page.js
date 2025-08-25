@@ -47,42 +47,118 @@ export default function CampaignDetailsPage() {
   })
 
   useEffect(() => {
+    let mounted = true
+    
     const loadCampaignAndApplication = async () => {
+      // Only load if we have campaign ID, profile, and haven't loaded yet
+      if (!params.id || authLoading || dataLoaded) {
+        return
+      }
+
       try {
-        // Get campaign details
-        const { data: campaignsData, error: campaignError } = await getCampaigns()
-        if (campaignError) throw new Error(campaignError.message)
+        console.log('📋 Loading campaign details for ID:', params.id)
+        setLoading(true)
+        setError('')
 
-        const foundCampaign = campaignsData.find(c => c.id === params.id)
-        if (!foundCampaign) {
-          router.push('/creator/campaigns')
-          return
-        }
-        setCampaign(foundCampaign)
+        // Add timeout protection (systematic fix pattern)
+        const loadTimeout = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Campaign loading timed out after 10 seconds')), 10000)
+        )
 
-        // Check if creator has already applied
-        if (profile?.id) {
-          const { data: applicationsData, error: appError } = await getCreatorApplications(profile.id)
-          if (appError) throw new Error(appError.message)
-
-          const existingApplication = applicationsData.find(app => app.campaign_id === params.id)
-          if (existingApplication) {
-            setHasApplied(true)
-            setApplicationStatus(existingApplication.status)
+        // Get campaign details with timeout protection
+        const campaignPromise = getCampaigns().then(result => {
+          if (!mounted) return { data: [], error: null }
+          
+          if (result.error) throw new Error(result.error.message)
+          
+          const foundCampaign = result.data.find(c => c.id === params.id)
+          if (!foundCampaign) {
+            console.warn('⚠️ Campaign not found, redirecting to campaigns list')
+            router.push('/creator/campaigns')
+            return { data: [], error: null }
           }
+          
+          setCampaign(foundCampaign)
+          console.log('✅ Campaign loaded successfully:', foundCampaign.title)
+          return result
+        })
+
+        // Check if creator has already applied (only if profile exists)
+        let applicationPromise = Promise.resolve({ data: [], error: null })
+        if (profile?.id) {
+          applicationPromise = getCreatorApplications(profile.id).then(result => {
+            if (!mounted) return { data: [], error: null }
+            
+            if (result.error) throw new Error(result.error.message)
+            
+            const existingApplication = result.data.find(app => app.campaign_id === params.id)
+            if (existingApplication) {
+              setHasApplied(true)
+              setApplicationStatus(existingApplication.status)
+              console.log('✅ Found existing application:', existingApplication.status)
+            }
+            
+            return result
+          })
         }
+
+        // Wait for both with timeout protection
+        await Promise.race([
+          Promise.all([campaignPromise, applicationPromise]),
+          loadTimeout
+        ])
+
+        if (mounted) {
+          setDataLoaded(true)
+          console.log('🎉 Campaign and application data loaded successfully')
+        }
+
       } catch (error) {
-        console.error('Error loading campaign:', error)
-        setError(error.message)
+        console.error('❌ Error loading campaign:', error)
+        if (mounted) {
+          if (error.message.includes('timed out')) {
+            setError('Loading timed out. Please check your connection and try again.')
+          } else {
+            setError(error.message || 'Failed to load campaign details')
+          }
+          setDataLoaded(true) // Prevent retry loops
+        }
       } finally {
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+          console.log('🔄 Campaign loading state cleared')
+        }
       }
     }
 
-    if (params.id && profile?.id) {
-      loadCampaignAndApplication()
+    // Add safety timeout (systematic fix pattern)
+    const safetyTimeout = setTimeout(() => {
+      if (mounted && loading && !dataLoaded) {
+        console.warn('⚠️ Campaign safety timeout - forcing loading to false')
+        setLoading(false)
+      }
+    }, 15000) // 15 second safety net
+
+    loadCampaignAndApplication()
+
+    return () => {
+      mounted = false
+      clearTimeout(safetyTimeout)
     }
-  }, [params.id, profile?.id, router])
+  }, [params.id, profile?.id, authLoading, dataLoaded, router])
+
+  // Add additional loading protection based on profile availability
+  useEffect(() => {
+    // If we have profile and campaign ID but loading is still true after 8 seconds, force it to false
+    if (profile && params.id && loading && !authLoading) {
+      const forceLoadTimeout = setTimeout(() => {
+        console.warn('⚠️ Forcing campaign loading to false due to profile availability')
+        setLoading(false)
+      }, 8000) // 8 seconds for detail pages
+      
+      return () => clearTimeout(forceLoadTimeout)
+    }
+  }, [profile, params.id, loading, authLoading])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
