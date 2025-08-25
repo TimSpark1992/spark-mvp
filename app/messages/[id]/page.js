@@ -42,36 +42,108 @@ export default function ConversationPage() {
   }
 
   useEffect(() => {
+    let mounted = true
+    
     const loadConversationAndMessages = async () => {
-      if (!profile?.id || !params.id) return
+      // Only load if we have conversation ID, profile, and haven't loaded yet
+      if (!params.id || !profile?.id || authLoading || dataLoaded) {
+        return
+      }
 
       try {
-        // Get conversation details
-        const { data: conversationsData, error: convError } = await getUserConversations(profile.id)
-        if (convError) throw new Error(convError.message)
+        console.log('💬 Loading conversation and messages for ID:', params.id)
+        setLoading(true)
 
-        const foundConversation = conversationsData?.find(c => c.id === params.id)
-        if (!foundConversation) {
-          router.push('/messages')
-          return
+        // Add timeout protection (systematic fix pattern)
+        const loadTimeout = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Messages loading timed out after 10 seconds')), 10000)
+        )
+
+        // Get conversation details with timeout protection
+        const conversationPromise = getUserConversations(profile.id).then(result => {
+          if (!mounted) return { data: [], error: null }
+          
+          if (result.error) throw new Error(result.error.message)
+
+          const foundConversation = result.data?.find(c => c.id === params.id)
+          if (!foundConversation) {
+            console.warn('⚠️ Conversation not found, redirecting to messages list')
+            router.push('/messages')
+            return { data: [], error: null }
+          }
+          setConversation(foundConversation)
+          console.log('✅ Conversation loaded successfully')
+          return result
+        })
+
+        // Get messages with timeout protection
+        const messagesPromise = getConversationMessages(params.id).then(result => {
+          if (!mounted) return { data: [], error: null }
+          
+          if (result.error) throw new Error(result.error.message)
+          
+          setMessages(result.data || [])
+          console.log('✅ Messages loaded:', result.data?.length || 0)
+          return result
+        })
+
+        // Wait for both with timeout protection
+        await Promise.race([
+          Promise.all([conversationPromise, messagesPromise]),
+          loadTimeout
+        ])
+
+        if (mounted) {
+          setDataLoaded(true)
+          console.log('🎉 Conversation and messages loaded successfully')
         }
-        setConversation(foundConversation)
-
-        // Get messages
-        const { data: messagesData, error: msgError } = await getConversationMessages(params.id)
-        if (msgError) throw new Error(msgError.message)
-        setMessages(messagesData || [])
 
       } catch (error) {
-        console.error('Error loading conversation:', error)
-        router.push('/messages')
+        console.error('❌ Error loading conversation:', error)
+        if (mounted) {
+          if (error.message.includes('timed out')) {
+            console.error('Messages loading timed out')
+          } else {
+            console.error('Failed to load conversation, redirecting to messages')
+            router.push('/messages')
+          }
+          setDataLoaded(true) // Prevent retry loops
+        }
       } finally {
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+          console.log('🔄 Messages loading state cleared')
+        }
       }
     }
 
+    // Add safety timeout (systematic fix pattern)
+    const safetyTimeout = setTimeout(() => {
+      if (mounted && loading && !dataLoaded) {
+        console.warn('⚠️ Messages safety timeout - forcing loading to false')
+        setLoading(false)
+      }
+    }, 15000) // 15 second safety net
+
     loadConversationAndMessages()
-  }, [params.id, profile?.id, router])
+
+    return () => {
+      mounted = false
+      clearTimeout(safetyTimeout)
+    }
+  }, [params.id, profile?.id, authLoading, dataLoaded, router])
+
+  // Add additional loading protection
+  useEffect(() => {
+    if (profile && params.id && loading && !authLoading) {
+      const forceLoadTimeout = setTimeout(() => {
+        console.warn('⚠️ Forcing messages loading to false due to profile availability')
+        setLoading(false)
+      }, 8000)
+      
+      return () => clearTimeout(forceLoadTimeout)
+    }
+  }, [profile, params.id, loading, authLoading])
 
   useEffect(() => {
     scrollToBottom()
