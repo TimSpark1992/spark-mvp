@@ -42,49 +42,117 @@ export default function ViewCampaignPage() {
     : `https://sparkplatform.tech/creator/campaigns/${campaignId}`
 
   useEffect(() => {
+    let mounted = true
+    
     const loadCampaignData = async () => {
+      // Only load if we have campaign ID, profile, and haven't loaded yet
+      if (!campaignId || !profile?.id || authLoading || dataLoaded) {
+        return
+      }
+
       try {
-        console.log('🔄 Loading campaign data for:', campaignId)
-        
-        if (profile?.id && campaignId) {
-          // Get all brand campaigns and find the specific one
-          const { data: campaignsData, error: campaignsError } = await getBrandCampaigns(profile.id)
+        console.log('🔄 Loading brand campaign data for:', campaignId)
+        setLoading(true)
+
+        // Add timeout protection (systematic fix pattern)
+        const loadTimeout = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Campaign loading timed out after 10 seconds')), 10000)
+        )
+
+        // Get campaigns with timeout protection
+        const campaignsPromise = getBrandCampaigns(profile.id).then(result => {
+          if (!mounted) return { data: [], error: null }
           
-          if (campaignsError) {
-            console.error('❌ Error fetching campaigns:', campaignsError)
-            return
+          if (result.error) {
+            console.error('❌ Error fetching campaigns:', result.error)
+            throw new Error(result.error.message || 'Failed to load campaigns')
           }
           
-          const foundCampaign = campaignsData?.find(c => c.id === campaignId)
+          const foundCampaign = result.data?.find(c => c.id === campaignId)
           
           if (foundCampaign) {
             setCampaign(foundCampaign)
-            console.log('✅ Campaign loaded:', foundCampaign.title)
-            
-            // Load applications for this campaign
-            const { data: applicationsData, error: applicationsError } = await getCampaignApplications(campaignId)
-            
-            if (applicationsError) {
-              console.error('❌ Error fetching applications:', applicationsError)
-            } else {
-              setApplications(applicationsData || [])
-              console.log('✅ Applications loaded:', applicationsData?.length || 0)
-            }
+            console.log('✅ Brand campaign loaded:', foundCampaign.title)
           } else {
             console.log('❌ Campaign not found')
+            throw new Error('Campaign not found')
           }
+          
+          return result
+        })
+
+        // Load applications with timeout protection
+        const applicationsPromise = getCampaignApplications(campaignId).then(result => {
+          if (!mounted) return { data: [], error: null }
+          
+          if (result.error) {
+            console.error('❌ Error fetching applications:', result.error)
+            // Don't throw error for applications - campaign can exist without applications
+          } else {
+            setApplications(result.data || [])
+            console.log('✅ Applications loaded:', result.data?.length || 0)
+          }
+          
+          return result
+        })
+
+        // Wait for both with timeout protection
+        await Promise.race([
+          Promise.all([campaignsPromise, applicationsPromise]),
+          loadTimeout
+        ])
+
+        if (mounted) {
+          setDataLoaded(true)
+          console.log('🎉 Brand campaign and applications loaded successfully')
         }
+
       } catch (error) {
         console.error('❌ Error loading campaign data:', error)
+        if (mounted) {
+          // Handle specific error cases
+          if (error.message.includes('timed out')) {
+            console.error('Campaign loading timed out')
+          } else if (error.message.includes('not found')) {
+            console.error('Campaign not found')
+          }
+          setDataLoaded(true) // Prevent retry loops
+        }
       } finally {
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+          console.log('🔄 Brand campaign loading state cleared')
+        }
       }
     }
 
-    if (profile?.id && campaignId) {
-      loadCampaignData()
+    // Add safety timeout (systematic fix pattern)
+    const safetyTimeout = setTimeout(() => {
+      if (mounted && loading && !dataLoaded) {
+        console.warn('⚠️ Brand campaign safety timeout - forcing loading to false')
+        setLoading(false)
+      }
+    }, 15000) // 15 second safety net
+
+    loadCampaignData()
+
+    return () => {
+      mounted = false
+      clearTimeout(safetyTimeout)
     }
-  }, [profile?.id, campaignId])
+  }, [profile?.id, campaignId, authLoading, dataLoaded])
+
+  // Add additional loading protection
+  useEffect(() => {
+    if (profile && campaignId && loading && !authLoading) {
+      const forceLoadTimeout = setTimeout(() => {
+        console.warn('⚠️ Forcing brand campaign loading to false due to profile availability')
+        setLoading(false)
+      }, 8000)
+      
+      return () => clearTimeout(forceLoadTimeout)
+    }
+  }, [profile, campaignId, loading, authLoading])
 
   const getStatusColor = (status) => {
     switch (status) {
