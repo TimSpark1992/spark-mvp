@@ -93,9 +93,9 @@ function LoginForm() {
     try {
       console.log('🔄 Starting login process for:', email)
       
-      // Enhanced timeout handling with better error messages (increased for production network conditions)
+      // Enhanced timeout handling with systematic loading fixes (reduced from 30s to 15s)
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Login request timed out. Please check your internet connection and try again.')), 30000)
+        setTimeout(() => reject(new Error('Login request timed out. Please check your internet connection and try again.')), 15000)
       )
 
       const loginPromise = signIn(email, password)
