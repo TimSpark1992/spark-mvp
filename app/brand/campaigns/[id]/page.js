@@ -30,10 +30,11 @@ import Link from 'next/link'
 
 export default function ViewCampaignPage() {
   const { id: campaignId } = useParams()
-  const { profile } = useAuth()
+  const { profile, loading: authLoading } = useAuth()
   const [campaign, setCampaign] = useState(null)
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
+  const [dataLoaded, setDataLoaded] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
 
   const shareUrl = typeof window !== 'undefined' 
