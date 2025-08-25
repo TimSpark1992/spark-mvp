@@ -71,9 +71,17 @@ export default function CampaignDetailsPage() {
           
           if (result.error) throw new Error(result.error.message)
           
-          const foundCampaign = result.data.find(c => c.id === params.id)
+          console.log('🔍 Debug - Looking for campaign ID:', params.id, typeof params.id)
+          console.log('🔍 Debug - Available campaigns:', result.data.map(c => ({ id: c.id, type: typeof c.id, title: c.title })))
+          
+          const foundCampaign = result.data.find(c => {
+            console.log('🔍 Debug - Comparing:', c.id, '===', params.id, '?', c.id === params.id)
+            return c.id === params.id
+          })
+          
           if (!foundCampaign) {
             console.warn('⚠️ Campaign not found, redirecting to campaigns list')
+            console.warn('⚠️ Searched for ID:', params.id, 'in', result.data.length, 'campaigns')
             router.push('/creator/campaigns')
             return { data: [], error: null }
           }
