@@ -459,7 +459,7 @@ class SystematicLoadingBackendTester:
             status = "✅" if result['success'] else "❌"
             timing = f" ({result['response_time']:.3f}s)" if result['response_time'] else ""
             print(f"{status} {result['test']}{timing}")
-            if not result['success'] or result.get('response_time', 0) > 5:
+            if not result['success'] or (result.get('response_time') is not None and result.get('response_time', 0) > 5):
                 print(f"    {result['details']}")
         
         total_time = time.time() - self.start_time
