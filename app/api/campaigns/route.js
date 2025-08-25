@@ -1,39 +1,23 @@
 import { NextResponse } from 'next/server'
+import { getCampaigns } from '@/lib/supabase'
 
 export async function GET(request) {
   try {
     console.log('📡 API: GET /api/campaigns called')
     
-    // Return sample campaigns data to test the fix
-    const campaigns = [
-      {
-        id: '1',
-        title: 'Fashion Photography Campaign',
-        description: 'Looking for fashion influencers to showcase our new summer collection',
-        category: 'Fashion & Beauty',
-        budget_range: '$2,500 - $5,000',
-        application_deadline: '2025-09-15',
-        created_at: '2025-08-15',
-        profiles: {
-          company_name: 'Sample Fashion Brand',
-        }
-      },
-      {
-        id: '2', 
-        title: 'Tech Review Campaign',
-        description: 'Need tech reviewers for our latest smartphone release',
-        category: 'Technology',
-        budget_range: '$1,000 - $2,500',
-        application_deadline: '2025-09-30',
-        created_at: '2025-08-16',
-        profiles: {
-          company_name: 'TechCorp',
-        }
-      }
-    ]
+    // Get real campaigns from database instead of hardcoded data
+    const { data: campaigns, error } = await getCampaigns()
     
-    console.log('✅ API: Sample campaigns returned:', campaigns.length)
-    return NextResponse.json({ campaigns })
+    if (error) {
+      console.error('❌ API: Error fetching campaigns from database:', error)
+      return NextResponse.json(
+        { error: 'Failed to fetch campaigns', details: error.message },
+        { status: 500 }
+      )
+    }
+    
+    console.log('✅ API: Real campaigns returned from database:', campaigns?.length || 0)
+    return NextResponse.json({ campaigns: campaigns || [] })
 
   } catch (error) {
     console.error('❌ API: Exception in GET /api/campaigns:', error)
