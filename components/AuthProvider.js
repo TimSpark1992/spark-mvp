@@ -21,56 +21,97 @@ export function AuthProvider({ children }) {
   const router = useRouter()
 
   useEffect(() => {
-    // Get initial user with faster timeout for unauthenticated users
-    const authTimeout = setTimeout(() => {
-      console.log('⚠️ Auth timeout - assuming no user')
-      setUser(null)
-      setProfile(null)
-      setLoading(false)
-    }, 5000) // 5 second timeout for auth check
+    let isMounted = true
     
-    getCurrentUser().then(async ({ user, error }) => {
-      clearTimeout(authTimeout) // Clear timeout since we got a response
-      
-      if (user) {
-        setUser(user)
-        // Get user profile with retry mechanism
-        let profile = null
-        let retryCount = 0
-        const maxRetries = 3
+    // Initial auth check with improved session rehydration
+    const initializeAuth = async () => {
+      try {
+        console.log('🔄 AuthProvider: Initializing authentication...')
         
-        while (!profile && retryCount < maxRetries) {
-          const { data: profileData, error: profileError } = await getProfile(user.id)
+        // Add additional timeout protection for authentication (systematic fix pattern)
+        const authTimeout = setTimeout(() => {
+          if (isMounted) {
+            console.warn('⚠️ Auth initialization timed out after 10 seconds')
+            setLoading(false)
+          }
+        }, 10000)
+        
+        // Get current session with better error handling
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error('❌ Session retrieval error:', sessionError)
+          if (isMounted) {
+            setUser(null)
+            setProfile(null)
+            setLoading(false)
+          }
+          clearTimeout(authTimeout)
+          return
+        }
+        
+        if (session?.user) {
+          console.log('✅ Session found for user:', session.user.email)
           
-          if (profileData) {
-            profile = profileData
-            setProfile(profile)
-            break
-          } else if (profileError) {
-            console.warn(`Initial profile retrieval attempt ${retryCount + 1} failed:`, profileError)
+          if (isMounted) {
+            setUser(session.user)
           }
           
-          retryCount++
-          // Wait before retry (increasing delay)
-          if (retryCount < maxRetries) {
-            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount))
+          // Get user profile with retry mechanism
+          let profile = null
+          let retryCount = 0
+          const maxRetries = 3
+          
+          while (!profile && retryCount < maxRetries && isMounted) {
+            try {
+              const { data: profileData, error: profileError } = await getProfile(session.user.id)
+              
+              if (profileData && isMounted) {
+                profile = profileData
+                setProfile(profileData)
+                console.log('✅ Profile loaded successfully:', profileData.role)
+                break
+              } else if (profileError) {
+                console.warn(`Profile retrieval attempt ${retryCount + 1} failed:`, profileError)
+              }
+            } catch (profileErr) {
+              console.warn(`Profile retrieval attempt ${retryCount + 1} error:`, profileErr)
+            }
+            
+            retryCount++
+            // Wait before retry (increasing delay)
+            if (retryCount < maxRetries && isMounted) {
+              await new Promise(resolve => setTimeout(resolve, 1000 * retryCount))
+            }
+          }
+          
+          if (!profile && isMounted) {
+            console.warn('⚠️ Profile retrieval failed after all retries for user:', session.user.id)
+          }
+        } else {
+          console.log('🔓 No active session found')
+          if (isMounted) {
+            setUser(null)
+            setProfile(null)
           }
         }
         
-        if (!profile) {
-          console.warn('Initial profile retrieval failed after all retries for user:', user.id)
+        if (isMounted) {
+          setLoading(false)
         }
-      } else {
-        console.log('🔓 No user authenticated - redirecting to login')
+        clearTimeout(authTimeout)
+        
+      } catch (error) {
+        console.error('❌ Auth initialization error:', error)
+        if (isMounted) {
+          setUser(null)
+          setProfile(null)
+          setLoading(false)
+        }
       }
-      setLoading(false)
-    }).catch((err) => {
-      clearTimeout(authTimeout)
-      console.error('❌ Auth check error:', err)
-      setUser(null)
-      setProfile(null) 
-      setLoading(false)
-    })
+    }
+
+    initializeAuth()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
