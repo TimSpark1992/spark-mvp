@@ -520,13 +520,8 @@ export default function CreatorProfilePage() {
       
       console.log('📊 Sanitized data for profile update:', sanitizedData)
       
-      // Add timeout protection for profile update (systematic fix pattern)
-      const updateTimeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Profile update timed out after 15 seconds')), 15000)
-      )
-      
-      const updatePromise = updateProfile(profile.id, sanitizedData)
-      const updateResult = await Promise.race([updatePromise, updateTimeout])
+      // Simple profile update without aggressive timeout
+      const updateResult = await updateProfile(profile.id, sanitizedData)
       
       console.log('📊 Profile update result:', updateResult)
       
@@ -543,15 +538,10 @@ export default function CreatorProfilePage() {
 
       console.log('✅ Creator profile update successful, refreshing profile...')
       
-      // Add timeout protection for profile refresh (systematic fix pattern)
+      // Simple profile refresh without aggressive timeout
       try {
         if (refreshProfile && typeof refreshProfile === 'function') {
-          const refreshTimeout = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Profile refresh timed out after 10 seconds')), 10000)
-          )
-          
-          const refreshPromise = refreshProfile()
-          await Promise.race([refreshPromise, refreshTimeout])
+          await refreshProfile()
           console.log('✅ Profile refresh completed successfully')
         } else {
           console.warn('⚠️ refreshProfile function not available, skipping refresh')
