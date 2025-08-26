@@ -153,11 +153,38 @@ export default function Navbar({ variant = 'landing', role = null }) {
                   {item.name}
                 </Link>
               ))}
-              <Link href="/auth/signup">
-                <Button variant="primary" size="sm" className="w-full">
-                  Sign Up
-                </Button>
-              </Link>
+              
+              {/* Mobile Auth Actions */}
+              {isAuthenticated ? (
+                <div className="space-y-3 pt-2 border-t border-white/10">
+                  {/* User Info */}
+                  <div className="flex items-center gap-2 text-sm text-gray-300 px-2">
+                    <User className="w-4 h-4" />
+                    <span>{profile?.full_name || profile?.company_name || user?.email || 'User'}</span>
+                  </div>
+                  
+                  {/* Logout Button */}
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    className="w-full bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
+                    onClick={() => {
+                      setIsMenuOpen(false)
+                      handleLogout()
+                    }}
+                    disabled={isLoggingOut}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    {isLoggingOut ? 'Logging out...' : 'Logout'}
+                  </Button>
+                </div>
+              ) : (
+                <Link href="/auth/signup">
+                  <Button variant="primary" size="sm" className="w-full">
+                    Sign Up
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         )}
