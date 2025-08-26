@@ -555,26 +555,13 @@ export default function CreatorProfilePage() {
       setShowSuccessModal(true)
       console.log('🎉 Creator profile save completed successfully')
       
-      // Auto-hide success modal after 3 seconds
-      setTimeout(() => {
-        setShowSuccessModal(false)
-        setSuccess('')
-      }, 3000)
-      
-      // Force loading state to false after 1 second as additional protection
-      setTimeout(() => {
-        setLoading(false)
-      }, 1000)
-      
     } catch (error) {
       console.error('❌ Creator profile save failed:', error)
       
       // Provide specific error messages based on error type (systematic fix pattern)
       let errorMessage = 'Failed to update profile'
       
-      if (error.message.includes('timed out')) {
-        errorMessage = 'Profile save timed out. Please check your internet connection and try again.'
-      } else if (error.message.includes('network') || error.message.includes('fetch')) {
+      if (error.message.includes('network') || error.message.includes('fetch')) {
         errorMessage = 'Network error occurred. Please check your connection and try again.'
       } else if (error.message.includes('validation')) {
         errorMessage = 'Please check your input and try again.'
