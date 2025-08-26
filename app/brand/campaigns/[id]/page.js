@@ -77,25 +77,33 @@ export default function ViewCampaignPage() {
         }, 10000) // Reduced from 20s to 10s for faster loading
 
         try {
-          const [campaignData, applicationsData] = await Promise.all([
-            getBrandCampaigns(),
-            getCampaignApplications(campaignId).catch(err => {
-              console.warn('Failed to load applications:', err)
-              return [] // Fallback to empty array
-            })
-          ])
+          // Load specific campaign directly
+          const campaignResponse = await fetch(`/api/campaigns/${campaignId}`)
+          let foundCampaign = null
+          
+          if (campaignResponse.ok) {
+            const campaignResult = await campaignResponse.json()
+            foundCampaign = campaignResult.campaign
+          } else {
+            console.warn('Direct campaign API failed, falling back to getBrandCampaigns')
+            // Fallback to searching through all campaigns
+            const campaignData = await getBrandCampaigns()
+            foundCampaign = campaignData?.find(c => c.id === campaignId)
+          }
+
+          // Load applications
+          const applicationsData = await getCampaignApplications(campaignId).catch(err => {
+            console.warn('Failed to load applications:', err)
+            return [] // Fallback to empty array
+          })
 
           if (!mounted) return
-
-          // Find the specific campaign
-          const foundCampaign = campaignData?.find(c => c.id === campaignId)
           
           if (foundCampaign) {
             setCampaign(foundCampaign)
             console.log('Campaign found:', foundCampaign.title)
           } else {
             console.error('Campaign not found with ID:', campaignId)
-            console.log('Available campaigns:', campaignData?.map(c => ({ id: c.id, title: c.title })))
           }
 
           setApplications(applicationsData || [])
