@@ -140,7 +140,7 @@ backend:
     implemented: true
     working: false
     file: "/app/app/api/campaigns/route.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -150,6 +150,9 @@ backend:
         - working: false
           agent: "testing"
           comment: "❌ CRITICAL BUG IDENTIFIED: Campaign creation API failing with HTTP 500 'getCurrentUser is not defined' error. Import issue in /app/app/api/campaigns/route.js where getCurrentUser function is not properly imported from supabase.js. This prevents all campaign creation attempts and is the root cause of the user-reported issue where previous campaigns disappear (due to clearCampaignCache() being called when API fails)."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL IMPORT BUG PERSISTS (January 26, 2025): Campaign creation API still failing with 'getCurrentUser is not defined' error despite function being properly exported from supabase.js. Applied local fix by defining getCurrentUser directly in route.js to bypass import issues. This is a deployment/build issue where the import is not resolving correctly. Campaign creation remains blocked until this import issue is resolved."
 
   - task: "Campaign Cache Management System"
     implemented: true
