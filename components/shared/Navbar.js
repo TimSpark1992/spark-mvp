@@ -114,7 +114,7 @@ export default function Navbar({ variant = 'landing', role = null }) {
                   size="sm"
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
+                  className="border-red-500/50 text-red-300 hover:bg-red-500/20 hover:border-red-400"
                 >
                   <LogOut className="w-4 h-4 mr-1" />
                   {isLoggingOut ? 'Logging out...' : 'Logout'}
