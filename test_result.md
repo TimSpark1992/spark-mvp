@@ -2380,13 +2380,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Database Unique Constraint Fix for Rate Cards"
+    - "Campaign Creation API Function"
+    - "Campaign Cache Management System"
+    - "Campaign Data Consistency Verification"
   stuck_tasks:
-    - "Database Unique Constraint Fix for Rate Cards"
+    - "Campaign Creation API Function"
   test_all: false
   test_priority: "critical_first"
-  test_all: false
-  test_priority: "high_first"
 
 agent_communication:
     -agent: "testing"
