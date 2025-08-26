@@ -250,14 +250,20 @@ export default function EditCampaignPage() {
     }
   }
 
-  if (loading) {
+  if (loading && !dataLoaded) {
     return (
       <ProtectedRoute requiredRole="brand">
         <Layout>
           <Container>
             <div className="py-8">
               <Card className="p-12 text-center">
-                <Text>Loading campaign...</Text>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8A2BE2] mx-auto mb-4"></div>
+                <Text size="lg" color="secondary">Loading campaign for editing...</Text>
+                <Text size="sm" color="secondary" className="mt-2">
+                  {authLoading ? 'Authenticating...' : 
+                   !profile?.id ? 'Loading profile...' : 
+                   'Fetching campaign data...'}
+                </Text>
               </Card>
             </div>
           </Container>
