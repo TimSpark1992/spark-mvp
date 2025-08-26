@@ -24,7 +24,10 @@ import {
   Pause,
   CheckCircle,
   Clock,
-  XCircle
+  XCircle,
+  Plus,
+  Target,
+  Settings
 } from 'lucide-react'
 import Link from 'next/link'
 
