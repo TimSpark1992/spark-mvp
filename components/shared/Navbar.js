@@ -96,13 +96,37 @@ export default function Navbar({ variant = 'landing', role = null }) {
             ))}
           </div>
           
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <Link href="/auth/signup">
-              <Button variant="primary" size="sm">
-                Sign Up
-              </Button>
-            </Link>
+          {/* CTA Button - Show different content based on auth state */}
+          <div className="hidden md:flex items-center gap-3">
+            {isAuthenticated ? (
+              <>
+                {/* User Profile Info */}
+                <div className="flex items-center gap-2 text-sm text-gray-300">
+                  <User className="w-4 h-4" />
+                  <span className="hidden lg:inline">
+                    {profile?.full_name || profile?.company_name || user?.email || 'User'}
+                  </span>
+                </div>
+                
+                {/* Logout Button */}
+                <Button 
+                  variant="secondary" 
+                  size="sm"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
+                >
+                  <LogOut className="w-4 h-4 mr-1" />
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                </Button>
+              </>
+            ) : (
+              <Link href="/auth/signup">
+                <Button variant="primary" size="sm">
+                  Sign Up
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
