@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getCampaigns, createCampaign, getCurrentUser } from '@/lib/supabase'
+import { getCampaigns, createCampaign, getCurrentUser } from '../../../lib/supabase'
 
 export async function GET(request) {
   try {
