@@ -1,9 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Menu, X, MessageCircle } from 'lucide-react'
+import { Menu, X, MessageCircle, LogOut, User } from 'lucide-react'
 import Button from '@/components/ui/Button'
+import { useAuth } from '@/components/AuthProvider'
+import { signOut } from '@/lib/supabase'
 import { sparkTheme } from '@/lib/theme'
 
 export default function Navbar({ variant = 'landing', role = null }) {
