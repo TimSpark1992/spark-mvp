@@ -107,6 +107,8 @@ export default function ViewCampaignPage() {
           }
 
           setApplications(applicationsData || [])
+
+          setApplications(applicationsData || [])
           setDataLoaded(true)
           
           // Clear timeouts
