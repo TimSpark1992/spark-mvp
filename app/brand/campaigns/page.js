@@ -410,6 +410,19 @@ export default function ManageCampaignsPage() {
                       </div>
                       
                       <div className="flex items-center gap-2 ml-4">
+                        {/* Quick Access to Offers */}
+                        <Link href={`/brand/campaigns/${campaign.id}/offers`}>
+                          <Button variant="secondary" size="sm" className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/30 hover:to-pink-600/30 border-purple-500/30">
+                            <Target className="w-4 h-4 mr-1" />
+                            Offers
+                          </Button>
+                        </Link>
+                        <Link href={`/brand/campaigns/${campaign.id}/offers/create`}>
+                          <Button variant="secondary" size="sm" className="bg-gradient-to-r from-green-600/20 to-emerald-600/20 hover:from-green-600/30 hover:to-emerald-600/30 border-green-500/30">
+                            <Plus className="w-4 h-4 mr-1" />
+                            Create Offer
+                          </Button>
+                        </Link>
                         <Link href={`/brand/campaigns/${campaign.id}/applications`}>
                           <Button variant="ghost" size="sm">
                             <Eye className="w-4 h-4 mr-1" />
