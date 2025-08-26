@@ -25,7 +25,9 @@ import {
   Trash2,
   Search,
   Filter,
-  ArrowLeft
+  ArrowLeft,
+  Target,
+  FileText
 } from 'lucide-react'
 import Link from 'next/link'
 
