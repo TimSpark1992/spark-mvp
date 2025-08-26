@@ -28,8 +28,8 @@ from datetime import datetime
 
 class LogoutBackendTester:
     def __init__(self):
-        # Get backend URL from environment or use default
-        self.backend_url = os.environ.get('REACT_APP_BACKEND_URL', 'https://spark-bugfix.preview.emergentagent.com')
+        # Get backend URL from environment or use local default
+        self.backend_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:3000')
         self.api_base = f"{self.backend_url}/api"
         
         print(f"🎯 LOGOUT FUNCTIONALITY BACKEND TESTING")
