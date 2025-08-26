@@ -167,7 +167,7 @@ export default function Navbar({ variant = 'landing', role = null }) {
                   <Button 
                     variant="secondary" 
                     size="sm" 
-                    className="w-full bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
+                    className="w-full border-red-500/50 text-red-300 hover:bg-red-500/20 hover:border-red-400"
                     onClick={() => {
                       setIsMenuOpen(false)
                       handleLogout()
