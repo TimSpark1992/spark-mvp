@@ -1,5 +1,12 @@
 import { NextResponse } from 'next/server'
-import { getCampaigns, createCampaign, getCurrentUser } from '../../../lib/supabase'
+import { getCampaigns, createCampaign } from '../../../lib/supabase'
+import { supabase } from '../../../lib/supabase'
+
+// Define getCurrentUser locally to avoid import issues
+const getCurrentUser = async () => {
+  const { data: { user }, error } = await supabase.auth.getUser()
+  return { user, error }
+}
 
 export async function GET(request) {
   try {
