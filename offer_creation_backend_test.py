@@ -20,8 +20,8 @@ import json
 import os
 from datetime import datetime
 
-# Get backend URL from environment
-BACKEND_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://www.sparkplatform.tech')
+# Get backend URL from environment - use local for testing
+BACKEND_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test campaign ID from review request
