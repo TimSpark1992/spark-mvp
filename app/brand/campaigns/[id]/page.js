@@ -376,6 +376,37 @@ export default function ViewCampaignPage() {
 
               {/* Sidebar */}
               <div className="space-y-6">
+                {/* Campaign Actions */}
+                <Card className="p-6">
+                  <Heading level={3} size="lg" className="mb-4">Campaign Actions</Heading>
+                  
+                  <div className="space-y-3">
+                    {/* Create Offer Button */}
+                    <Link href={`/brand/campaigns/${campaign.id}/offers/create`}>
+                      <Button className="w-full bg-gradient-to-r from-[#8A2BE2] to-[#FF1493] hover:from-[#7A1BD2] to-[#E01483]">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Offer
+                      </Button>
+                    </Link>
+                    
+                    {/* View All Offers */}
+                    <Link href={`/brand/campaigns/${campaign.id}/offers`}>
+                      <Button variant="secondary" className="w-full">
+                        <Target className="w-4 h-4 mr-2" />
+                        View All Offers
+                      </Button>
+                    </Link>
+                    
+                    {/* Edit Campaign */}
+                    <Link href={`/brand/campaigns/${campaign.id}/edit`}>
+                      <Button variant="secondary" className="w-full">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Edit Campaign
+                      </Button>
+                    </Link>
+                  </div>
+                </Card>
+
                 {/* Application Stats */}
                 <Card className="p-6">
                   <Heading level={3} size="lg" className="mb-4">Application Statistics</Heading>
