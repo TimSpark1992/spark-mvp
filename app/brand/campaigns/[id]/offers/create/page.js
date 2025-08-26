@@ -25,46 +25,119 @@ const CreateOfferPage = () => {
   const [showOfferSheet, setShowOfferSheet] = useState(false)
   const [showCostEstimator, setShowCostEstimator] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [dataLoaded, setDataLoaded] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    loadCampaignData()
-    loadAvailableCreators()
+    let mounted = true
+    
+    const loadPageData = async () => {
+      try {
+        setLoading(true)
+        
+        console.log('Loading offer creation page data for campaign:', campaignId)
+        
+        // Start loading with timeout protection
+        const loadingTimeout = setTimeout(() => {
+          if (mounted) {
+            console.error('Data loading timeout - forcing load completion')
+            setLoading(false)
+            setDataLoaded(true)
+          }
+        }, 8000) // 8 second timeout
+
+        const safetyTimeout = setTimeout(() => {
+          if (mounted && !dataLoaded) {
+            console.error('Safety timeout reached - forcing completion')
+            setLoading(false)
+            setDataLoaded(true)
+          }
+        }, 10000) // 10 second safety timeout
+
+        try {
+          await Promise.all([
+            loadCampaignData(mounted),
+            loadAvailableCreators(mounted)
+          ])
+
+          if (mounted) {
+            setDataLoaded(true)
+            
+            // Clear timeouts
+            clearTimeout(loadingTimeout)
+            clearTimeout(safetyTimeout)
+          }
+        } catch (error) {
+          console.error('Error loading page data:', error)
+          if (mounted) {
+            setError('Failed to load page data')
+            setDataLoaded(true)
+          }
+        }
+      } catch (error) {
+        console.error('Error in loadPageData:', error)
+        if (mounted) {
+          setError('Failed to load page')
+          setDataLoaded(true)
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadPageData()
+
+    return () => {
+      mounted = false
+    }
   }, [campaignId])
 
-  const loadCampaignData = async () => {
+  const loadCampaignData = async (mounted = true) => {
     try {
       const response = await fetch(`/api/campaigns/${campaignId}`)
       if (response.ok) {
         const data = await response.json()
-        setCampaign(data.campaign)
+        if (mounted) {
+          setCampaign(data.campaign)
+        }
       } else {
-        setError('Failed to load campaign details')
+        if (mounted) {
+          setError('Failed to load campaign details')
+        }
       }
     } catch (err) {
-      setError('Failed to load campaign details')
+      if (mounted) {
+        setError('Failed to load campaign details')
+      }
     }
   }
 
-  const loadAvailableCreators = async () => {
+  const loadAvailableCreators = async (mounted = true) => {
     try {
       const response = await fetch(`/api/campaigns/${campaignId}/applications`)
       if (response.ok) {
         const data = await response.json()
         // Get creators who have applied to this campaign
-        setCreators(data.applications?.map(app => app.creator) || [])
+        if (mounted) {
+          setCreators(data.applications?.map(app => app.creator) || [])
+        }
       } else {
         // If no applications API, load all creators as fallback
         const creatorsResponse = await fetch('/api/profiles?role=creator')
         if (creatorsResponse.ok) {
           const creatorsData = await creatorsResponse.json()
-          setCreators(creatorsData.profiles || [])
+          if (mounted) {
+            setCreators(creatorsData.profiles || [])
+          }
         }
       }
     } catch (err) {
       console.error('Failed to load creators:', err)
-    } finally {
-      setLoading(false)
+      if (mounted) {
+        setError('Failed to load creators')
+      }
     }
   }
 
