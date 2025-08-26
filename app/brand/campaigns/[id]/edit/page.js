@@ -24,10 +24,11 @@ import Link from 'next/link'
 
 export default function EditCampaignPage() {
   const { id: campaignId } = useParams()
-  const { profile } = useAuth()
+  const { profile, loading: authLoading } = useAuth()
   const router = useRouter()
   const [campaign, setCampaign] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [dataLoaded, setDataLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
