@@ -10,7 +10,36 @@ import { signOut } from '@/lib/supabase'
 import { sparkTheme } from '@/lib/theme'
 
 export default function Navbar({ variant = 'landing', role = null }) {
+  const router = useRouter()
+  const { user, profile, isAuthenticated } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true)
+      console.log('🔐 Logging out user...')
+      
+      const { error } = await signOut()
+      
+      if (error) {
+        console.error('❌ Logout error:', error)
+        // Even if there's an error, still redirect to clear local state
+      } else {
+        console.log('✅ Logout successful')
+      }
+      
+      // Always redirect to home page after logout attempt
+      router.push('/')
+      
+    } catch (error) {
+      console.error('❌ Logout failed:', error)
+      // Still redirect even if logout fails to clear local state
+      router.push('/')
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
 
   const navigationItems = {
     landing: [
