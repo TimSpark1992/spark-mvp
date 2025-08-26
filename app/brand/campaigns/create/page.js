@@ -203,10 +203,15 @@ export default function CreateCampaignPage() {
         const newCampaign = data[0] // createCampaign returns array with the new campaign
         console.log('💾 Adding new campaign to cache:', newCampaign.title)
         addCampaignToCache(newCampaign)
+      } else if (data && !Array.isArray(data)) {
+        // Handle case where createCampaign returns single object instead of array
+        console.log('💾 Adding new campaign to cache (single object):', data.title)
+        addCampaignToCache(data)
       } else {
-        // If data structure is different, clear cache so it refreshes on next load
-        console.log('🧹 Clearing cache to ensure fresh data on dashboard')
-        clearCampaignCache()
+        // CRITICAL FIX: Don't clear cache on unexpected data structure - just skip cache update
+        console.warn('⚠️ Unexpected data structure from createCampaign, skipping cache update')
+        console.warn('⚠️ Dashboard will refresh data on next visit instead of clearing existing campaigns')
+        // DO NOT call clearCampaignCache() here as it removes existing campaigns
       }
       
       setSuccess(true)
