@@ -74,20 +74,34 @@ export default function EditCampaignPage() {
   ]
 
   useEffect(() => {
+    let mounted = true
+    
     const loadCampaign = async () => {
+      // Only load if we have campaign ID, profile, and haven't loaded yet
+      if (!campaignId || !profile?.id || authLoading || dataLoaded) {
+        return
+      }
+
       try {
         console.log('🔄 Loading campaign for editing:', campaignId)
-        
-        if (profile?.id && campaignId) {
-          const { data: campaignsData, error: campaignsError } = await getBrandCampaigns(profile.id)
+        setLoading(true)
+        setError('')
+
+        // Add timeout protection (systematic fix pattern)
+        const loadTimeout = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Campaign loading timed out after 10 seconds')), 10000)
+        )
+
+        // Get campaigns with timeout protection
+        const campaignsPromise = getBrandCampaigns(profile.id).then(result => {
+          if (!mounted) return { data: [], error: null }
           
-          if (campaignsError) {
-            console.error('❌ Error fetching campaigns:', campaignsError)
-            setError('Failed to load campaign')
-            return
+          if (result.error) {
+            console.error('❌ Error fetching campaigns:', result.error)
+            throw new Error(result.error.message || 'Failed to load campaigns')
           }
           
-          const foundCampaign = campaignsData?.find(c => c.id === campaignId)
+          const foundCampaign = result.data?.find(c => c.id === campaignId)
           
           if (foundCampaign) {
             setCampaign(foundCampaign)
@@ -102,21 +116,70 @@ export default function EditCampaignPage() {
             })
             console.log('✅ Campaign loaded for editing:', foundCampaign.title)
           } else {
-            setError('Campaign not found or you do not have permission to edit it')
+            console.warn('⚠️ Campaign not found, redirecting to campaigns list')
+            router.push('/brand/campaigns')
+            return { data: [], error: null }
           }
+          
+          return result
+        })
+
+        // Wait for data loading with timeout protection
+        await Promise.race([campaignsPromise, loadTimeout])
+
+        if (mounted) {
+          setDataLoaded(true)
+          console.log('🎉 Campaign edit data loaded successfully')
         }
+
       } catch (error) {
-        console.error('❌ Error loading campaign:', error)
-        setError('Failed to load campaign')
+        console.error('❌ Error loading campaign for editing:', error)
+        if (mounted) {
+          if (error.message.includes('timed out')) {
+            setError('Loading timed out. Please check your connection and try again.')
+          } else if (error.message.includes('not found')) {
+            setError('Campaign not found. Redirecting to campaigns list.')
+            setTimeout(() => router.push('/brand/campaigns'), 2000)
+          } else {
+            setError(error.message || 'Failed to load campaign for editing')
+          }
+          setDataLoaded(true) // Prevent retry loops
+        }
       } finally {
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+          console.log('🔄 Campaign edit loading state cleared')
+        }
       }
     }
 
-    if (profile?.id && campaignId) {
-      loadCampaign()
+    // Add safety timeout (systematic fix pattern)
+    const safetyTimeout = setTimeout(() => {
+      if (mounted && loading && !dataLoaded) {
+        console.warn('⚠️ Campaign edit safety timeout - forcing loading to false')
+        setLoading(false)
+      }
+    }, 15000) // 15 second safety net
+
+    loadCampaign()
+
+    return () => {
+      mounted = false
+      clearTimeout(safetyTimeout)
     }
-  }, [profile?.id, campaignId])
+  }, [profile?.id, campaignId, authLoading, dataLoaded, router])
+
+  // Add additional loading protection
+  useEffect(() => {
+    if (profile && campaignId && loading && !authLoading) {
+      const forceLoadTimeout = setTimeout(() => {
+        console.warn('⚠️ Forcing campaign edit loading to false due to profile availability')
+        setLoading(false)
+      }, 8000)
+      
+      return () => clearTimeout(forceLoadTimeout)
+    }
+  }, [profile, campaignId, loading, authLoading])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
