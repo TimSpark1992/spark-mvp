@@ -87,8 +87,17 @@ export default function ViewCampaignPage() {
           } else {
             console.warn('Direct campaign API failed, falling back to getBrandCampaigns')
             // Fallback to searching through all campaigns for this brand
-            const campaignData = await getBrandCampaigns(profile.id)
-            foundCampaign = campaignData?.find(c => c.id === campaignId)
+            try {
+              const campaignData = await getBrandCampaigns(profile.id)
+              foundCampaign = campaignData?.find(c => c.id === campaignId)
+              if (foundCampaign) {
+                console.log('Campaign found via fallback:', foundCampaign.title)
+              } else {
+                console.error('Campaign not found in brand campaigns list')
+              }
+            } catch (fallbackError) {
+              console.error('Fallback getBrandCampaigns also failed:', fallbackError)
+            }
           }
 
           // Load applications
