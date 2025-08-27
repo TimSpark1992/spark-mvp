@@ -88,7 +88,13 @@ export default function ViewCampaignPage() {
             console.warn('Direct campaign API failed, falling back to getBrandCampaigns')
             // Fallback to searching through all campaigns for this brand
             try {
-              const campaignData = await getBrandCampaigns(profile.id)
+              const { data: campaignData, error: campaignError } = await getBrandCampaigns(profile.id)
+              
+              if (campaignError) {
+                console.error('Error loading brand campaigns:', campaignError)
+                return
+              }
+              
               foundCampaign = campaignData?.find(c => c.id === campaignId)
               if (foundCampaign) {
                 console.log('Campaign found via fallback:', foundCampaign.title)
