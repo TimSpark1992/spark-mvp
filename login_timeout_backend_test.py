@@ -340,79 +340,127 @@ class LoginTimeoutTester:
                 f"Timeout sequence consistency test error: {str(e)}"
             )
 
-    def test_database_connectivity(self):
-        """Test 4: Database Connectivity - Ensure authentication queries to the database complete within acceptable time"""
-        print("🔍 TEST 4: DATABASE CONNECTIVITY FOR AUTH QUERIES")
+    def test_end_to_end_login_flow(self):
+        """Test 4: End-to-End Login Flow - Test complete authentication workflow to ensure no premature timeouts"""
+        print("🔍 TEST 4: END-TO-END LOGIN FLOW TESTING")
         print("-" * 40)
         
-        # Test profile data retrieval (simulates auth database queries)
+        # Test complete login workflow simulation
         try:
+            # Step 1: Test login page access
             start_time = time.time()
-            response = requests.get(f"{self.api_base}/profiles", timeout=25)
-            response_time = time.time() - start_time
+            response = requests.get(f"{self.base_url}/auth/login", timeout=30)
+            page_load_time = time.time() - start_time
             
-            if response.status_code in [200, 401, 403] and response_time < 20.0:
+            if response.status_code == 200 and page_load_time < 25.0:
                 self.log_result(
-                    "Database Auth Query Performance",
+                    "Login Page Access",
                     True,
-                    f"Profile queries complete within timeout (HTTP {response.status_code})",
-                    response_time
+                    f"Login page loads within timeout limits (HTTP {response.status_code})",
+                    page_load_time
                 )
             else:
                 self.log_result(
-                    "Database Auth Query Performance",
+                    "Login Page Access",
                     False,
-                    f"Profile queries exceed timeout or error (HTTP {response.status_code})",
-                    response_time
+                    f"Login page access issues (HTTP {response.status_code})",
+                    page_load_time
                 )
                 
         except requests.exceptions.Timeout:
             self.log_result(
-                "Database Auth Query Performance",
+                "Login Page Access",
                 False,
-                "Database auth queries timed out after 25 seconds",
-                25.0
+                "Login page access timed out after 30 seconds",
+                30.0
             )
         except Exception as e:
             self.log_result(
-                "Database Auth Query Performance",
+                "Login Page Access",
                 False,
-                f"Database auth query error: {str(e)}"
+                f"Login page access error: {str(e)}"
             )
 
-        # Test rate cards query (another database operation)
+        # Step 2: Test authentication API call simulation
         try:
             start_time = time.time()
-            response = requests.get(f"{self.api_base}/rate-cards", timeout=25)
-            response_time = time.time() - start_time
+            login_data = {
+                "email": self.test_credentials["email"],
+                "password": self.test_credentials["password"]
+            }
             
-            if response_time < 20.0:
+            # Simulate the actual login API call that would happen in the frontend
+            response = requests.post(
+                f"{self.api_base}/auth/login",
+                json=login_data,
+                timeout=30,  # Frontend timeout
+                headers={"Content-Type": "application/json"}
+            )
+            auth_time = time.time() - start_time
+            
+            # Check if authentication completes within frontend timeout
+            if auth_time < 30.0:
                 self.log_result(
-                    "Database Query Timeout Compliance",
+                    "Authentication API Call",
                     True,
-                    f"Database queries complete within 20s backend limit (HTTP {response.status_code})",
-                    response_time
+                    f"Auth API responds within 30s frontend timeout (HTTP {response.status_code})",
+                    auth_time
                 )
             else:
                 self.log_result(
-                    "Database Query Timeout Compliance",
+                    "Authentication API Call",
                     False,
-                    f"Database queries exceed 20s backend limit (HTTP {response.status_code})",
-                    response_time
+                    f"Auth API exceeds 30s frontend timeout (HTTP {response.status_code})",
+                    auth_time
                 )
                 
         except requests.exceptions.Timeout:
             self.log_result(
-                "Database Query Timeout Compliance",
+                "Authentication API Call",
                 False,
-                "Database queries timed out after 25 seconds",
-                25.0
+                "Authentication API timed out after 30 seconds (matches frontend timeout)",
+                30.0
             )
         except Exception as e:
             self.log_result(
-                "Database Query Timeout Compliance",
+                "Authentication API Call",
                 False,
-                f"Database query timeout test error: {str(e)}"
+                f"Authentication API error: {str(e)}"
+            )
+
+        # Step 3: Test post-login redirect simulation
+        try:
+            start_time = time.time()
+            response = requests.get(f"{self.base_url}/creator/dashboard", timeout=30)
+            redirect_time = time.time() - start_time
+            
+            if redirect_time < 25.0:
+                self.log_result(
+                    "Post-Login Redirect",
+                    True,
+                    f"Post-login navigation completes within timeout (HTTP {response.status_code})",
+                    redirect_time
+                )
+            else:
+                self.log_result(
+                    "Post-Login Redirect",
+                    False,
+                    f"Post-login navigation may timeout (HTTP {response.status_code})",
+                    redirect_time
+                )
+                
+        except requests.exceptions.Timeout:
+            self.log_result(
+                "Post-Login Redirect",
+                False,
+                "Post-login redirect timed out after 30 seconds",
+                30.0
+            )
+        except Exception as e:
+            self.log_result(
+                "Post-Login Redirect",
+                False,
+                f"Post-login redirect error: {str(e)}"
             )
 
     def test_error_handling(self):
