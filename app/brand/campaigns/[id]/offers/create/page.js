@@ -269,9 +269,9 @@ const CreateOfferPage = () => {
                   </Text>
                   <Button 
                     variant="secondary"
-                    onClick={() => router.push(`/brand/campaigns/${campaignId}`)}
+                    onClick={() => router.push('/brand/campaigns')}
                   >
-                    Back to Campaign
+                    Back to Campaigns
                   </Button>
                 </div>
               ) : (
