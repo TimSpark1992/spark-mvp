@@ -754,7 +754,8 @@ class LoginTimeoutTester:
         self.test_supabase_connection()
         self.test_authentication_api()
         self.test_timeout_configuration()
-        self.test_database_connectivity()
+        self.test_end_to_end_login_flow()
+        self.test_supabase_connection_performance()
         self.test_error_handling()
         self.test_performance_testing()
         
