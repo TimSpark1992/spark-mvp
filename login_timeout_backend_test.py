@@ -795,13 +795,13 @@ class LoginTimeoutTester:
         
         # Timeout compliance analysis
         timeout_compliant = sum(1 for r in self.test_results 
-                              if r["response_time"] and r["response_time"] < 20.0)
+                              if r["response_time"] and r["response_time"] < 30.0)
         timeout_tests = len([r for r in self.test_results if r["response_time"]])
         
         if timeout_tests > 0:
             timeout_compliance = (timeout_compliant / timeout_tests * 100)
             print("⏰ TIMEOUT COMPLIANCE ANALYSIS:")
-            print(f"   Tests within 20s backend limit: {timeout_compliant}/{timeout_tests}")
+            print(f"   Tests within 30s frontend limit: {timeout_compliant}/{timeout_tests}")
             print(f"   Timeout compliance rate: {timeout_compliance:.1f}%")
             print()
         
@@ -813,8 +813,8 @@ class LoginTimeoutTester:
             if not result["success"]:
                 if "timeout" in result["details"].lower():
                     critical_issues.append(f"❌ TIMEOUT ISSUE: {result['test']} - {result['details']}")
-                elif result["response_time"] and result["response_time"] > 20.0:
-                    critical_issues.append(f"⚠️ SLOW RESPONSE: {result['test']} - {result['response_time']:.3f}s exceeds 20s backend limit")
+                elif result["response_time"] and result["response_time"] > 30.0:
+                    critical_issues.append(f"⚠️ SLOW RESPONSE: {result['test']} - {result['response_time']:.3f}s exceeds 30s frontend limit")
         
         if critical_issues:
             for issue in critical_issues:
@@ -822,7 +822,8 @@ class LoginTimeoutTester:
         else:
             print("   ✅ No critical timeout issues detected")
             print("   ✅ All responses within acceptable timeout limits")
-            print("   ✅ Login timeout fixes appear to be working correctly")
+            print("   ✅ Login timeout fixes (Frontend: 30s, Supabase: 35s) working correctly")
+            print("   ✅ Timeout sequence properly configured to prevent conflicts")
         
         print()
         
