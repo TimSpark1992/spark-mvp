@@ -463,6 +463,116 @@ class LoginTimeoutTester:
                 f"Post-login redirect error: {str(e)}"
             )
 
+    def test_supabase_connection_performance(self):
+        """Test 5: Supabase Connection Testing - Verify Supabase authentication service is responding quickly"""
+        print("🔍 TEST 5: SUPABASE CONNECTION PERFORMANCE TESTING")
+        print("-" * 40)
+        
+        # Test Supabase-backed API endpoints for performance
+        try:
+            start_time = time.time()
+            response = requests.get(f"{self.api_base}/profiles", timeout=30)
+            response_time = time.time() - start_time
+            
+            if response_time < 25.0:  # Well within both 30s and 35s limits
+                self.log_result(
+                    "Supabase Profile API Performance",
+                    True,
+                    f"Supabase profile queries fast enough to prevent timeouts (HTTP {response.status_code})",
+                    response_time
+                )
+            else:
+                self.log_result(
+                    "Supabase Profile API Performance",
+                    False,
+                    f"Supabase profile queries may cause timeout issues (HTTP {response.status_code})",
+                    response_time
+                )
+                
+        except requests.exceptions.Timeout:
+            self.log_result(
+                "Supabase Profile API Performance",
+                False,
+                "Supabase profile API timed out after 30 seconds",
+                30.0
+            )
+        except Exception as e:
+            self.log_result(
+                "Supabase Profile API Performance",
+                False,
+                f"Supabase profile API error: {str(e)}"
+            )
+
+        # Test Supabase rate cards API (another Supabase operation)
+        try:
+            start_time = time.time()
+            response = requests.get(f"{self.api_base}/rate-cards", timeout=30)
+            response_time = time.time() - start_time
+            
+            if response_time < 25.0:
+                self.log_result(
+                    "Supabase Rate Cards API Performance",
+                    True,
+                    f"Supabase rate cards queries complete quickly (HTTP {response.status_code})",
+                    response_time
+                )
+            else:
+                self.log_result(
+                    "Supabase Rate Cards API Performance",
+                    False,
+                    f"Supabase rate cards queries may timeout (HTTP {response.status_code})",
+                    response_time
+                )
+                
+        except requests.exceptions.Timeout:
+            self.log_result(
+                "Supabase Rate Cards API Performance",
+                False,
+                "Supabase rate cards API timed out after 30 seconds",
+                30.0
+            )
+        except Exception as e:
+            self.log_result(
+                "Supabase Rate Cards API Performance",
+                False,
+                f"Supabase rate cards API error: {str(e)}"
+            )
+
+        # Test Supabase campaigns API (critical for login flow)
+        try:
+            start_time = time.time()
+            response = requests.get(f"{self.api_base}/campaigns", timeout=30)
+            response_time = time.time() - start_time
+            
+            if response_time < 25.0:
+                self.log_result(
+                    "Supabase Campaigns API Performance",
+                    True,
+                    f"Supabase campaigns queries support fast login flow (HTTP {response.status_code})",
+                    response_time
+                )
+            else:
+                self.log_result(
+                    "Supabase Campaigns API Performance",
+                    False,
+                    f"Supabase campaigns queries may delay login (HTTP {response.status_code})",
+                    response_time
+                )
+                
+        except requests.exceptions.Timeout:
+            self.log_result(
+                "Supabase Campaigns API Performance",
+                False,
+                "Supabase campaigns API timed out after 30 seconds",
+                30.0
+            )
+        except Exception as e:
+            self.log_result(
+                "Supabase Campaigns API Performance",
+                False,
+                f"Supabase campaigns API error: {str(e)}"
+            )
+
     def test_error_handling(self):
         """Test 5: Error Handling - Test that timeout errors are properly handled and don't cause system issues"""
         print("🔍 TEST 5: ERROR HANDLING FOR TIMEOUT ERRORS")
