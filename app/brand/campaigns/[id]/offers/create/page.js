@@ -195,10 +195,10 @@ const CreateOfferPage = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => router.push(`/brand/campaigns/${campaignId}`)}
+                onClick={() => router.push('/brand/campaigns')}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Campaign
+                Back to Campaigns
               </Button>
               <div>
                 <Heading level={1} size="2xl" className="mb-2">Create Offer</Heading>
