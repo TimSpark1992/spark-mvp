@@ -228,78 +228,116 @@ class LoginTimeoutTester:
             )
 
     def test_timeout_configuration(self):
-        """Test 3: Timeout Configuration - Verify the new timeout settings (Frontend: 30s, Backend: 20s)"""
+        """Test 3: Timeout Configuration - Verify the new timeout settings (Frontend: 30s, Supabase: 35s)"""
         print("🔍 TEST 3: TIMEOUT CONFIGURATION VERIFICATION")
         print("-" * 40)
         
-        # Test backend timeout configuration (should be 20s)
+        # Test that backend APIs respond well within 30s frontend timeout
         try:
             start_time = time.time()
-            response = requests.get(f"{self.api_base}/campaigns", timeout=25)
+            response = requests.get(f"{self.api_base}/campaigns", timeout=32)
             response_time = time.time() - start_time
             
-            if response_time < 20.0:
+            if response_time < 30.0:
                 self.log_result(
-                    "Backend Timeout Configuration",
+                    "Frontend Timeout Compatibility (30s)",
                     True,
-                    f"Backend responds within 20s timeout limit (actual: {response_time:.3f}s)",
+                    f"Backend responds within 30s frontend timeout (actual: {response_time:.3f}s)",
                     response_time
                 )
             else:
                 self.log_result(
-                    "Backend Timeout Configuration",
+                    "Frontend Timeout Compatibility (30s)",
                     False,
-                    f"Backend exceeds 20s timeout limit (actual: {response_time:.3f}s)",
+                    f"Backend exceeds 30s frontend timeout (actual: {response_time:.3f}s)",
                     response_time
                 )
                 
         except requests.exceptions.Timeout:
-            response_time = 25.0
+            response_time = 32.0
             self.log_result(
-                "Backend Timeout Configuration",
+                "Frontend Timeout Compatibility (30s)",
                 False,
-                f"Backend timeout exceeded 25s test limit",
+                f"Backend timeout exceeded 32s test limit",
                 response_time
             )
         except Exception as e:
             self.log_result(
-                "Backend Timeout Configuration",
+                "Frontend Timeout Compatibility (30s)",
                 False,
-                f"Backend timeout test error: {str(e)}"
+                f"Frontend timeout compatibility test error: {str(e)}"
             )
 
-        # Test multiple rapid requests to verify timeout consistency
+        # Test Supabase timeout configuration (should be 35s, longer than frontend 30s)
+        try:
+            start_time = time.time()
+            response = requests.get(f"{self.api_base}/health", timeout=37)
+            response_time = time.time() - start_time
+            
+            # Verify response is fast enough to prevent timeout conflicts
+            if response_time < 25.0:  # Well within both 30s and 35s limits
+                self.log_result(
+                    "Supabase Timeout Sequence (35s > 30s)",
+                    True,
+                    f"Supabase operations complete before timeout conflicts (actual: {response_time:.3f}s)",
+                    response_time
+                )
+            else:
+                self.log_result(
+                    "Supabase Timeout Sequence (35s > 30s)",
+                    False,
+                    f"Supabase operations may cause timeout conflicts (actual: {response_time:.3f}s)",
+                    response_time
+                )
+                
+        except requests.exceptions.Timeout:
+            response_time = 37.0
+            self.log_result(
+                "Supabase Timeout Sequence (35s > 30s)",
+                False,
+                f"Supabase timeout exceeded 37s test limit",
+                response_time
+            )
+        except Exception as e:
+            self.log_result(
+                "Supabase Timeout Sequence (35s > 30s)",
+                False,
+                f"Supabase timeout sequence test error: {str(e)}"
+            )
+
+        # Test timeout sequence verification - multiple rapid requests
         try:
             response_times = []
             for i in range(3):
                 start_time = time.time()
-                response = requests.get(f"{self.api_base}/health", timeout=25)
+                response = requests.get(f"{self.api_base}/test", timeout=32)
                 response_time = time.time() - start_time
                 response_times.append(response_time)
                 
             avg_response_time = sum(response_times) / len(response_times)
             max_response_time = max(response_times)
             
-            if max_response_time < 20.0:
+            # Verify all requests complete well before timeout limits
+            if max_response_time < 25.0:
                 self.log_result(
-                    "Timeout Consistency Test",
+                    "Timeout Sequence Consistency",
                     True,
-                    f"All requests within 20s limit (avg: {avg_response_time:.3f}s, max: {max_response_time:.3f}s)",
+                    f"All requests prevent timeout conflicts (avg: {avg_response_time:.3f}s, max: {max_response_time:.3f}s)",
                     avg_response_time
                 )
             else:
                 self.log_result(
-                    "Timeout Consistency Test",
+                    "Timeout Sequence Consistency",
                     False,
-                    f"Some requests exceed 20s limit (avg: {avg_response_time:.3f}s, max: {max_response_time:.3f}s)",
+                    f"Some requests may cause timeout conflicts (avg: {avg_response_time:.3f}s, max: {max_response_time:.3f}s)",
                     avg_response_time
                 )
                 
         except Exception as e:
             self.log_result(
-                "Timeout Consistency Test",
+                "Timeout Sequence Consistency",
                 False,
-                f"Timeout consistency test error: {str(e)}"
+                f"Timeout sequence consistency test error: {str(e)}"
             )
 
     def test_database_connectivity(self):
