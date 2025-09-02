@@ -258,9 +258,9 @@ const CreateOfferPage = () => {
               {creators.length === 0 ? (
                 <div className="text-center py-12">
                   <Users className="w-16 h-16 mx-auto text-gray-500 mb-4" />
-                  <Heading level={3} size="lg" className="mb-2">No Creators Available</Heading>
+                  <Heading level={3} size="lg" className="mb-2">No Creators Found</Heading>
                   <Text color="secondary" className="mb-6 max-w-md mx-auto">
-                    Creators will appear here once they apply to your campaign. Share your campaign to attract creators!
+                    No creator profiles are available in the system yet. Creators need to sign up and complete their profiles first.
                   </Text>
                   <Button 
                     variant="secondary"
