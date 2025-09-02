@@ -116,21 +116,16 @@ const CreateOfferPage = () => {
 
   const loadAvailableCreators = async (mounted = true) => {
     try {
-      const response = await fetch(`/api/campaigns/${campaignId}/applications`)
-      if (response.ok) {
-        const data = await response.json()
-        // Get creators who have applied to this campaign
+      // Load all creators - brands should be able to create offers for any creator
+      const creatorsResponse = await fetch('/api/profiles?role=creator')
+      if (creatorsResponse.ok) {
+        const creatorsData = await creatorsResponse.json()
         if (mounted) {
-          setCreators(data.applications?.map(app => app.creator) || [])
+          setCreators(creatorsData.profiles || [])
         }
       } else {
-        // If no applications API, load all creators as fallback
-        const creatorsResponse = await fetch('/api/profiles?role=creator')
-        if (creatorsResponse.ok) {
-          const creatorsData = await creatorsResponse.json()
-          if (mounted) {
-            setCreators(creatorsData.profiles || [])
-          }
+        if (mounted) {
+          setError('Failed to load creators')
         }
       }
     } catch (err) {
