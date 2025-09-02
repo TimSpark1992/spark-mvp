@@ -10,9 +10,13 @@ import sys
 import time
 from datetime import datetime
 from supabase import create_client, Client
+from dotenv import load_dotenv
 
 class SupabaseOnboardingUpdater:
     def __init__(self):
+        # Load environment variables from .env.local
+        load_dotenv('/app/.env.local')
+        
         # Load Supabase configuration from environment
         self.supabase_url = os.getenv('NEXT_PUBLIC_SUPABASE_URL')
         self.supabase_service_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
