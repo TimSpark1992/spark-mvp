@@ -4,16 +4,16 @@ Login Timeout Fix Backend Testing Suite
 =====================================
 
 This test suite verifies the login timeout fixes for authentication functionality:
-1. Supabase Connection testing
-2. Authentication API testing  
-3. Timeout Configuration verification (Frontend: 30s, Backend: 20s)
-4. Database Connectivity for auth queries
-5. Error Handling for timeout errors
+1. Timeout Configuration Verification (Frontend: 30s, Supabase: 35s)
+2. Authentication API Performance Testing
+3. Supabase Connection Testing  
+4. End-to-End Login Flow Testing
+5. Timeout Sequence Verification
 6. Performance Testing for normal login requests
 
-Context: Fixed critical login timeout issue where frontend (15s) was timing out 
-before Supabase backend (25s) could complete. Updated frontend to 30s timeout 
-and backend to 20s timeout to ensure proper sequencing.
+Context: Fixed critical timeout conflict where Supabase AbortController timeout (20s) 
+was triggering before frontend Promise.race timeout (30s), causing false timeout errors. 
+Updated Supabase timeout to 35s to ensure proper sequencing.
 """
 
 import requests
