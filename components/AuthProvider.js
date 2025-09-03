@@ -34,7 +34,7 @@ export function AuthProvider({ children }) {
             console.warn('⚠️ Auth initialization timed out after 10 seconds')
             setLoading(false)
           }
-        }, 10000)
+        }, 15000)
         
         // Get current session with better error handling
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
