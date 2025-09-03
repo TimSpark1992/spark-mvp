@@ -93,12 +93,18 @@ function LoginForm() {
     try {
       console.log('🔄 Starting login process for:', email)
       
-      // Enhanced timeout handling - increased to 30s for better reliability
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Login request timed out. Please check your internet connection and try again.')), 30000)
-      )
+      // Enhanced timeout handling - increased to 45s for network variability and proper AbortController cleanup
+      let timeoutId
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          reject(new Error('Login request timed out. Please check your internet connection and try again.'))
+        }, 45000)
+      })
 
-      const loginPromise = signIn(email, password)
+      const loginPromise = signIn(email, password).finally(() => {
+        // Clean up timeout to prevent resource conflicts
+        if (timeoutId) clearTimeout(timeoutId)
+      })
       
       const result = await Promise.race([loginPromise, timeoutPromise])
       
