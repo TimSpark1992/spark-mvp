@@ -24,6 +24,7 @@ const CreateOfferPage = () => {
   const [selectedCreator, setSelectedCreator] = useState(null)
   const [showOfferSheet, setShowOfferSheet] = useState(false)
   const [showCostEstimator, setShowCostEstimator] = useState(false)
+  const [estimatedOfferData, setEstimatedOfferData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [dataLoaded, setDataLoaded] = useState(false)
   const [error, setError] = useState('')
