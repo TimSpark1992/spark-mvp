@@ -56,6 +56,29 @@ const OfferSheet = ({
     }
   }, [offer, mode]);
 
+  // Initialize form data with Cost Estimator data when creating new offer
+  useEffect(() => {
+    if (estimatedData && mode === 'create') {
+      const firstItem = estimatedData.items?.[0];
+      if (firstItem) {
+        setFormData(prev => ({
+          ...prev,
+          campaign_id: campaignId,
+          creator_id: creatorId,
+          deliverable_type: firstItem.deliverable_type || '',
+          quantity: firstItem.qty || 1,
+          currency: estimatedData.currency || 'USD',
+          base_price_cents: firstItem.unit_price_cents || 0,
+          rush_fee_pct: firstItem.rush_pct || 0,
+          platform_fee_pct: estimatedData.platform_fee_pct || 20,
+          subtotal_cents: estimatedData.subtotal_cents || 0,
+          total_cents: estimatedData.total_cents || 0,
+          status: 'draft'
+        }));
+      }
+    }
+  }, [estimatedData, mode, campaignId, creatorId]);
+
   // Calculate pricing when relevant fields change
   useEffect(() => {
     const subtotal = formData.base_price_cents * formData.quantity;
