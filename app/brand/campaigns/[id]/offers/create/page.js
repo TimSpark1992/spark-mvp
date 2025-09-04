@@ -412,10 +412,15 @@ const CreateOfferPage = () => {
                   <OfferSheet
                     campaignId={campaignId}
                     creatorId={selectedCreator.id}
+                    estimatedData={estimatedOfferData}
                     mode="create"
                     userRole="brand"
                     onSubmit={handleCreateOffer}
-                    onCancel={() => setShowOfferSheet(false)}
+                    onCancel={() => {
+                      setShowOfferSheet(false)
+                      setSelectedCreator(null)
+                      setEstimatedOfferData(null)
+                    }}
                   />
                 </div>
               </div>
