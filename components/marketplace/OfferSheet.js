@@ -373,6 +373,15 @@ const OfferSheet = ({
             </Alert>
           )}
 
+          {estimatedData && mode === 'create' && (
+            <Alert className="border-blue-500 bg-blue-50/10">
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription className="text-blue-200">
+                ✨ Form pre-filled with Cost Estimator data. You can review and adjust the details below before creating the offer.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
