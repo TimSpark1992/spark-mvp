@@ -3,19 +3,35 @@ import { NextResponse } from 'next/server'
 import { verifyAdminAccess } from '../../../../lib/auth-helpers.js'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-)
+// Create Supabase client with environment variable checks
+function getSupabaseAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.warn('Supabase environment variables not configured for admin violations')
+    return null
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey)
+}
 
 export async function GET(request) {
   try {
     // Verify admin access
     const adminCheck = await verifyAdminAccess(request)
-    if (!adminCheck.isAdmin) {
+    if (!adminCheck.success) {
       return NextResponse.json(
-        { error: 'Admin access required' },
+        { error: 'Unauthorized access' },
         { status: 403 }
+      )
+    }
+
+    const supabase = getSupabaseAdminClient()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database service unavailable' },
+        { status: 503 }
       )
     }
     
@@ -122,10 +138,18 @@ export async function PATCH(request) {
   try {
     // Verify admin access
     const adminCheck = await verifyAdminAccess(request)
-    if (!adminCheck.isAdmin) {
+    if (!adminCheck.success) {
       return NextResponse.json(
-        { error: 'Admin access required' },
+        { error: 'Unauthorized access' },
         { status: 403 }
+      )
+    }
+
+    const supabase = getSupabaseAdminClient()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database service unavailable' },
+        { status: 503 }
       )
     }
     
