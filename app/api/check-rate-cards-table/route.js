@@ -2,14 +2,32 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-)
+// Create Supabase client with environment variable checks
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.warn('Supabase environment variables not configured for rate-cards table check')
+    return null
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey)
+}
 
 export async function GET(request) {
   try {
     console.log('🔍 Checking rate_cards table...')
+
+    const supabase = getSupabaseClient()
+    if (!supabase) {
+      return NextResponse.json({
+        tableExists: false,
+        error: 'Database service unavailable',
+        message: 'Supabase environment variables not configured',
+        recommendation: 'Configure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY'
+      }, { status: 503 })
+    }
     
     // Try to query the table to see if it exists
     const { data, error } = await supabase

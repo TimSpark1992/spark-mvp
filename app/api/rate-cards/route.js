@@ -1,144 +1,103 @@
-// app/api/rate-cards/route.js
+// app/api/rate-cards/route.js  
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { clearRateCardCache } from '@/lib/rate-card-cache'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-)
+// Create Supabase client with environment variable checks
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.warn('Supabase environment variables not configured for rate-cards')
+    return null
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey)
+}
 
 export async function GET(request) {
   try {
+    const supabase = getSupabaseClient()
+    if (!supabase) {
+      return NextResponse.json({
+        error: 'Database service unavailable - Supabase not configured'
+      }, { status: 503 })
+    }
+
     const { searchParams } = new URL(request.url)
     const creatorId = searchParams.get('creator_id')
-    
-    console.log('📋 Fetching rate cards, creator_id:', creatorId)
-    
-    // Use service role client to bypass RLS
+
     let query = supabase
       .from('rate_cards')
       .select('*')
       .eq('active', true)
-      .order('deliverable_type')
-    
+
     if (creatorId) {
       query = query.eq('creator_id', creatorId)
     }
-    
-    const { data: rateCards, error } = await query
-    
+
+    const { data: rateCards, error } = await query.order('created_at', { ascending: false })
+
     if (error) {
       console.error('❌ Error fetching rate cards:', error)
-      console.error('❌ Error details:', JSON.stringify(error, null, 2))
-      return NextResponse.json(
-        { error: 'Failed to fetch rate cards', details: error },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
-    
-    console.log('✅ Rate cards fetched:', rateCards?.length || 0)
-    
-    return NextResponse.json({ 
-      rateCards,
-      success: true 
-    })
-    
+
+    return NextResponse.json({ rateCards })
+
   } catch (error) {
     console.error('❌ Rate cards API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 export async function POST(request) {
   try {
+    const supabase = getSupabaseClient()
+    if (!supabase) {
+      return NextResponse.json({
+        error: 'Database service unavailable - Supabase not configured'
+      }, { status: 503 })
+    }
+
     const body = await request.json()
-    
-    console.log('📋 Creating rate card:', body)
-    
-    // Validate required fields
-    const requiredFields = ['creator_id', 'deliverable_type', 'base_price_cents', 'currency']
-    for (const field of requiredFields) {
-      if (!body[field]) {
-        return NextResponse.json(
-          { error: `${field} is required` },
-          { status: 400 }
-        )
-      }
+    const { creator_id, deliverable_type, base_price_cents, currency, description } = body
+
+    if (!creator_id || !deliverable_type || !base_price_cents) {
+      return NextResponse.json({
+        error: 'creator_id, deliverable_type, and base_price_cents are required'
+      }, { status: 400 })
     }
-    
-    // Validate price
-    if (body.base_price_cents <= 0) {
-      return NextResponse.json(
-        { error: 'Price must be greater than zero' },
-        { status: 400 }
-      )
-    }
-    
-    // Validate currency
-    const validCurrencies = ['USD', 'MYR', 'SGD']
-    if (!validCurrencies.includes(body.currency)) {
-      return NextResponse.json(
-        { error: 'Invalid currency' },
-        { status: 400 }
-      )
-    }
-    
-    // Validate deliverable type
-    const validTypes = ['IG_Reel', 'IG_Story', 'TikTok_Post', 'YouTube_Video', 'Bundle']
-    if (!validTypes.includes(body.deliverable_type)) {
-      return NextResponse.json(
-        { error: 'Invalid deliverable type' },
-        { status: 400 }
-      )
-    }
-    
-    // Use service role client to bypass RLS
+
     const { data: rateCard, error } = await supabase
       .from('rate_cards')
       .insert({
-        creator_id: body.creator_id,
-        deliverable_type: body.deliverable_type,
-        base_price_cents: body.base_price_cents,
-        currency: body.currency,
-        rush_pct: body.rush_pct || 0,
+        creator_id,
+        deliverable_type,
+        base_price_cents,
+        currency: currency || 'USD',
+        description,
         active: true
       })
       .select()
       .single()
-    
+
     if (error) {
       console.error('❌ Error creating rate card:', error)
-      console.error('❌ Error details:', JSON.stringify(error, null, 2))
-      
-      // Handle unique constraint violation
-      if (error.code === '23505') {
-        return NextResponse.json(
-          { error: 'Rate card already exists for this deliverable type and currency' },
-          { status: 409 }
-        )
-      }
-      
-      return NextResponse.json(
-        { error: 'Failed to create rate card', details: error },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
-    
-    console.log('✅ Rate card created:', rateCard.id)
-    
+
+    // Clear cache for this creator
+    clearRateCardCache(creator_id)
+
     return NextResponse.json({ 
       rateCard,
-      success: true 
+      message: 'Rate card created successfully'
     }, { status: 201 })
-    
+
   } catch (error) {
-    console.error('❌ Rate card creation API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('❌ Rate cards creation API error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
