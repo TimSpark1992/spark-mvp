@@ -15,6 +15,7 @@ const OfferSheet = ({
   offer = null, 
   campaignId, 
   creatorId = null,
+  estimatedData = null,
   onSubmit, 
   onCancel, 
   onAccept, 
