@@ -25,12 +25,21 @@ export async function GET(request) {
 
     const offset = (page - 1) * limit;
 
-    // Import supabase client with service role
+    // Import supabase client with service role with environment checks
     const { createClient } = require('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.warn('Supabase environment variables not configured for admin users');
+      return NextResponse.json(
+        { error: 'Database service unavailable' },
+        { status: 503 }
+      );
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Build query
     let query = supabase
