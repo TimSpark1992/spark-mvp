@@ -383,6 +383,7 @@ const CreateOfferPage = () => {
                   <CostEstimator
                     creatorId={selectedCreator.id}
                     onOfferCreate={(estimatedData) => {
+                      setEstimatedOfferData(estimatedData)
                       setShowCostEstimator(false)
                       setShowOfferSheet(true)
                     }}
