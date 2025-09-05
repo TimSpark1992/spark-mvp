@@ -66,6 +66,7 @@ const OfferSheet = ({
           ...prev,
           campaign_id: campaignId,
           creator_id: creatorId,
+          brand_id: brandId,
           deliverable_type: firstItem.deliverable_type || '',
           quantity: firstItem.qty || 1,
           currency: estimatedData.currency || 'USD',
