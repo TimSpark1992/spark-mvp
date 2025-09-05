@@ -414,6 +414,7 @@ const CreateOfferPage = () => {
                   <OfferSheet
                     campaignId={campaignId}
                     creatorId={selectedCreator.id}
+                    brandId={profile?.id}
                     estimatedData={estimatedOfferData}
                     mode="create"
                     userRole="brand"
