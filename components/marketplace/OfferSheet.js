@@ -40,7 +40,7 @@ const OfferSheet = ({
     description: '',
     requirements: '',
     deadline: '',
-    status: 'draft'
+    status: 'drafted'
   });
 
   const [loading, setLoading] = useState(false);
