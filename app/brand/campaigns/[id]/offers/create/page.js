@@ -150,7 +150,7 @@ const CreateOfferPage = () => {
           ...offerData,
           campaign_id: campaignId,
           creator_id: selectedCreator.id,
-          status: 'draft'
+          status: 'drafted'
         }),
       })
 
