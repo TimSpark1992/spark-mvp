@@ -53,8 +53,15 @@ export default function CostEstimator({
         
         if (response.ok) {
           setRateCards(data.rateCards || [])
+          if (data.warning) {
+            console.warn('Cost Estimator warning:', data.warning)
+            // Still allow the component to work with empty rate cards
+          }
         } else {
+          console.error('Rate cards API error:', data.error)
           setError(data.error || 'Failed to load rate cards')
+          // Set empty rate cards to allow manual price entry
+          setRateCards([])
         }
       } catch (err) {
         setError('Failed to load rate cards')
