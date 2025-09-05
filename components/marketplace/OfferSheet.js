@@ -75,7 +75,7 @@ const OfferSheet = ({
           platform_fee_pct: estimatedData.platform_fee_pct || 20,
           subtotal_cents: estimatedData.subtotal_cents || 0,
           total_cents: estimatedData.total_cents || 0,
-          status: 'draft'
+          status: 'drafted'
         }));
       }
     }
