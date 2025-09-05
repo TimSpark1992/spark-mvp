@@ -79,7 +79,7 @@ const OfferSheet = ({
         }));
       }
     }
-  }, [estimatedData, mode, campaignId, creatorId]);
+  }, [estimatedData, mode, campaignId, creatorId, brandId]);
 
   // Calculate pricing when relevant fields change
   useEffect(() => {
