@@ -200,7 +200,6 @@ export default function CostEstimator({
   }
 
   if (rateCards.length === 0) {
-    console.log('🚫 Cost Estimator: No rate cards found', { rateCards, loading, error })
     return (
       <Card className={`p-6 ${className}`}>
         <div className="flex items-center gap-3 mb-4">
@@ -208,12 +207,6 @@ export default function CostEstimator({
           <Heading level={3} size="lg">Cost Estimator</Heading>
         </div>
         <Text color="secondary">This creator hasn't set up their rate cards yet.</Text>
-        {/* Debug info */}
-        <div className="mt-4 p-2 bg-gray-800 rounded text-xs">
-          <div>Debug: rateCards={JSON.stringify(rateCards)}</div>
-          <div>Loading: {loading.toString()}</div>
-          <div>Error: {error || 'none'}</div>
-        </div>
       </Card>
     )
   }
