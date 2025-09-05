@@ -18,6 +18,7 @@ import { formatPrice, formatDate } from '@/lib/formatters'
 const CreateOfferPage = () => {
   const params = useParams()
   const router = useRouter()
+  const { profile } = useAuth()
   const campaignId = params.id
 
   const [campaign, setCampaign] = useState(null)
