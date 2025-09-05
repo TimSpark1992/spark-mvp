@@ -151,7 +151,7 @@ const OfferSheet = ({
             description: '',
             requirements: '',
             deadline: '',
-            status: 'draft'
+            status: 'drafted'
           });
           setSuccess('');
         }, 2000);
