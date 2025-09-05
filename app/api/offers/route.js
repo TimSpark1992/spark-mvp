@@ -93,23 +93,29 @@ export async function POST(request) {
       }, { status: 400 })
     }
 
+    // Create the items array for the JSONB column
+    const items = [{
+      deliverable_type: deliverable_type || 'IG_Reel',
+      quantity: quantity || 1,
+      base_price_cents: base_price_cents || 0,
+      rush_fee_pct: rush_fee_pct || 0
+    }]
+
     const { data: offer, error } = await supabase
       .from('offers')
       .insert({
         campaign_id,
         creator_id,
         brand_id,
-        deliverable_type,
-        quantity: quantity || 1,
-        base_price_cents,
-        rush_fee_pct: rush_fee_pct || 0,
+        items: JSON.stringify(items),
+        subtotal_cents: subtotal_cents || 0,
         platform_fee_pct: platform_fee_pct || 20,
-        subtotal_cents,
-        total_cents,
+        platform_fee_cents: Math.round((subtotal_cents || 0) * ((platform_fee_pct || 20) / 100)),
+        total_cents: total_cents || 0,
         currency: currency || 'USD',
-        deadline,
-        description,
-        status: status || 'draft'
+        expires_at: deadline,
+        notes: description,
+        status: status || 'drafted'
       })
       .select()
       .single()
