@@ -20,9 +20,12 @@ export async function GET(request) {
   try {
     const supabase = getSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({
-        error: 'Database service unavailable - Supabase not configured'
-      }, { status: 503 })
+      console.warn('⚠️  Supabase not configured, returning empty rate cards')
+      // Return empty data instead of 503 for frontend compatibility
+      return NextResponse.json({ 
+        rateCards: [],
+        warning: 'Database service temporarily unavailable'
+      })
     }
 
     const { searchParams } = new URL(request.url)
