@@ -50,18 +50,22 @@ const OfferSheet = ({
   // Initialize form data if editing existing offer
   useEffect(() => {
     if (offer && mode !== 'create') {
+      console.log('🔍 OfferSheet: Processing offer data:', offer)
+      
       // Parse the items JSONB field to get offer details
       let parsedItems = []
       try {
         parsedItems = typeof offer.items === 'string' ? JSON.parse(offer.items) : offer.items || []
+        console.log('📊 Parsed items:', parsedItems)
       } catch (error) {
-        console.error('Error parsing offer items:', error)
+        console.error('❌ Error parsing offer items:', error)
         parsedItems = []
       }
       
       const firstItem = parsedItems[0] || {}
+      console.log('🎯 First item extracted:', firstItem)
       
-      setFormData({
+      const newFormData = {
         ...offer,
         // Extract data from the first item for display
         deliverable_type: firstItem.deliverable_type || '',
@@ -70,7 +74,16 @@ const OfferSheet = ({
         rush_fee_pct: firstItem.rush_fee_pct || 0,
         deadline: offer.expires_at ? offer.expires_at.split('T')[0] : '',
         description: offer.notes || ''
-      });
+      }
+      
+      console.log('💾 Setting form data:', {
+        deliverable_type: newFormData.deliverable_type,
+        quantity: newFormData.quantity,
+        base_price_cents: newFormData.base_price_cents,
+        rush_fee_pct: newFormData.rush_fee_pct
+      })
+      
+      setFormData(newFormData);
     }
   }, [offer, mode]);
 
