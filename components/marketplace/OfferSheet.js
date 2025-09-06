@@ -273,7 +273,7 @@ const OfferSheet = ({
                 <label className="text-sm font-medium text-gray-700">Deliverable Type</label>
                 <div className="flex items-center mt-1">
                   <Package className="w-4 h-4 mr-2 text-gray-500" />
-                  <span>{offer?.deliverable_type?.replace('_', ' ')}</span>
+                  <span>{formData.deliverable_type?.replace('_', ' ')}</span>
                 </div>
               </div>
               
