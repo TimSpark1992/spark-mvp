@@ -19,19 +19,31 @@ export default function ProtectedRoute({ children, requiredRole = null, redirect
         return
       }
 
+      // Add additional check: if requiredRole is specified but profile is not loaded yet, wait
+      if (requiredRole && !profile) {
+        console.log('🔄 ProtectedRoute: Profile still loading, waiting...')
+        return
+      }
+
       if (requiredRole && profile?.role !== requiredRole) {
         // Instead of automatic redirect, show unauthorized message
         // This prevents unwanted redirects and data loss
-        console.log('ProtectedRoute: User role mismatch', {
+        console.log('❌ ProtectedRoute: User role mismatch', {
           required: requiredRole,
           userRole: profile?.role,
-          currentPath: pathname
+          currentPath: pathname,
+          profileLoaded: !!profile
         })
         setShowUnauthorized(true)
         return
       }
       
       // User is authorized for this page
+      console.log('✅ ProtectedRoute: Access granted', {
+        userRole: profile?.role,
+        requiredRole,
+        currentPath: pathname
+      })
       setShowUnauthorized(false)
     }
   }, [user, profile, loading, requiredRole, redirectTo, router, pathname])
