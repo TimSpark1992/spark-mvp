@@ -50,9 +50,26 @@ const OfferSheet = ({
   // Initialize form data if editing existing offer
   useEffect(() => {
     if (offer && mode !== 'create') {
+      // Parse the items JSONB field to get offer details
+      let parsedItems = []
+      try {
+        parsedItems = typeof offer.items === 'string' ? JSON.parse(offer.items) : offer.items || []
+      } catch (error) {
+        console.error('Error parsing offer items:', error)
+        parsedItems = []
+      }
+      
+      const firstItem = parsedItems[0] || {}
+      
       setFormData({
         ...offer,
-        deadline: offer.deadline ? offer.deadline.split('T')[0] : ''
+        // Extract data from the first item for display
+        deliverable_type: firstItem.deliverable_type || '',
+        quantity: firstItem.quantity || 1,
+        base_price_cents: firstItem.base_price_cents || 0,
+        rush_fee_pct: firstItem.rush_fee_pct || 0,
+        deadline: offer.expires_at ? offer.expires_at.split('T')[0] : '',
+        description: offer.notes || ''
       });
     }
   }, [offer, mode]);
