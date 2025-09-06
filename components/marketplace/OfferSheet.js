@@ -51,6 +51,7 @@ const OfferSheet = ({
   useEffect(() => {
     if (offer && mode !== 'create') {
       console.log('🔍 OfferSheet: Processing offer data:', offer)
+      console.log('🔍 Raw offer.items:', offer.items, 'Type:', typeof offer.items)
       
       // Parse the items JSONB field to get offer details
       let parsedItems = []
@@ -64,6 +65,11 @@ const OfferSheet = ({
       
       const firstItem = parsedItems[0] || {}
       console.log('🎯 First item extracted:', firstItem)
+      console.log('💰 First item base_price_cents:', firstItem.base_price_cents, 'Type:', typeof firstItem.base_price_cents)
+      
+      // Test the formatPrice function with the value
+      const testPrice = formatPrice(firstItem.base_price_cents || 0, offer.currency || 'USD')
+      console.log('🧪 Testing formatPrice with base_price_cents:', firstItem.base_price_cents, '-> Result:', testPrice)
       
       const newFormData = {
         ...offer,
@@ -82,6 +88,8 @@ const OfferSheet = ({
         base_price_cents: newFormData.base_price_cents,
         rush_fee_pct: newFormData.rush_fee_pct
       })
+      console.log('🧮 Final calculation test - Base price * quantity:', newFormData.base_price_cents * newFormData.quantity)
+      console.log('🧮 Final formatPrice test:', formatPrice(newFormData.base_price_cents * newFormData.quantity, newFormData.currency))
       
       setFormData(newFormData);
     }
