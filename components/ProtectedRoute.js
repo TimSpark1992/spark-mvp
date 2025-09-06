@@ -62,8 +62,8 @@ export default function ProtectedRoute({ children, requiredRole = null, redirect
     }
   }, [loading, user, requiredRole, profile, profileTimeout])
 
-  // Show loading state if auth is loading OR if profile is needed but not loaded yet
-  if (loading || (requiredRole && user && !profile)) {
+  // Show loading state if auth is loading OR if profile is needed but not loaded yet (with timeout protection)
+  if (loading || (requiredRole && user && !profile && !profileTimeout)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0F0F1A]">
         <div className="text-center space-y-4">
