@@ -280,7 +280,7 @@ const OfferSheet = ({
               <div>
                 <label className="text-sm font-medium text-gray-700">Quantity</label>
                 <div className="flex items-center mt-1">
-                  <span className="font-medium">{offer?.quantity}</span>
+                  <span className="font-medium">{formData.quantity}</span>
                 </div>
               </div>
 
