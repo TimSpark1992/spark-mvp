@@ -44,6 +44,7 @@ export async function GET(request) {
     if (brandId) query = query.eq('brand_id', brandId)
 
     const { data: offers, error } = await query
+      .neq('status', 'cancelled')  // Filter out deleted offers
       .order('created_at', { ascending: false })
 
     if (error) {
