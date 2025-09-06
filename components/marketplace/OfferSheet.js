@@ -301,10 +301,10 @@ const OfferSheet = ({
                     <span>Base Price:</span>
                     <span>{formatPrice(formData.base_price_cents * formData.quantity, formData.currency)}</span>
                   </div>
-                  {offer?.rush_fee_pct > 0 && (
+                  {formData.rush_fee_pct > 0 && (
                     <div className="flex justify-between">
-                      <span>Rush Fee ({offer.rush_fee_pct}%):</span>
-                      <span>{formatPrice(Math.round(offer.base_price_cents * offer.quantity * (offer.rush_fee_pct / 100)), offer.currency)}</span>
+                      <span>Rush Fee ({formData.rush_fee_pct}%):</span>
+                      <span>{formatPrice(Math.round(formData.base_price_cents * formData.quantity * (formData.rush_fee_pct / 100)), formData.currency)}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
