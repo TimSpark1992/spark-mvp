@@ -299,7 +299,7 @@ const OfferSheet = ({
                 <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                   <div className="flex justify-between">
                     <span>Base Price:</span>
-                    <span>{formatPrice(offer?.base_price_cents * offer?.quantity, offer?.currency)}</span>
+                    <span>{formatPrice(formData.base_price_cents * formData.quantity, formData.currency)}</span>
                   </div>
                   {offer?.rush_fee_pct > 0 && (
                     <div className="flex justify-between">
