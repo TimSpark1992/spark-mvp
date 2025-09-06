@@ -305,17 +305,15 @@ const OffersPage = () => {
                               Edit
                             </Button>
                           )}
-                          {offer.status === 'draft' && (
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => handleDeleteOffer(offer.id)}
-                              className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Delete
-                            </Button>
-                          )}
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handleDeleteOffer(offer.id)}
+                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </Button>
                         </div>
                       </div>
                     </div>
