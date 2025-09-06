@@ -309,15 +309,15 @@ const OfferSheet = ({
                   )}
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
-                    <span>{formatPrice(offer?.subtotal_cents, offer?.currency)}</span>
+                    <span>{formatPrice(formData.subtotal_cents, formData.currency)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Platform Fee ({offer?.platform_fee_pct}%):</span>
-                    <span>{formatPrice(Math.round(offer?.subtotal_cents * (offer?.platform_fee_pct / 100)), offer?.currency)}</span>
+                    <span>Platform Fee ({formData.platform_fee_pct}%):</span>
+                    <span>{formatPrice(Math.round(formData.subtotal_cents * (formData.platform_fee_pct / 100)), formData.currency)}</span>
                   </div>
                   <div className="flex justify-between font-bold border-t pt-2">
                     <span>Total:</span>
-                    <span>{formatPrice(offer?.total_cents, offer?.currency)}</span>
+                    <span>{formatPrice(formData.total_cents, formData.currency)}</span>
                   </div>
                 </div>
               </div>
