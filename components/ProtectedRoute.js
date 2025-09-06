@@ -21,7 +21,7 @@ export default function ProtectedRoute({ children, requiredRole = null, redirect
       }
 
       // Add additional check: if requiredRole is specified but profile is not loaded yet, wait
-      if (requiredRole && !profile) {
+      if (requiredRole && !profile && !profileTimeout) {
         console.log('🔄 ProtectedRoute: Profile still loading, waiting...')
         return
       }
@@ -47,7 +47,20 @@ export default function ProtectedRoute({ children, requiredRole = null, redirect
       })
       setShowUnauthorized(false)
     }
-  }, [user, profile, loading, requiredRole, redirectTo, router, pathname])
+  }, [user, profile, loading, requiredRole, redirectTo, router, pathname, profileTimeout])
+
+  // Add timeout for profile loading to prevent infinite loading
+  useEffect(() => {
+    if (!loading && user && requiredRole && !profile && !profileTimeout) {
+      console.log('⏰ ProtectedRoute: Starting 10-second profile timeout')
+      const timer = setTimeout(() => {
+        console.warn('⚠️ ProtectedRoute: Profile loading timeout - proceeding without role check')
+        setProfileTimeout(true)
+      }, 10000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [loading, user, requiredRole, profile, profileTimeout])
 
   // Show loading state if auth is loading OR if profile is needed but not loaded yet
   if (loading || (requiredRole && user && !profile)) {
