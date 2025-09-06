@@ -35,7 +35,7 @@ export async function GET(request) {
       .select(`
         *,
         campaign:campaigns(id, title, brand_id),
-        creator_profile:profiles!creator_id(id, full_name, username),
+        creator_profile:profiles!creator_id(id, full_name, email),
         brand_profile:profiles!brand_id(id, full_name, company_name)
       `)
 
