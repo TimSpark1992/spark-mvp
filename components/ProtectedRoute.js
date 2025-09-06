@@ -48,13 +48,16 @@ export default function ProtectedRoute({ children, requiredRole = null, redirect
     }
   }, [user, profile, loading, requiredRole, redirectTo, router, pathname])
 
-  if (loading) {
+  // Show loading state if auth is loading OR if profile is needed but not loaded yet
+  if (loading || (requiredRole && user && !profile)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0F0F1A]">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2] mx-auto"></div>
           <p className="text-white">
-            {user === null ? 'Redirecting to login...' : 'Loading your profile...'}
+            {!user ? 'Redirecting to login...' : 
+             requiredRole && !profile ? 'Loading your profile...' : 
+             'Loading...'}
           </p>
           <p className="text-gray-400 text-sm">
             This should only take a few seconds
