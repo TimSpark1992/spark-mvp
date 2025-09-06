@@ -9,6 +9,7 @@ export default function ProtectedRoute({ children, requiredRole = null, redirect
   const router = useRouter()
   const pathname = usePathname()
   const [showUnauthorized, setShowUnauthorized] = useState(false)
+  const [profileTimeout, setProfileTimeout] = useState(false)
 
   useEffect(() => {
     if (!loading) {
