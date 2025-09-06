@@ -129,5 +129,10 @@ export default function ProtectedRoute({ children, requiredRole = null, redirect
     )
   }
 
+  // If profile timeout occurred but user is authenticated, allow access with warning
+  if (profileTimeout && user) {
+    console.warn('⚠️ ProtectedRoute: Profile timeout - allowing access without role verification')
+  }
+
   return children
 }
