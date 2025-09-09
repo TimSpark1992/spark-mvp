@@ -31,10 +31,10 @@ export function AuthProvider({ children }) {
         // Add additional timeout protection for authentication (systematic fix pattern)
         const authTimeout = setTimeout(() => {
           if (isMounted) {
-            console.warn('⚠️ Auth initialization timed out after 10 seconds')
+            console.warn('⚠️ Auth initialization timed out after 8 seconds - allowing page access')
             setLoading(false)
           }
-        }, 15000)
+        }, 8000)
         
         // Get current session with better error handling and retry mechanism
         let session = null
