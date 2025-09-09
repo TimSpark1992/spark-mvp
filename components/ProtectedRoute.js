@@ -49,14 +49,14 @@ export default function ProtectedRoute({ children, requiredRole = null, redirect
     }
   }, [user, profile, loading, requiredRole, redirectTo, router, pathname, profileTimeout])
 
-  // Add timeout for profile loading to prevent infinite loading
+  // Add timeout for profile loading to prevent infinite loading (more aggressive for refresh issues)
   useEffect(() => {
     if (!loading && user && requiredRole && !profile && !profileTimeout) {
-      console.log('⏰ ProtectedRoute: Starting 10-second profile timeout')
+      console.log('⏰ ProtectedRoute: Starting 5-second profile timeout (refresh fix)')
       const timer = setTimeout(() => {
         console.warn('⚠️ ProtectedRoute: Profile loading timeout - proceeding without role check')
         setProfileTimeout(true)
-      }, 10000)
+      }, 5000)
 
       return () => clearTimeout(timer)
     }
