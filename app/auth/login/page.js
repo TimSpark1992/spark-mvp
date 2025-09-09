@@ -93,12 +93,12 @@ function LoginForm() {
     try {
       console.log('🔄 Starting login process for:', email)
       
-      // Enhanced timeout handling - increased to 45s for network variability and proper AbortController cleanup
+      // Enhanced timeout handling - increased to 60s to exceed Supabase client timeout (50s) 
       let timeoutId
       const timeoutPromise = new Promise((_, reject) => {
         timeoutId = setTimeout(() => {
           reject(new Error('Login request timed out. Please check your internet connection and try again.'))
-        }, 45000)
+        }, 60000)
       })
 
       const loginPromise = signIn(email, password).finally(() => {
