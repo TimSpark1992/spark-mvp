@@ -29,12 +29,16 @@ export function AuthProvider({ children }) {
         console.log('🔄 AuthProvider: Initializing authentication...')
         
         // Add additional timeout protection for authentication (systematic fix pattern)
+        // Use longer timeout for initial load, shorter for page refreshes
+        const isPageRefresh = typeof window !== 'undefined' && window.performance.navigation.type === 1
+        const timeoutDuration = isPageRefresh ? 8000 : 20000 // 8s for refresh, 20s for login
+        
         const authTimeout = setTimeout(() => {
           if (isMounted) {
-            console.warn('⚠️ Auth initialization timed out after 8 seconds - allowing page access')
+            console.warn(`⚠️ Auth initialization timed out after ${timeoutDuration/1000} seconds - allowing page access`)
             setLoading(false)
           }
-        }, 8000)
+        }, timeoutDuration)
         
         // Get current session with better error handling and retry mechanism
         let session = null
