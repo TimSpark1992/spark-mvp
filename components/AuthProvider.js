@@ -101,7 +101,20 @@ export function AuthProvider({ children }) {
               
               if (profileData && isMounted) {
                 profile = profileData
+                console.log('🔄 Setting profile state:', profileData)
                 setProfile(profileData)
+                
+                // Force state update and verify it persists
+                setTimeout(() => {
+                  if (isMounted) {
+                    console.log('🔍 Profile state after hydration:', profileData.role)
+                    setProfile(prevProfile => {
+                      console.log('🔍 Current profile in state:', prevProfile?.role || 'null')
+                      return profileData // Ensure state is definitely set
+                    })
+                  }
+                }, 500) // Give hydration time to complete
+                
                 console.log('✅ Profile loaded successfully:', profileData.role)
                 break
               } else if (profileError) {
