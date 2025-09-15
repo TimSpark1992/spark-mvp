@@ -144,7 +144,10 @@ export function AuthProvider({ children }) {
       }
     }
 
-    initializeAuth()
+    // Ensure we're fully client-side mounted before initializing auth
+    const timer = setTimeout(() => {
+      initializeAuth()
+    }, 100) // Small delay to ensure hydration is complete
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
