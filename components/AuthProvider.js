@@ -231,6 +231,28 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // Add backup mechanism to recover profile if lost during hydration
+  useEffect(() => {
+    if (user && !profile && !loading) {
+      console.warn('⚠️ User exists but profile is missing - attempting recovery')
+      const recoverProfile = async () => {
+        try {
+          const { data: profileData, error } = await getProfile(user.id)
+          if (profileData) {
+            console.log('🔄 Profile recovered:', profileData.role)
+            setProfile(profileData)
+          } else {
+            console.error('❌ Profile recovery failed:', error)
+          }
+        } catch (err) {
+          console.error('❌ Profile recovery error:', err)
+        }
+      }
+      
+      const timer = setTimeout(recoverProfile, 1000) // Wait 1 second before recovery
+      return () => clearTimeout(timer)
+    }
+  }, [user, profile, loading])
   const value = {
     user,
     profile,
