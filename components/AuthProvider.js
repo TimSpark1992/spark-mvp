@@ -190,6 +190,7 @@ export function AuthProvider({ children }) {
 
     return () => {
       isMounted = false
+      clearTimeout(timer)
       subscription.unsubscribe()
     }
   }, [])
