@@ -253,6 +253,7 @@ export function AuthProvider({ children }) {
       return () => clearTimeout(timer)
     }
   }, [user, profile, loading])
+
   const value = {
     user,
     profile,
