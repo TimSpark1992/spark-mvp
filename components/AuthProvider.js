@@ -25,8 +25,14 @@ export function AuthProvider({ children }) {
     
     // Initial auth check with improved session rehydration
     const initializeAuth = async () => {
+      // CRITICAL FIX: Only run on client-side to prevent server/client session mismatch
+      if (typeof window === 'undefined') {
+        console.log('🔄 AuthProvider: Skipping server-side initialization, waiting for client-side hydration')
+        return
+      }
+      
       try {
-        console.log('🔄 AuthProvider: Initializing authentication...')
+        console.log('🔄 AuthProvider: Starting client-side authentication initialization')
         
         // Add additional timeout protection for authentication (systematic fix pattern)
         // Use longer timeout for production network latency (60s based on troubleshoot analysis)
