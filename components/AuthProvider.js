@@ -104,6 +104,8 @@ export function AuthProvider({ children }) {
           // Load user profile ONLY after session is fully validated
           console.log('🔄 Step 5: Loading user profile for:', session.user.id)
           let profile = null
+          let retryCount = 0
+          const maxRetries = 3
           
           while (!profile && retryCount < maxRetries && isMounted) {
             try {
