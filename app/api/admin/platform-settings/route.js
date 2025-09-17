@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server'
 import { verifyAdminAccess } from '@/lib/auth-helpers'
 import { createClient } from '@supabase/supabase-js'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 // Create Supabase client with environment variable checks
 function getSupabaseAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
