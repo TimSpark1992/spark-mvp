@@ -101,28 +101,6 @@ export function AuthProvider({ children }) {
             setUser(session.user)
           }
           
-          // 🚨 EMERGENCY BYPASS: Fix for persistent profile state loss issue
-          if (session.user.email === 'prodtest1755229904@example.com') {
-            console.log('🚨 EMERGENCY BYPASS: Setting brand role for test user')
-            const emergencyProfile = {
-              id: session.user.id,
-              email: session.user.email,
-              role: 'brand',
-              full_name: 'Test Brand User',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }
-            
-            if (isMounted) {
-              setProfile(emergencyProfile)
-              setLoading(false)
-            }
-            
-            console.log('✅ Emergency bypass complete - profile role set to brand')
-            clearTimeout(authTimeout)
-            return
-          }
-          
           // Load user profile ONLY after session is fully validated
           console.log('🔄 Step 5: Loading user profile for:', session.user.id)
           let profile = null
