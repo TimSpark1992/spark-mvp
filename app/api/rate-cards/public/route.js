@@ -19,7 +19,7 @@ export async function GET(request) {
         updated_at,
         profiles:creator_id (
           full_name,
-          username
+          email
         )
       `)
       .eq('active', true)
