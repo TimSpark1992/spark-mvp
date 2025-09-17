@@ -45,7 +45,7 @@ export async function GET(request) {
       updated_at: card.updated_at,
       creator_profile: {
         full_name: card.profiles?.full_name,
-        username: card.profiles?.username
+        email: card.profiles?.email
       }
     }))
     
