@@ -35,13 +35,13 @@ export function AuthProvider({ children }) {
         console.log('🔄 AuthProvider: Starting client-side authentication initialization')
         
         // Add additional timeout protection for authentication (systematic fix pattern)
-        // Use longer timeout for production network latency (60s based on troubleshoot analysis)
+        // Reduced timeout to prevent login conflicts (10s for faster response)
         const authTimeout = setTimeout(() => {
           if (isMounted) {
-            console.warn('⚠️ Auth initialization timed out after 60 seconds - allowing page access')
+            console.warn('⚠️ Auth initialization timed out after 10 seconds - allowing page access')
             setLoading(false)
           }
-        }, 60000)
+        }, 10000)
         
         // CRITICAL FIX: Sequential authentication with session validation
         console.log('🔄 Step 1: Getting session from storage')
