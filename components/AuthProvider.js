@@ -59,16 +59,51 @@ export function AuthProvider({ children }) {
         }
         
         if (session?.user) {
-          console.log('✅ Session found for user:', session.user.email)
+          console.log('✅ Step 2: Session found for user:', session.user.email)
+          
+          // CRITICAL FIX: Validate session is fully authenticated before database queries
+          console.log('🔄 Step 3: Validating session authentication')
+          try {
+            // Make a test authenticated query to ensure Supabase client is ready
+            const { data: testQuery, error: testError } = await supabase.auth.getUser()
+            
+            if (testError || !testQuery?.user) {
+              console.warn('⚠️ Session authentication validation failed:', testError)
+              // Session exists but isn't properly authenticated - wait and retry
+              await new Promise(resolve => setTimeout(resolve, 2000))
+              
+              const { data: retryUser, error: retryError } = await supabase.auth.getUser()
+              if (retryError || !retryUser?.user) {
+                console.error('❌ Session validation failed after retry')
+                if (isMounted) {
+                  setUser(null)
+                  setProfile(null)
+                  setLoading(false)
+                }
+                clearTimeout(authTimeout)
+                return
+              }
+            }
+            
+            console.log('✅ Step 4: Session authentication validated')
+          } catch (validationError) {
+            console.error('❌ Session validation error:', validationError)
+            if (isMounted) {
+              setUser(null)
+              setProfile(null)
+              setLoading(false)
+            }
+            clearTimeout(authTimeout)
+            return
+          }
           
           if (isMounted) {
             setUser(session.user)
           }
           
-          // Get user profile with retry mechanism
+          // Load user profile ONLY after session is fully validated
+          console.log('🔄 Step 5: Loading user profile for:', session.user.id)
           let profile = null
-          let retryCount = 0
-          const maxRetries = 3
           
           while (!profile && retryCount < maxRetries && isMounted) {
             try {
