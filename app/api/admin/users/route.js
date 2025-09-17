@@ -62,7 +62,7 @@ export async function GET(request) {
 
     // Apply filters
     if (search) {
-      query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,username.ilike.%${search}%`);
+      query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`);
     }
 
     if (role) {
