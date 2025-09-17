@@ -43,37 +43,12 @@ export function AuthProvider({ children }) {
           }
         }, 60000)
         
-        // Get current session with better error handling and retry mechanism
-        let session = null
-        let sessionError = null
-        let retryCount = 0
-        const maxRetries = 3
+        // CRITICAL FIX: Sequential authentication with session validation
+        console.log('🔄 Step 1: Getting session from storage')
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
-        while (!session && retryCount < maxRetries && isMounted) {
-          try {
-            const { data: sessionData, error: sessionErr } = await supabase.auth.getSession()
-            session = sessionData?.session
-            sessionError = sessionErr
-            
-            if (session || !sessionErr) break
-            
-            console.warn(`Session retrieval attempt ${retryCount + 1} failed:`, sessionErr)
-            retryCount++
-            
-            if (retryCount < maxRetries && isMounted) {
-              await new Promise(resolve => setTimeout(resolve, 1000 * retryCount))
-            }
-          } catch (err) {
-            console.warn(`Session retrieval attempt ${retryCount + 1} error:`, err)
-            retryCount++
-            if (retryCount < maxRetries && isMounted) {
-              await new Promise(resolve => setTimeout(resolve, 1000 * retryCount))
-            }
-          }
-        }
-        
-        if (sessionError && !session) {
-          console.error('❌ Session retrieval failed after all retries:', sessionError)
+        if (sessionError) {
+          console.error('❌ Session retrieval failed:', sessionError)
           if (isMounted) {
             setUser(null)
             setProfile(null)
