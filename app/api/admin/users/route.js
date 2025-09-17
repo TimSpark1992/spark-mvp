@@ -48,7 +48,6 @@ export async function GET(request) {
         id,
         full_name,
         email,
-        username,
         role,
         followers_count,
         categories,
