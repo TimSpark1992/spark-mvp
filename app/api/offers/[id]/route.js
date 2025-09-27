@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server'
 import { getOffer, updateOffer, deleteOffer } from '@/lib/supabase'
 import { createClient } from '@supabase/supabase-js'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 // Create Supabase admin client for delete operations
 function getSupabaseAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
