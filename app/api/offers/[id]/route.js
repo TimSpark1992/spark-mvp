@@ -135,7 +135,23 @@ export async function DELETE(request, { params }) {
     
     console.log('📋 Deleting offer:', id)
     
-    const { data: offer, error } = await deleteOffer(id)
+    const supabase = getSupabaseAdminClient()
+    if (!supabase) {
+      return NextResponse.json({
+        error: 'Database service unavailable - Supabase not configured'
+      }, { status: 503 })
+    }
+    
+    // Use admin client to ensure delete permissions
+    const { data: offer, error } = await supabase
+      .from('offers')
+      .update({ 
+        status: 'cancelled', 
+        updated_at: new Date().toISOString() 
+      })
+      .eq('id', id)
+      .select()
+      .single()
     
     if (error) {
       if (error.code === 'PGRST116') {
@@ -152,7 +168,7 @@ export async function DELETE(request, { params }) {
       )
     }
     
-    console.log('✅ Offer deleted:', offer.id)
+    console.log('✅ Offer deleted - status set to cancelled:', offer.id)
     
     return NextResponse.json({ 
       offer,
