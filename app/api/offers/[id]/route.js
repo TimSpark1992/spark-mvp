@@ -1,6 +1,20 @@
 // app/api/offers/[id]/route.js
 import { NextResponse } from 'next/server'
 import { getOffer, updateOffer, deleteOffer } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+
+// Create Supabase admin client for delete operations
+function getSupabaseAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.warn('Supabase environment variables not configured')
+    return null
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey)
+}
 
 export async function GET(request, { params }) {
   try {
