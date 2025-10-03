@@ -1,15 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, DollarSign, Clock, User, Package, CheckCircle, XCircle, Edit } from 'lucide-react';
-import { formatPrice, formatDate } from '@/lib/formatters';
 
 const OfferSheet = ({ 
   offer = null, 
@@ -22,19 +14,21 @@ const OfferSheet = ({
   mode = 'create',
   userRole = 'brand'
 }) => {
-  // MINIMAL TEST VERSION - Just render basic content to test modal functionality
   console.log('🧪 OfferSheet TEST VERSION - Rendering with offer ID:', offer?.id, 'Mode:', mode);
   
   return (
-    <div className="p-6 bg-white rounded-lg">
-      <h2 className="text-xl font-bold mb-4">Test OfferSheet Modal</h2>
-      <p className="mb-2">Offer ID: {offer?.id || 'No ID'}</p>
-      <p className="mb-2">Mode: {mode}</p>
-      <p className="mb-2">Campaign ID: {campaignId}</p>
-      <p className="mb-4">Status: {offer?.status || 'Unknown'}</p>
-      <div className="mt-4">
-        <Button onClick={onCancel} variant="secondary">
-          Close
+    <div className="p-6 bg-white rounded-lg max-w-md mx-auto">
+      <h2 className="text-xl font-bold mb-4 text-gray-900">Test OfferSheet Modal</h2>
+      <div className="space-y-2 text-gray-700">
+        <p><strong>Offer ID:</strong> {offer?.id || 'No ID'}</p>
+        <p><strong>Mode:</strong> {mode}</p>
+        <p><strong>Campaign ID:</strong> {campaignId}</p>
+        <p><strong>Status:</strong> {offer?.status || 'Unknown'}</p>
+        <p><strong>User Role:</strong> {userRole}</p>
+      </div>
+      <div className="mt-6">
+        <Button onClick={onCancel} variant="secondary" className="w-full">
+          Close Modal
         </Button>
       </div>
     </div>
