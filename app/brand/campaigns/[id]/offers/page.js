@@ -305,7 +305,13 @@ const OffersPage = () => {
                             <Button
                               variant="secondary"
                               size="sm"
-                              onClick={() => openOfferSheet(offer, 'edit')}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log('Edit button clicked for offer:', offer.id);
+                                openOfferSheet(offer, 'edit');
+                              }}
+                              type="button"
                             >
                               <Edit className="w-4 h-4 mr-2" />
                               Edit
@@ -314,7 +320,13 @@ const OffersPage = () => {
                           <Button
                             variant="secondary"
                             size="sm"
-                            onClick={() => handleDeleteOffer(offer.id)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              console.log('Delete button clicked for offer:', offer.id);
+                              handleDeleteOffer(offer.id);
+                            }}
+                            type="button"
                             className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
