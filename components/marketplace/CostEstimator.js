@@ -268,8 +268,13 @@ export default function CostEstimator({
                 <input
                   type="number"
                   min="1"
+                  step="1"
                   value={item.qty}
-                  onChange={(e) => updateItem(item.id, 'qty', parseInt(e.target.value) || 1)}
+                  onChange={(e) => {
+                    const value = e.target.value === '' ? 1 : parseInt(e.target.value) || 1;
+                    updateItem(item.id, 'qty', value);
+                  }}
+                  onFocus={(e) => e.target.select()}
                   className="w-full px-3 py-2 text-sm bg-[#2A2A3A] border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
