@@ -925,6 +925,7 @@ backend:
 
 test_plan:
   current_focus:
+    - "Cost Estimator UX Regression Testing"
     - "Campaign Creation API Array Format Fix"
     - "Password Reset Functionality Testing"
     - "Enhanced Campaign Deletion Modal with Spark Design System"
