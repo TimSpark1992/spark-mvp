@@ -605,6 +605,7 @@ const OfferSheet = ({
       </CardContent>
     </Card>
   );
+  */
 };
 
 export default OfferSheet;
