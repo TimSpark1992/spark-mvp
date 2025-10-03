@@ -52,61 +52,123 @@ const OfferSheet = ({
     if (offer && mode !== 'create') {
       try {
         console.log('🔍 OfferSheet: Processing offer data:', offer)
+        
+        // ROBUST DATA VALIDATION - prevent crashes from malformed data
+        if (!offer || typeof offer !== 'object') {
+          console.error('❌ Invalid offer object:', offer)
+          return
+        }
+        
         console.log('🔍 Raw offer.items:', offer.items, 'Type:', typeof offer.items)
         
-        // Parse the items JSONB field to get offer details
+        // Safe JSONB parsing with comprehensive validation
         let parsedItems = []
-        try {
-          if (offer.items) {
-            parsedItems = typeof offer.items === 'string' ? JSON.parse(offer.items) : offer.items || []
-            console.log('📊 Parsed items:', parsedItems)
+        let firstItem = {}
+        
+        if (offer.items) {
+          try {
+            // Validate JSON string before parsing
+            if (typeof offer.items === 'string') {
+              if (offer.items.trim().length === 0 || !offer.items.startsWith('[')) {
+                console.warn('⚠️ Invalid JSON format in offer.items:', offer.items)
+                parsedItems = []
+              } else {
+                parsedItems = JSON.parse(offer.items)
+                console.log('📊 Successfully parsed items:', parsedItems)
+              }
+            } else if (Array.isArray(offer.items)) {
+              parsedItems = offer.items
+              console.log('📊 Items already parsed:', parsedItems)
+            } else {
+              console.warn('⚠️ Unexpected items format:', typeof offer.items)
+              parsedItems = []
+            }
+          } catch (parseError) {
+            console.error('❌ JSON parse error:', parseError)
+            console.error('❌ Raw items data:', offer.items)
+            parsedItems = []
           }
-        } catch (error) {
-          console.error('❌ Error parsing offer items:', error)
-          parsedItems = []
         }
         
-        const firstItem = parsedItems[0] || {}
-        console.log('🎯 First item extracted:', firstItem)
-        console.log('💰 First item base_price_cents:', firstItem.base_price_cents, 'Type:', typeof firstItem.base_price_cents)
+        // Safe first item extraction
+        if (Array.isArray(parsedItems) && parsedItems.length > 0) {
+          firstItem = parsedItems[0] || {}
+          console.log('🎯 First item extracted:', firstItem)
+        } else {
+          console.log('🎯 No items found, using offer-level data')
+          firstItem = {}
+        }
         
-        // Test the formatPrice function with the value
-        const testPrice = formatPrice(firstItem.base_price_cents || 0, offer.currency || 'USD')
-        console.log('🧪 Testing formatPrice with base_price_cents:', firstItem.base_price_cents, '-> Result:', testPrice)
+        // Safe numeric value extraction with validation
+        const safeBasePrice = (() => {
+          const value = firstItem.base_price_cents || offer.base_price_cents || 0
+          return (typeof value === 'number' && !isNaN(value) && value >= 0) ? value : 0
+        })()
         
+        const safeQuantity = (() => {
+          const value = firstItem.quantity || offer.quantity || 1
+          return (typeof value === 'number' && !isNaN(value) && value > 0) ? value : 1
+        })()
+        
+        const safeRushPct = (() => {
+          const value = firstItem.rush_fee_pct || offer.rush_fee_pct || 0
+          return (typeof value === 'number' && !isNaN(value) && value >= 0) ? value : 0
+        })()
+        
+        console.log('💰 Safe values - Price:', safeBasePrice, 'Qty:', safeQuantity, 'Rush:', safeRushPct)
+        
+        // Safe formatPrice test with validation
+        let testPrice = '$0.00'
+        try {
+          testPrice = formatPrice(safeBasePrice, offer.currency || 'USD')
+          console.log('🧪 FormatPrice test successful:', testPrice)
+        } catch (formatError) {
+          console.error('❌ FormatPrice error:', formatError)
+          testPrice = '$0.00'
+        }
+        
+        // Build form data with validated values
         const newFormData = {
           ...offer,
-          // Extract data from the first item for display
           deliverable_type: firstItem.deliverable_type || offer.deliverable_type || '',
-          quantity: firstItem.quantity || offer.quantity || 1,
-          base_price_cents: firstItem.base_price_cents || offer.base_price_cents || 0,
-          rush_fee_pct: firstItem.rush_fee_pct || offer.rush_fee_pct || 0,
+          quantity: safeQuantity,
+          base_price_cents: safeBasePrice,
+          rush_fee_pct: safeRushPct,
           deadline: offer.expires_at ? offer.expires_at.split('T')[0] : '',
-          description: offer.notes || offer.description || ''
+          description: offer.notes || offer.description || '',
+          currency: offer.currency || 'USD'
         }
         
-        console.log('💾 Setting form data:', {
+        console.log('💾 Setting validated form data:', {
           deliverable_type: newFormData.deliverable_type,
           quantity: newFormData.quantity,
           base_price_cents: newFormData.base_price_cents,
           rush_fee_pct: newFormData.rush_fee_pct
         })
-        console.log('🧮 Final calculation test - Base price * quantity:', newFormData.base_price_cents * newFormData.quantity)
-        console.log('🧮 Final formatPrice test:', formatPrice(newFormData.base_price_cents * newFormData.quantity, newFormData.currency))
         
         setFormData(newFormData);
       } catch (error) {
-        console.error('❌ Critical error in OfferSheet useEffect:', error)
-        // Set fallback form data to prevent crashes
-        setFormData({
-          ...offer,
-          deliverable_type: offer.deliverable_type || '',
-          quantity: offer.quantity || 1,
-          base_price_cents: offer.base_price_cents || 0,
-          rush_fee_pct: offer.rush_fee_pct || 0,
+        console.error('❌ CRITICAL ERROR in OfferSheet useEffect:', error)
+        console.error('❌ Error stack:', error.stack)
+        
+        // FALLBACK: Set minimal working form data to prevent component crash
+        const fallbackData = {
+          id: offer.id || '',
+          campaign_id: offer.campaign_id || '',
+          creator_id: offer.creator_id || '',
+          brand_id: offer.brand_id || '',
+          deliverable_type: 'IG_Reel',
+          quantity: 1,
+          base_price_cents: 0,
+          rush_fee_pct: 0,
+          currency: 'USD',
           deadline: '',
-          description: offer.notes || ''
-        });
+          description: '',
+          status: offer.status || 'drafted'
+        }
+        
+        console.log('🛡️ Using fallback form data to prevent crash')
+        setFormData(fallbackData);
       }
     }
   }, [offer, mode]);
