@@ -290,7 +290,13 @@ const OffersPage = () => {
                           <Button
                             variant="secondary"
                             size="sm"
-                            onClick={() => openOfferSheet(offer, 'view')}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              console.log('View button clicked for offer:', offer.id);
+                              openOfferSheet(offer, 'view');
+                            }}
+                            type="button"
                           >
                             <Eye className="w-4 h-4 mr-2" />
                             View
