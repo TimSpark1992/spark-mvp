@@ -28,9 +28,10 @@ const OfferSheet = ({
   return (
     <div className="p-6 bg-white rounded-lg">
       <h2 className="text-xl font-bold mb-4">Test OfferSheet Modal</h2>
-      <p>Offer ID: {offer?.id || 'No ID'}</p>
-      <p>Mode: {mode}</p>
-      <p>Campaign ID: {campaignId}</p>
+      <p className="mb-2">Offer ID: {offer?.id || 'No ID'}</p>
+      <p className="mb-2">Mode: {mode}</p>
+      <p className="mb-2">Campaign ID: {campaignId}</p>
+      <p className="mb-4">Status: {offer?.status || 'Unknown'}</p>
       <div className="mt-4">
         <Button onClick={onCancel} variant="secondary">
           Close
@@ -38,9 +39,7 @@ const OfferSheet = ({
       </div>
     </div>
   );
-
-  // OLD CODE COMMENTED OUT FOR TESTING
-  /*
+};
   const [formData, setFormData] = useState({
     campaign_id: campaignId,
     creator_id: creatorId,
