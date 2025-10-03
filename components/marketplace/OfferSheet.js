@@ -18,13 +18,29 @@ const OfferSheet = ({
   brandId = null,
   estimatedData = null,
   onSubmit, 
-  onCancel, 
-  onAccept, 
-  onReject, 
-  onCounterOffer,
-  mode = 'create', // 'create', 'view', 'edit', 'respond'
+  onCancel,
+  mode = 'create',
   userRole = 'brand'
 }) => {
+  // MINIMAL TEST VERSION - Just render basic content to test modal functionality
+  console.log('🧪 OfferSheet TEST VERSION - Rendering with offer ID:', offer?.id, 'Mode:', mode);
+  
+  return (
+    <div className="p-6 bg-white rounded-lg">
+      <h2 className="text-xl font-bold mb-4">Test OfferSheet Modal</h2>
+      <p>Offer ID: {offer?.id || 'No ID'}</p>
+      <p>Mode: {mode}</p>
+      <p>Campaign ID: {campaignId}</p>
+      <div className="mt-4">
+        <Button onClick={onCancel} variant="secondary">
+          Close
+        </Button>
+      </div>
+    </div>
+  );
+
+  // OLD CODE COMMENTED OUT FOR TESTING
+  /*
   const [formData, setFormData] = useState({
     campaign_id: campaignId,
     creator_id: creatorId,
