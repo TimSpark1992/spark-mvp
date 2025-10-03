@@ -262,7 +262,7 @@ const OffersPage = () => {
                             {offer.creator_profile?.full_name || 'Unknown Creator'}
                           </Text>
                           <Text size="sm" color="secondary" className="mb-2">
-                            {offer.deliverable_type?.replace('_', ' ')} • {offer.quantity}x
+                            {offer.deliverable_type?.replace('_', ' ')} • Qty: {offer.quantity}
                           </Text>
                           <div className="flex items-center gap-4">
                             <div className="flex items-center gap-1">
