@@ -394,7 +394,8 @@ const OfferSheet = ({
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
         <CardTitle>
-          {mode === 'create' ? 'Create New Offer' : mode === 'edit' ? 'Edit Offer' : 'Offer Details'}
+          {mode === 'create' ? (estimatedData ? 'Summary' : 'Create New Offer') : 
+           mode === 'edit' ? 'Edit Offer' : 'Offer Details'}
         </CardTitle>
       </CardHeader>
       <CardContent>
