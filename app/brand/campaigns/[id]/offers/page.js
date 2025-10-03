@@ -352,17 +352,40 @@ const OffersPage = () => {
                       ✕
                     </Button>
                   </div>
-                  <OfferSheet
-                    offer={selectedOffer}
-                    campaignId={campaignId}
-                    mode={offerSheetMode}
-                    userRole="brand"
-                    onSubmit={handleUpdateOffer}
-                    onCancel={() => {
-                      setShowOfferSheet(false)
-                      setSelectedOffer(null)
-                    }}
-                  />
+                  {(() => {
+                    try {
+                      return (
+                        <OfferSheet
+                          offer={selectedOffer}
+                          campaignId={campaignId}
+                          mode={offerSheetMode}
+                          userRole="brand"
+                          onSubmit={handleUpdateOffer}
+                          onCancel={() => {
+                            setShowOfferSheet(false)
+                            setSelectedOffer(null)
+                          }}
+                        />
+                      )
+                    } catch (error) {
+                      console.error('OfferSheet Error:', error)
+                      return (
+                        <div className="p-6 text-center">
+                          <Text color="error" className="mb-2">Error loading offer details</Text>
+                          <Text size="sm" color="secondary">{error.message}</Text>
+                          <Button 
+                            onClick={() => {
+                              setShowOfferSheet(false)
+                              setSelectedOffer(null)
+                            }}
+                            className="mt-4"
+                          >
+                            Close
+                          </Button>
+                        </div>
+                      )
+                    }
+                  })()}
                 </div>
               </div>
             </div>
