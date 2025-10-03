@@ -428,19 +428,33 @@ const OfferSheet = ({
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Deliverable Type *
                 </label>
-                <Select value={formData.deliverable_type} onValueChange={(value) => handleInputChange('deliverable_type', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select deliverable type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="IG_Reel">Instagram Reel</SelectItem>
-                    <SelectItem value="IG_Story">Instagram Story</SelectItem>
-                    <SelectItem value="TikTok_Post">TikTok Post</SelectItem>
-                    <SelectItem value="YouTube_Video">YouTube Video</SelectItem>
-                    <SelectItem value="YouTube_Short">YouTube Short</SelectItem>
-                    <SelectItem value="Bundle">Bundle</SelectItem>
-                  </SelectContent>
-                </Select>
+                {estimatedData ? (
+                  // Show as read-only when pre-filled from Cost Estimator
+                  <div className="flex items-center p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <Package className="w-4 h-4 text-blue-600 mr-2" />
+                    <span className="text-sm font-medium text-blue-900">
+                      {formData.deliverable_type?.replace('_', ' ') || 'Not specified'}
+                    </span>
+                    <Badge variant="outline" className="ml-auto text-xs text-blue-700 bg-blue-100 border-blue-300">
+                      Selected from Cost Estimator
+                    </Badge>
+                  </div>
+                ) : (
+                  // Show dropdown when creating manually
+                  <Select value={formData.deliverable_type} onValueChange={(value) => handleInputChange('deliverable_type', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select deliverable type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="IG_Reel">Instagram Reel</SelectItem>
+                      <SelectItem value="IG_Story">Instagram Story</SelectItem>
+                      <SelectItem value="TikTok_Post">TikTok Post</SelectItem>
+                      <SelectItem value="YouTube_Video">YouTube Video</SelectItem>
+                      <SelectItem value="YouTube_Short">YouTube Short</SelectItem>
+                      <SelectItem value="Bundle">Bundle</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               <div>
