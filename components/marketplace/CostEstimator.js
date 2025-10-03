@@ -289,8 +289,22 @@ export default function CostEstimator({
                     type="number"
                     min="0"
                     max="200"
+                    step="1"
                     value={item.rush_pct}
-                    onChange={(e) => updateItem(item.id, 'rush_pct', parseInt(e.target.value) || 0)}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0;
+                      updateItem(item.id, 'rush_pct', value);
+                    }}
+                    onFocus={(e) => {
+                      // Select all text on focus for better UX
+                      e.target.select();
+                    }}
+                    onInput={(e) => {
+                      // Remove leading zeros while typing
+                      if (e.target.value.length > 1 && e.target.value.startsWith('0') && e.target.value !== '0') {
+                        e.target.value = e.target.value.replace(/^0+/, '');
+                      }
+                    }}
                     className="w-full px-3 py-2 text-sm bg-[#2A2A3A] border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {item.rush_pct > 0 && <Zap className="w-4 h-4 text-yellow-400" />}
