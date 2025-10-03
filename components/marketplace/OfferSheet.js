@@ -50,48 +50,64 @@ const OfferSheet = ({
   // Initialize form data if editing existing offer
   useEffect(() => {
     if (offer && mode !== 'create') {
-      console.log('🔍 OfferSheet: Processing offer data:', offer)
-      console.log('🔍 Raw offer.items:', offer.items, 'Type:', typeof offer.items)
-      
-      // Parse the items JSONB field to get offer details
-      let parsedItems = []
       try {
-        parsedItems = typeof offer.items === 'string' ? JSON.parse(offer.items) : offer.items || []
-        console.log('📊 Parsed items:', parsedItems)
+        console.log('🔍 OfferSheet: Processing offer data:', offer)
+        console.log('🔍 Raw offer.items:', offer.items, 'Type:', typeof offer.items)
+        
+        // Parse the items JSONB field to get offer details
+        let parsedItems = []
+        try {
+          if (offer.items) {
+            parsedItems = typeof offer.items === 'string' ? JSON.parse(offer.items) : offer.items || []
+            console.log('📊 Parsed items:', parsedItems)
+          }
+        } catch (error) {
+          console.error('❌ Error parsing offer items:', error)
+          parsedItems = []
+        }
+        
+        const firstItem = parsedItems[0] || {}
+        console.log('🎯 First item extracted:', firstItem)
+        console.log('💰 First item base_price_cents:', firstItem.base_price_cents, 'Type:', typeof firstItem.base_price_cents)
+        
+        // Test the formatPrice function with the value
+        const testPrice = formatPrice(firstItem.base_price_cents || 0, offer.currency || 'USD')
+        console.log('🧪 Testing formatPrice with base_price_cents:', firstItem.base_price_cents, '-> Result:', testPrice)
+        
+        const newFormData = {
+          ...offer,
+          // Extract data from the first item for display
+          deliverable_type: firstItem.deliverable_type || offer.deliverable_type || '',
+          quantity: firstItem.quantity || offer.quantity || 1,
+          base_price_cents: firstItem.base_price_cents || offer.base_price_cents || 0,
+          rush_fee_pct: firstItem.rush_fee_pct || offer.rush_fee_pct || 0,
+          deadline: offer.expires_at ? offer.expires_at.split('T')[0] : '',
+          description: offer.notes || offer.description || ''
+        }
+        
+        console.log('💾 Setting form data:', {
+          deliverable_type: newFormData.deliverable_type,
+          quantity: newFormData.quantity,
+          base_price_cents: newFormData.base_price_cents,
+          rush_fee_pct: newFormData.rush_fee_pct
+        })
+        console.log('🧮 Final calculation test - Base price * quantity:', newFormData.base_price_cents * newFormData.quantity)
+        console.log('🧮 Final formatPrice test:', formatPrice(newFormData.base_price_cents * newFormData.quantity, newFormData.currency))
+        
+        setFormData(newFormData);
       } catch (error) {
-        console.error('❌ Error parsing offer items:', error)
-        parsedItems = []
+        console.error('❌ Critical error in OfferSheet useEffect:', error)
+        // Set fallback form data to prevent crashes
+        setFormData({
+          ...offer,
+          deliverable_type: offer.deliverable_type || '',
+          quantity: offer.quantity || 1,
+          base_price_cents: offer.base_price_cents || 0,
+          rush_fee_pct: offer.rush_fee_pct || 0,
+          deadline: '',
+          description: offer.notes || ''
+        });
       }
-      
-      const firstItem = parsedItems[0] || {}
-      console.log('🎯 First item extracted:', firstItem)
-      console.log('💰 First item base_price_cents:', firstItem.base_price_cents, 'Type:', typeof firstItem.base_price_cents)
-      
-      // Test the formatPrice function with the value
-      const testPrice = formatPrice(firstItem.base_price_cents || 0, offer.currency || 'USD')
-      console.log('🧪 Testing formatPrice with base_price_cents:', firstItem.base_price_cents, '-> Result:', testPrice)
-      
-      const newFormData = {
-        ...offer,
-        // Extract data from the first item for display
-        deliverable_type: firstItem.deliverable_type || '',
-        quantity: firstItem.quantity || 1,
-        base_price_cents: firstItem.base_price_cents || 0,
-        rush_fee_pct: firstItem.rush_fee_pct || 0,
-        deadline: offer.expires_at ? offer.expires_at.split('T')[0] : '',
-        description: offer.notes || ''
-      }
-      
-      console.log('💾 Setting form data:', {
-        deliverable_type: newFormData.deliverable_type,
-        quantity: newFormData.quantity,
-        base_price_cents: newFormData.base_price_cents,
-        rush_fee_pct: newFormData.rush_fee_pct
-      })
-      console.log('🧮 Final calculation test - Base price * quantity:', newFormData.base_price_cents * newFormData.quantity)
-      console.log('🧮 Final formatPrice test:', formatPrice(newFormData.base_price_cents * newFormData.quantity, newFormData.currency))
-      
-      setFormData(newFormData);
     }
   }, [offer, mode]);
 
