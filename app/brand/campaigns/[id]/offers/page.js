@@ -227,7 +227,7 @@ const OffersPage = () => {
                 <div className="text-center">
                   <Text color="secondary" size="sm" className="mb-2">Pending</Text>
                   <Heading level={3} size="2xl" className="text-yellow-400">
-                    {offers.filter(o => o.status === 'sent').length}
+                    {Array.isArray(offers) ? offers.filter(o => o.status === 'sent').length : 0}
                   </Heading>
                 </div>
                 <div className="text-center">
