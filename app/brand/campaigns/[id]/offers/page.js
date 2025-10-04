@@ -126,9 +126,18 @@ const OffersPage = () => {
   }
 
   const openOfferSheet = (offer, mode) => {
-    setSelectedOffer(offer)
-    setOfferSheetMode(mode)
-    setShowOfferSheet(true)
+    console.log('🔵 openOfferSheet called with:', { offerId: offer?.id, mode });
+    try {
+      console.log('🔵 Setting selectedOffer...');
+      setSelectedOffer(offer);
+      console.log('🔵 Setting offerSheetMode...');
+      setOfferSheetMode(mode);
+      console.log('🔵 Setting showOfferSheet to true...');
+      setShowOfferSheet(true);
+      console.log('🔵 openOfferSheet completed successfully');
+    } catch (error) {
+      console.error('🔴 Error in openOfferSheet:', error);
+    }
   }
 
   if (loading) {
