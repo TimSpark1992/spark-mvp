@@ -361,7 +361,11 @@ const OffersPage = () => {
                       </div>
                     )}
                   </Card>
-                ))}
+                )) : (
+                  <div className="text-center py-8">
+                    <Text color="secondary">No offers data available</Text>
+                  </div>
+                )}
               </div>
             )}
           </Card>
