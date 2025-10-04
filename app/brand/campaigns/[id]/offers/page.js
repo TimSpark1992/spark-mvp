@@ -267,7 +267,7 @@ const OffersPage = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                {offers.map((offer) => (
+                {Array.isArray(offers) ? offers.map((offer) => (
                   <Card key={offer.id} className="p-6 border-l-4 border-l-purple-500/50 hover:bg-[#1A1A2A]/30 transition-colors">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                       <div className="flex items-center space-x-4">
