@@ -7,7 +7,7 @@ correct values like base_price_cents: 7150 but frontend shows $0.00
 Focus Areas:
 1. GET /api/offers API returns correct data structure with items JSONB field
 2. Test specific offer ID "07bc674b-f40f-4928-be79-b5bc574fb1fa" 
-3. Test campaign offers endpoint: GET /api/offers?campaign_id=be9e2307-d8bc-4292-b6f7-17ddcd0b07ca
+3. Test campaign offers endpoint: GET /api/offers?campaign_id=next-error-fix
 4. Verify JSONB parsing logic - ensure items field is returned as valid JSON string
 5. Test mathematical calculations: 7150 cents * 2 quantity = 14300 cents = $143.00
 """

@@ -11,7 +11,7 @@ import time
 from datetime import datetime, timedelta
 
 # Configuration
-BASE_URL = "https://spark-bugfix.preview.emergentagent.com"
+BASE_URL = "https://next-error-fix.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class PaymentBackendTester:

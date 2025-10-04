@@ -8,7 +8,7 @@ profile loading. User was stuck on "Loading your profile..." after deleting all 
 
 SPECIFIC TESTS:
 1. Test GET /api/offers with campaign that has no offers - should return empty array
-2. Test GET /api/offers?campaign_id=be9e2307-d8bc-4292-b6f7-17ddcd0b07ca - should return empty array if all offers deleted
+2. Test GET /api/offers?campaign_id=next-error-fix - should return empty array if all offers deleted
 3. Verify API returns proper JSON structure even when no offers exist
 4. Test API response time is within acceptable limits (< 5 seconds)
 5. Confirm API doesn't hang or timeout when returning empty results

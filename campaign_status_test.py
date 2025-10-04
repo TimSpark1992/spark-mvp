@@ -31,7 +31,7 @@ import os
 from datetime import datetime, timedelta
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://spark-bugfix.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://next-error-fix.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 class CampaignStatusTester:

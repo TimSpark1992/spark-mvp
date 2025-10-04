@@ -20,7 +20,7 @@ import os
 from datetime import datetime
 
 # Configuration
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://4f187fa2-e698-4163-ab14-cb3017f6b9af.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://next-error-fix.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 class BasePriceInputTester:
