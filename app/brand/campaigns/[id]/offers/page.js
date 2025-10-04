@@ -47,14 +47,22 @@ const OffersPage = () => {
 
   const loadOffers = async () => {
     try {
+      console.log('🔵 loadOffers: Fetching offers...');
       const response = await fetch(`/api/offers?campaign_id=${campaignId}`)
       if (response.ok) {
         const data = await response.json()
-        setOffers(data.offers || [])
+        console.log('🔵 loadOffers: API response:', data);
+        console.log('🔵 loadOffers: data.offers type:', typeof data.offers, 'isArray:', Array.isArray(data.offers));
+        
+        const offersToSet = data.offers || [];
+        console.log('🔵 loadOffers: Setting offers to:', offersToSet);
+        setOffers(offersToSet);
       } else {
+        console.error('🔴 loadOffers: API response not ok:', response.status);
         setError('Failed to load offers')
       }
     } catch (err) {
+      console.error('🔴 loadOffers: Exception:', err);
       setError('Failed to load offers')
     } finally {
       setLoading(false)
