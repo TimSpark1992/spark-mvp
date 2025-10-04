@@ -70,7 +70,15 @@ const OffersPage = () => {
       })
 
       if (response.ok) {
-        setOffers(offers.filter(offer => offer.id !== offerId))
+        // Safe filter with array check
+        setOffers(prevOffers => {
+          if (Array.isArray(prevOffers)) {
+            return prevOffers.filter(offer => offer.id !== offerId);
+          } else {
+            console.error('🔴 offers is not an array:', prevOffers);
+            return [];
+          }
+        });
       } else {
         setError('Failed to delete offer')
       }
