@@ -359,41 +359,53 @@ const OffersPage = () => {
           </Card>
 
           {/* Offer Sheet Modal */}
-          {showOfferSheet && selectedOffer && (
-            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-              <div className="bg-[#0F0F1A] border border-white/10 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <Heading level={2} size="lg">
-                      {offerSheetMode === 'view' ? 'View Offer' : 'Edit Offer'}
-                    </Heading>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => {
-                        setShowOfferSheet(false)
-                        setSelectedOffer(null)
-                      }}
-                      className="text-gray-400 hover:text-white"
-                    >
-                      ✕
-                    </Button>
+          {(() => {
+            console.log('🔵 Modal render check:', { showOfferSheet, selectedOffer: !!selectedOffer, offerSheetMode });
+            
+            if (showOfferSheet && selectedOffer) {
+              console.log('🔵 Rendering modal with offer:', selectedOffer.id);
+              return (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                  <div className="bg-[#0F0F1A] border border-white/10 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <Heading level={2} size="lg">
+                          {offerSheetMode === 'view' ? 'View Offer' : 'Edit Offer'}
+                        </Heading>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            console.log('🔵 Closing modal...');
+                            setShowOfferSheet(false)
+                            setSelectedOffer(null)
+                          }}
+                          className="text-gray-400 hover:text-white"
+                        >
+                          ✕
+                        </Button>
+                      </div>
+                      <OfferSheet
+                        offer={selectedOffer}
+                        campaignId={campaignId}
+                        mode={offerSheetMode}
+                        userRole="brand"
+                        onSubmit={handleUpdateOffer}
+                        onCancel={() => {
+                          console.log('🔵 OfferSheet onCancel called...');
+                          setShowOfferSheet(false)
+                          setSelectedOffer(null)
+                        }}
+                      />
+                    </div>
                   </div>
-                  <OfferSheet
-                    offer={selectedOffer}
-                    campaignId={campaignId}
-                    mode={offerSheetMode}
-                    userRole="brand"
-                    onSubmit={handleUpdateOffer}
-                    onCancel={() => {
-                      setShowOfferSheet(false)
-                      setSelectedOffer(null)
-                    }}
-                  />
                 </div>
-              </div>
-            </div>
-          )}
+              );
+            } else {
+              console.log('🔵 Modal not shown - conditions not met');
+              return null;
+            }
+          })()}
         </Container>
       </Layout>
     </ProtectedRoute>
