@@ -99,9 +99,16 @@ const OffersPage = () => {
 
       if (response.ok) {
         const data = await response.json()
-        setOffers(offers.map(offer => 
-          offer.id === selectedOffer.id ? data.offer : offer
-        ))
+        setOffers(prevOffers => {
+          if (Array.isArray(prevOffers)) {
+            return prevOffers.map(offer => 
+              offer.id === selectedOffer.id ? data.offer : offer
+            );
+          } else {
+            console.error('🔴 offers is not an array in handleUpdateOffer:', prevOffers);
+            return [data.offer];
+          }
+        })
         setShowOfferSheet(false)
         setSelectedOffer(null)
       } else {
