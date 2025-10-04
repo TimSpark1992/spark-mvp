@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import OfferSheet from '@/components/marketplace/OfferSheet'
+import { useAuth } from '@/components/AuthProvider'
 import { Button } from '@/components/ui/button'
 import { 
   ArrowLeft, Plus, DollarSign, Users, Eye, Edit, Trash2, 
@@ -14,6 +15,7 @@ const OffersPage = () => {
   const params = useParams()
   const router = useRouter()
   const campaignId = params.id
+  const { user, profile, loading: authLoading } = useAuth()
 
   // Initialize offers as empty array to prevent .filter() errors
   const [offers, setOffers] = useState([])
@@ -25,11 +27,12 @@ const OffersPage = () => {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (campaignId) {
+    // Only fetch data when user is authenticated and campaign ID is available
+    if (campaignId && user && !authLoading) {
       loadCampaignData()
       loadOffers()
     }
-  }, [campaignId])
+  }, [campaignId, user, authLoading])
 
   const loadCampaignData = async () => {
     try {
