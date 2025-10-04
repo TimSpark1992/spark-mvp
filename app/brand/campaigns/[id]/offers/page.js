@@ -3,15 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import ProtectedRoute from '@/components/ProtectedRoute'
-import Layout from '@/components/shared/Layout'
-import { Container } from '@/components/shared/Container'
-import Button from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { Heading, Text } from '@/components/ui/Typography'
-import { ArrowLeft, Plus, Eye, Edit, Trash2, Users, DollarSign, AlertCircle, Target, Clock, CheckCircle } from 'lucide-react'
-import OfferSheet from '@/components/marketplace/OfferSheet'
-import { formatPrice, formatDate } from '@/lib/formatters'
 
 const OffersPage = () => {
   const params = useParams()
