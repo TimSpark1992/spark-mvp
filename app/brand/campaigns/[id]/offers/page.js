@@ -19,6 +19,16 @@ const OffersPage = () => {
   const campaignId = params.id
 
   const [offers, setOffers] = useState([])
+  
+  // Debug offers state changes
+  useEffect(() => {
+    console.log('🔵 offers state changed:', {
+      type: typeof offers,
+      isArray: Array.isArray(offers),
+      length: offers?.length,
+      value: offers
+    });
+  }, [offers])
   const [campaign, setCampaign] = useState(null)
   const [selectedOffer, setSelectedOffer] = useState(null)
   const [showOfferSheet, setShowOfferSheet] = useState(false)
