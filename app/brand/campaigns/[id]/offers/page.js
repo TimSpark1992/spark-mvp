@@ -29,155 +29,22 @@ const OffersPage = () => {
     }
   }, [isMounted, campaignId, user, authLoading])
 
-  const loadCampaignData = async () => {
-    try {
-      const response = await fetch(`/api/campaigns/${campaignId}`)
-      if (response.ok) {
-        const data = await response.json()
-        setCampaign(data.campaign)
-      } else {
-        setError('Failed to load campaign details')
-      }
-    } catch (err) {
-      console.error('Error loading campaign:', err)
-      setError('Failed to load campaign details')
-    }
-  }
-
   const loadOffers = async () => {
     try {
       const response = await fetch(`/api/offers?campaign_id=${campaignId}`)
       if (response.ok) {
         const data = await response.json()
-        // Ensure we always set an array
         const offersData = Array.isArray(data.offers) ? data.offers : []
         setOffers(offersData)
       } else {
         setError('Failed to load offers')
-        setOffers([]) // Ensure offers is still an array on error
       }
     } catch (err) {
       console.error('Error loading offers:', err)
       setError('Failed to load offers')
-      setOffers([]) // Ensure offers is still an array on error
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleDeleteOffer = async (offerId) => {
-    if (!window.confirm('Are you sure you want to delete this offer?')) return
-
-    try {
-      const response = await fetch(`/api/offers/${offerId}`, {
-        method: 'DELETE',
-      })
-
-      if (response.ok) {
-        // Safe filter - offers is guaranteed to be an array
-        setOffers(prevOffers => prevOffers.filter(offer => offer.id !== offerId))
-      } else {
-        setError('Failed to delete offer')
-      }
-    } catch (err) {
-      console.error('Error deleting offer:', err)
-      setError('Failed to delete offer')
-    }
-  }
-
-  const handleUpdateOffer = async (offerData) => {
-    try {
-      const response = await fetch(`/api/offers/${selectedOffer.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(offerData),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setOffers(prevOffers => 
-          prevOffers.map(offer => 
-            offer.id === selectedOffer.id ? data.offer : offer
-          )
-        )
-        setShowOfferSheet(false)
-        setSelectedOffer(null)
-      } else {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to update offer')
-      }
-    } catch (err) {
-      console.error('Error updating offer:', err)
-      throw err
-    }
-  }
-
-  const openOfferSheet = (offer, mode) => {
-    setSelectedOffer(offer)
-    setOfferSheetMode(mode)
-    setShowOfferSheet(true)
-  }
-
-  const formatPrice = (cents, currency = 'USD') => {
-    if (typeof cents !== 'number') return '$0.00'
-    const formatter = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-    })
-    return formatter.format(cents / 100)
-  }
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Not set'
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
-  }
-
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      draft: { bg: 'bg-gray-500/20', text: 'text-gray-300', label: 'Draft' },
-      drafted: { bg: 'bg-gray-500/20', text: 'text-gray-300', label: 'Draft' },
-      sent: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Sent' },
-      accepted: { bg: 'bg-green-500/20', text: 'text-green-300', label: 'Accepted' },
-      rejected: { bg: 'bg-red-500/20', text: 'text-red-300', label: 'Rejected' },
-      counter_offer: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'Counter Offer' },
-      paid_escrow: { bg: 'bg-purple-500/20', text: 'text-purple-300', label: 'Paid (Escrow)' },
-      in_progress: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'In Progress' },
-      submitted: { bg: 'bg-indigo-500/20', text: 'text-indigo-300', label: 'Submitted' },
-      approved: { bg: 'bg-green-600/20', text: 'text-green-300', label: 'Approved' },
-      completed: { bg: 'bg-emerald-500/20', text: 'text-emerald-300', label: 'Completed' },
-      cancelled: { bg: 'bg-gray-600/20', text: 'text-gray-300', label: 'Cancelled' },
-      refunded: { bg: 'bg-red-600/20', text: 'text-red-300', label: 'Refunded' }
-    }
-
-    const config = statusConfig[status] || statusConfig.draft
-    return (
-      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${config.bg} ${config.text}`}>
-        {config.label}
-      </span>
-    )
-  }
-
-  // Extract deliverable info from items JSONB
-  const getDeliverableInfo = (offer) => {
-    try {
-      const items = typeof offer.items === 'string' ? JSON.parse(offer.items) : offer.items
-      if (Array.isArray(items) && items.length > 0) {
-        const firstItem = items[0]
-        return {
-          type: firstItem.deliverable_type?.replace(/_/g, ' ') || 'Unknown',
-          quantity: firstItem.quantity || 1
-        }
-      }
-    } catch (err) {
-      console.error('Error parsing offer items:', err)
-    }
-    return { type: 'Unknown', quantity: 1 }
   }
 
   // Prevent hydration mismatch: Don't render content until mounted on client
