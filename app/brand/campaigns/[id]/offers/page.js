@@ -1,15 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import ProtectedRoute from '@/components/ProtectedRoute'
-import OfferSheet from '@/components/marketplace/OfferSheet'
 import { useAuth } from '@/components/AuthProvider'
-import { Button } from '@/components/ui/button'
-import { 
-  ArrowLeft, Plus, DollarSign, Users, Eye, Edit, Trash2, 
-  Clock, AlertCircle, Target 
-} from 'lucide-react'
 
 const OffersPage = () => {
   const params = useParams()
@@ -19,13 +13,7 @@ const OffersPage = () => {
 
   // Hydration-safe: track if component is mounted on client
   const [isMounted, setIsMounted] = useState(false)
-  
-  // Initialize offers as empty array to prevent .filter() errors
   const [offers, setOffers] = useState([])
-  const [campaign, setCampaign] = useState(null)
-  const [selectedOffer, setSelectedOffer] = useState(null)
-  const [showOfferSheet, setShowOfferSheet] = useState(false)
-  const [offerSheetMode, setOfferSheetMode] = useState('view')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -37,7 +25,6 @@ const OffersPage = () => {
   // Data fetching: Only run on client after mount and authentication
   useEffect(() => {
     if (isMounted && campaignId && user && !authLoading) {
-      loadCampaignData()
       loadOffers()
     }
   }, [isMounted, campaignId, user, authLoading])
