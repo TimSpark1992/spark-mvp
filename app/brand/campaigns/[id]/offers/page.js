@@ -17,6 +17,9 @@ const OffersPage = () => {
   const campaignId = params.id
   const { user, profile, loading: authLoading } = useAuth()
 
+  // Hydration-safe: track if component is mounted on client
+  const [isMounted, setIsMounted] = useState(false)
+  
   // Initialize offers as empty array to prevent .filter() errors
   const [offers, setOffers] = useState([])
   const [campaign, setCampaign] = useState(null)
@@ -26,13 +29,18 @@ const OffersPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // Hydration guard: Set mounted state only on client
   useEffect(() => {
-    // Only fetch data when user is authenticated and campaign ID is available
-    if (campaignId && user && !authLoading) {
+    setIsMounted(true)
+  }, [])
+
+  // Data fetching: Only run on client after mount and authentication
+  useEffect(() => {
+    if (isMounted && campaignId && user && !authLoading) {
       loadCampaignData()
       loadOffers()
     }
-  }, [campaignId, user, authLoading])
+  }, [isMounted, campaignId, user, authLoading])
 
   const loadCampaignData = async () => {
     try {
