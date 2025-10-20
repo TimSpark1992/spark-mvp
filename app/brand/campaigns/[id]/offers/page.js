@@ -56,9 +56,9 @@ const OffersPage = () => {
     <div className="min-h-screen bg-gray-900 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-8">
-          <h1 className="text-3xl font-bold text-white mb-4">🧪 TEST: Campaign Offers (No Auth)</h1>
-          <p className="text-gray-400 mb-2">Campaign ID: {campaignId}</p>
-          <p className="text-yellow-400 mb-6">⚠️ This is a test version without authentication</p>
+          <h1 className="text-5xl font-bold text-green-400 mb-4">✅✅✅ VERSION 2025-10-15 DEPLOYED ✅✅✅</h1>
+          <p className="text-white text-2xl mb-2">Campaign ID: {campaignId}</p>
+          <p className="text-yellow-400 text-xl mb-6">⚠️ This is a NEW test version - If you see this, the deployment worked!</p>
           
           {error && (
             <div className="bg-red-900/20 border border-red-500/20 rounded-lg p-4 mb-6">
