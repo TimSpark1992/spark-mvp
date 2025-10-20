@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import { useAuth } from '@/components/AuthProvider'
 
 const OffersPage = () => {
   const params = useParams()
   const router = useRouter()
   const campaignId = params.id
+  const { user, loading: authLoading } = useAuth()
 
   const [isMounted, setIsMounted] = useState(false)
   const [offers, setOffers] = useState([])
@@ -18,10 +21,11 @@ const OffersPage = () => {
   }, [])
 
   useEffect(() => {
-    if (isMounted && campaignId) {
+    // Only fetch when mounted, authenticated, and campaign ID exists
+    if (isMounted && campaignId && user && !authLoading) {
       loadOffers()
     }
-  }, [isMounted, campaignId])
+  }, [isMounted, campaignId, user, authLoading])
 
   const loadOffers = async () => {
     try {
