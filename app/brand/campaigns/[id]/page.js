@@ -419,17 +419,17 @@ export default function ViewCampaignPage() {
                 <Card className="p-6">
                   <Heading level={3} size="lg" className="mb-6">Campaign Actions</Heading>
                   
-                  <div className="space-y-4">
+                  <div className="flex flex-col gap-3">
                     {/* Create Offer Button */}
-                    <Link href={`/brand/campaigns/${campaign.id}/offers/create`}>
-                      <Button className="w-full bg-gradient-to-r from-[#8A2BE2] to-[#FF1493] hover:from-[#7A1BD2] to-[#E01483]">
+                    <Link href={`/brand/campaigns/${campaign.id}/offers/create`} className="block">
+                      <Button className="w-full bg-gradient-to-r from-[#8A2BE2] to-[#FF1493] hover:from-[#7A1BD2] hover:to-[#E01483]">
                         <Plus className="w-4 h-4 mr-2" />
                         Create Offer
                       </Button>
                     </Link>
                     
                     {/* View All Offers */}
-                    <Link href={`/brand/campaigns/${campaign.id}/offers`}>
+                    <Link href={`/brand/campaigns/${campaign.id}/offers`} className="block">
                       <Button variant="secondary" className="w-full">
                         <Target className="w-4 h-4 mr-2" />
                         View All Offers
@@ -437,7 +437,7 @@ export default function ViewCampaignPage() {
                     </Link>
                     
                     {/* Edit Campaign */}
-                    <Link href={`/brand/campaigns/${campaign.id}/edit`}>
+                    <Link href={`/brand/campaigns/${campaign.id}/edit`} className="block">
                       <Button variant="secondary" className="w-full">
                         <Settings className="w-4 h-4 mr-2" />
                         Edit Campaign
