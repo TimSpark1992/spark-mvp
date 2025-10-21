@@ -197,12 +197,13 @@ export default function ViewCampaignPage() {
     return colors[status] || colors.draft
   }
 
-  // Calculate statistics
+  // Calculate statistics with safety checks
+  const safeApplications = Array.isArray(applications) ? applications : []
   const stats = {
-    total: applications.length,
-    pending: applications.filter(app => app.status === 'pending').length,
-    approved: applications.filter(app => app.status === 'approved').length,
-    rejected: applications.filter(app => app.status === 'rejected').length
+    total: safeApplications.length,
+    pending: safeApplications.filter(app => app.status === 'pending').length,
+    approved: safeApplications.filter(app => app.status === 'approved').length,
+    rejected: safeApplications.filter(app => app.status === 'rejected').length
   }
 
   if (authLoading || loading) {
