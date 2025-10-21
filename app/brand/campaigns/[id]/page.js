@@ -372,11 +372,11 @@ export default function ViewCampaignPage() {
                 )}
 
                 {/* Recent Applications */}
-                {applications.length > 0 && (
+                {safeApplications.length > 0 && (
                   <Card className="p-6">
                     <Heading level={3} size="lg" className="mb-4">Recent Applications</Heading>
                     <div className="space-y-4">
-                      {applications.slice(0, 5).map((application) => (
+                      {safeApplications.slice(0, 5).map((application) => (
                         <div key={application.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
